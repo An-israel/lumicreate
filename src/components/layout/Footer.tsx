@@ -13,10 +13,10 @@ const Footer = () => {
       { name: "Diamond Tier", href: "/packages?tier=diamond" },
     ],
     support: [
-      { name: "FAQs", href: "/faqs" },
+      { name: "FAQs", href: "/#faq" },
       { name: "Track Order", href: "/track-order" },
       { name: "Consultations", href: "/consultations" },
-      { name: "Contact Us", href: "/contact" },
+      { name: "Contact Us", href: "/about#contact" },
     ],
     company: [
       { name: "About Luminate", href: "/about" },
