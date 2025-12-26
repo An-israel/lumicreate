@@ -42,23 +42,7 @@ export interface CoinTransaction {
   created_at: string;
 }
 
-export interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  price_naira: number;
-  price_coins: number;
-  tier: ProductTier;
-  content_types: ContentType[];
-  image_url: string | null;
-  specifications: Record<string, unknown>;
-  in_stock: boolean;
-  is_package: boolean;
-  package_items: string[];
-  original_price_naira: number | null;
-  created_at: string;
-  updated_at: string;
-}
+// Product interface moved to after Order to avoid duplication
 
 export interface DeliveryAddress {
   id: string;
@@ -86,9 +70,36 @@ export interface Order {
   paystack_reference: string | null;
   delivery_address_id: string | null;
   tracking_id: string | null;
+  tracking_history: { date: string; status: string; message: string }[];
   notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price_naira: number;
+  price_coins: number;
+  tier: ProductTier;
+  content_types: ContentType[];
+  image_url: string | null;
+  image_urls: string[];
+  specifications: Record<string, unknown>;
+  in_stock: boolean;
+  is_package: boolean;
+  package_items: string[];
+  original_price_naira: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WishlistItem {
+  id: string;
+  user_id: string;
+  product_id: string;
+  created_at: string;
 }
 
 export interface OrderItem {

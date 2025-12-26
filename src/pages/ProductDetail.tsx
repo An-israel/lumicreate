@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import Layout from "@/components/layout/Layout";
+import ImageGallery from "@/components/product/ImageGallery";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,15 +17,14 @@ import {
   Package, 
   Check, 
   ArrowLeft, 
-  Star, 
   Truck, 
   Shield, 
   HeadphonesIcon,
-  ChevronRight
+  ChevronRight,
+  Heart
 } from "lucide-react";
 import { formatNaira, formatCoins, TIERS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { Product } from "@/types/database";
 
 export default function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
@@ -31,6 +32,7 @@ export default function ProductDetail() {
   const { product, isLoading, error } = useProduct(productId);
   const { products: allProducts } = useProducts();
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -50,6 +52,17 @@ export default function ProductDetail() {
     await addToCart(product.id, quantity);
     setIsAdding(false);
   };
+
+  const handleWishlistToggle = () => {
+    if (!product) return;
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product.id);
+    }
+  };
+
+  const isWishlisted = product ? isInWishlist(product.id) : false;
 
   if (isLoading) {
     return (
@@ -93,6 +106,12 @@ export default function ProductDetail() {
   }
 
   const tierInfo = TIERS[product.tier as keyof typeof TIERS];
+  
+  // Combine image_url with image_urls for gallery
+  const allImages = [
+    ...(product.image_url ? [product.image_url] : []),
+    ...(product.image_urls || [])
+  ].filter(Boolean);
 
   return (
     <Layout>
@@ -111,28 +130,19 @@ export default function ProductDetail() {
         </nav>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Product Image */}
+          {/* Product Image Gallery */}
           <div className="space-y-4">
-            <div className="aspect-square rounded-xl bg-muted overflow-hidden relative">
-              {product.image_url ? (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Package className="h-24 w-24 text-muted-foreground" />
-                </div>
-              )}
+            <div className="relative">
+              <ImageGallery images={allImages} productName={product.name} />
+              
               {product.is_package && (
-                <Badge className="absolute top-4 left-4 bg-accent text-accent-foreground">
+                <Badge className="absolute top-4 left-4 bg-accent text-accent-foreground z-10">
                   <Package className="h-3 w-3 mr-1" />
                   Package Deal
                 </Badge>
               )}
               {!product.in_stock && (
-                <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
+                <div className="absolute inset-0 bg-background/80 flex items-center justify-center rounded-xl z-10">
                   <Badge variant="destructive" className="text-lg py-2 px-4">
                     Out of Stock
                   </Badge>
@@ -160,9 +170,19 @@ export default function ProductDetail() {
           {/* Product Info */}
           <div className="space-y-6">
             {/* Tier Badge */}
-            <Badge className={cn(tierInfo?.color, "text-white")}>
-              {product.tier.charAt(0).toUpperCase() + product.tier.slice(1)} Tier
-            </Badge>
+            <div className="flex items-center justify-between">
+              <Badge className={cn(tierInfo?.color, "text-white")}>
+                {product.tier.charAt(0).toUpperCase() + product.tier.slice(1)} Tier
+              </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleWishlistToggle}
+                className={cn(isWishlisted && "text-red-500")}
+              >
+                <Heart className={cn("h-5 w-5", isWishlisted && "fill-current")} />
+              </Button>
+            </div>
 
             {/* Title */}
             <h1 className="text-3xl lg:text-4xl font-bold">{product.name}</h1>
