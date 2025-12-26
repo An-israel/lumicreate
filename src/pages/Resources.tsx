@@ -66,11 +66,12 @@ const Resources = () => {
     }
 
     setIsSubscribing(true);
+    const trimmedEmail = email.trim().toLowerCase();
     
     try {
       const { error } = await supabase
         .from("newsletter_subscribers")
-        .insert({ email: email.trim().toLowerCase() });
+        .insert({ email: trimmedEmail });
 
       if (error) {
         if (error.code === "23505") {
@@ -82,11 +83,20 @@ const Resources = () => {
           throw error;
         }
       } else {
+        // Send welcome email (fire and forget - don't block UI)
+        supabase.functions.invoke("send-newsletter-welcome", {
+          body: { email: trimmedEmail },
+        }).then(({ error: emailError }) => {
+          if (emailError) {
+            console.error("Failed to send welcome email:", emailError);
+          }
+        });
+        
         setIsSubscribed(true);
         setEmail("");
         toast({
           title: "Subscribed!",
-          description: "Welcome! You'll receive our latest creator tips soon.",
+          description: "Welcome! Check your inbox for a confirmation email.",
         });
       }
     } catch (error) {
