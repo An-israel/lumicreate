@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart, Coins, User, LogOut } from "lucide-react";
+import { Menu, X, ShoppingCart, Coins, User, LogOut, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, profile, wallet, signOut, isAdmin } = useAuth();
   const { totalItems } = useCart();
+  const { items: wishlistItems } = useWishlist();
   const navigate = useNavigate();
   
   const coinBalance = wallet?.balance ?? 0;
@@ -64,11 +66,23 @@ const Header = () => {
             <>
               {/* Coin Balance */}
               <Link
-                to="/coins"
+                to="/buy-coins"
                 className="flex items-center gap-2 rounded-full bg-secondary/50 px-3 py-1.5 text-sm font-medium text-secondary-foreground hover:bg-secondary transition-colors"
               >
                 <Coins className="h-4 w-4 text-coin" />
                 <span>{coinBalance.toLocaleString()}</span>
+              </Link>
+
+              {/* Wishlist */}
+              <Link to="/wishlist" className="relative">
+                <Button variant="ghost" size="icon">
+                  <Heart className="h-5 w-5" />
+                  {wishlistItems.length > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                      {wishlistItems.length}
+                    </span>
+                  )}
+                </Button>
               </Link>
 
               {/* Cart */}
@@ -103,7 +117,10 @@ const Header = () => {
                     <Link to="/orders">My Orders</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/coins">Buy Coins</Link>
+                    <Link to="/wishlist">My Wishlist</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/buy-coins">Buy Coins</Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <>
@@ -164,12 +181,20 @@ const Header = () => {
               {user ? (
                 <>
                   <Link
-                    to="/coins"
+                    to="/buy-coins"
                     className="flex items-center gap-2 py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Coins className="h-5 w-5 text-coin" />
                     <span>{coinBalance.toLocaleString()} Coins</span>
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    className="flex items-center gap-2 py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Heart className="h-5 w-5" />
+                    <span>Wishlist ({wishlistItems.length})</span>
                   </Link>
                   <Link
                     to="/cart"
