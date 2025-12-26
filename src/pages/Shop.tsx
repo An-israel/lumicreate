@@ -28,7 +28,7 @@ const Shop = () => {
   const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
   const [showPackagesOnly, setShowPackagesOnly] = useState(false);
 
-  const { data: products, isLoading } = useProducts();
+  const { products, isLoading } = useProducts();
 
   // Filter products
   const filteredProducts = useMemo(() => {
