@@ -17,6 +17,7 @@ import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
 import PaymentCallback from "./pages/PaymentCallback";
 import OrderTracking from "./pages/OrderTracking";
+import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/payment/callback" element={<PaymentCallback />} />
                 <Route path="/order/:orderId" element={<OrderTracking />} />
+                <Route path="/wishlist" element={<Wishlist />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
