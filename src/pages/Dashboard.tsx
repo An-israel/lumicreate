@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Coins, ShoppingBag, Calendar, Package, ArrowRight, TrendingUp } from "lucide-react";
+import { Coins, ShoppingBag, Calendar, Package, ArrowRight, TrendingUp, User, Settings } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -137,7 +137,7 @@ const Dashboard = () => {
           {/* Quick Actions */}
           <div className="mb-8">
             <h2 className="font-semibold text-lg text-foreground mb-4">Quick Actions</h2>
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-5">
               <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
                 <Link to="/shop">
                   <ShoppingBag className="h-5 w-5 text-primary" />
@@ -148,7 +148,7 @@ const Dashboard = () => {
                 </Link>
               </Button>
               <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
-                <Link to="/coins">
+                <Link to="/buy-coins">
                   <Coins className="h-5 w-5 text-coin" />
                   <div className="text-left">
                     <p className="font-medium">Buy Coins</p>
@@ -166,11 +166,20 @@ const Dashboard = () => {
                 </Link>
               </Button>
               <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
-                <Link to="/track-order">
-                  <TrendingUp className="h-5 w-5 text-emerald-500" />
+                <Link to="/orders">
+                  <Package className="h-5 w-5 text-emerald-500" />
                   <div className="text-left">
-                    <p className="font-medium">Track Order</p>
-                    <p className="text-xs text-muted-foreground">Check delivery status</p>
+                    <p className="font-medium">My Orders</p>
+                    <p className="text-xs text-muted-foreground">View order history</p>
+                  </div>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
+                <Link to="/profile">
+                  <Settings className="h-5 w-5 text-muted-foreground" />
+                  <div className="text-left">
+                    <p className="font-medium">Profile Settings</p>
+                    <p className="text-xs text-muted-foreground">Manage your account</p>
                   </div>
                 </Link>
               </Button>

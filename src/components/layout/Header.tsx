@@ -120,6 +120,9 @@ const Header = () => {
                     <Link to="/wishlist">My Wishlist</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link to="/profile">Profile Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link to="/buy-coins">Buy Coins</Link>
                   </DropdownMenuItem>
                   {isAdmin && (

@@ -19,6 +19,10 @@ import PaymentCallback from "./pages/PaymentCallback";
 import OrderTracking from "./pages/OrderTracking";
 import Wishlist from "./pages/Wishlist";
 import About from "./pages/About";
+import Profile from "./pages/Profile";
+import Orders from "./pages/Orders";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +45,8 @@ const App = () => (
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/orders" element={<Orders />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/buy-coins" element={<BuyCoins />} />
                 <Route path="/consultations" element={<Consultations />} />
@@ -49,6 +55,8 @@ const App = () => (
                 <Route path="/order/:orderId" element={<OrderTracking />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
