@@ -11,7 +11,8 @@ import {
   Sparkles,
   Video,
   Headphones,
-  Camera
+  Camera,
+  Quote
 } from "lucide-react";
 
 const About = () => {
@@ -60,6 +61,51 @@ const About = () => {
       icon: Camera,
       title: "Curated Packages",
       description: "Pre-built equipment bundles designed for different creator levels and niches."
+    }
+  ];
+
+  const testimonials = [
+    {
+      quote: "Luminate completely transformed my content quality. The equipment package they recommended was perfect for my YouTube channel, and the delivery was super fast!",
+      name: "Chioma Adeyemi",
+      role: "YouTube Creator",
+      followers: "150K subscribers",
+      gradient: "from-pink-500 to-rose-500"
+    },
+    {
+      quote: "As a podcaster, audio quality is everything. The team at Luminate helped me pick the perfect mic setup within my budget. My listeners immediately noticed the difference!",
+      name: "Oluwaseun Bakare",
+      role: "Podcast Host",
+      followers: "50K listeners",
+      gradient: "from-blue-500 to-cyan-500"
+    },
+    {
+      quote: "I was nervous about investing in equipment, but the consultation call gave me confidence. Now I have a professional setup that makes my TikTok videos stand out.",
+      name: "Amara Okonkwo",
+      role: "TikTok Creator",
+      followers: "300K followers",
+      gradient: "from-purple-500 to-indigo-500"
+    }
+  ];
+
+  const teamMembers = [
+    {
+      name: "Adaeze Nwosu",
+      role: "Founder & CEO",
+      bio: "Former tech executive turned creator advocate. Passionate about empowering the next generation of Nigerian content creators.",
+      gradient: "from-primary to-accent"
+    },
+    {
+      name: "Emeka Obi",
+      role: "Head of Operations",
+      bio: "Logistics expert ensuring every creator gets their equipment fast and in perfect condition.",
+      gradient: "from-accent to-secondary"
+    },
+    {
+      name: "Fatima Hassan",
+      role: "Creator Success Lead",
+      bio: "Professional videographer helping creators find the perfect equipment for their unique needs.",
+      gradient: "from-secondary to-primary"
     }
   ];
 
@@ -217,6 +263,82 @@ const About = () => {
                 </h3>
                 <p className="text-muted-foreground">
                   {offering.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 md:py-24 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              What Creators Say
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Hear from Nigerian creators who have elevated their content with Luminate.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index} 
+                className="bg-card rounded-xl p-6 border border-border card-hover relative"
+              >
+                <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${testimonial.gradient} flex items-center justify-center text-white font-bold text-lg`}>
+                    {testimonial.name.split(' ').map(n => n[0]).join('')}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
+                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="text-xs text-primary">{testimonial.followers}</p>
+                  </div>
+                </div>
+                <p className="text-muted-foreground italic leading-relaxed">
+                  "{testimonial.quote}"
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Meet the Team
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              The passionate people behind Luminate Creators.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {teamMembers.map((member, index) => (
+              <div 
+                key={index} 
+                className="text-center"
+              >
+                <div className={`w-32 h-32 mx-auto rounded-full bg-gradient-to-br ${member.gradient} flex items-center justify-center mb-4 ring-4 ring-background shadow-lg`}>
+                  <span className="text-3xl font-bold text-white">
+                    {member.name.split(' ').map(n => n[0]).join('')}
+                  </span>
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-1">
+                  {member.name}
+                </h3>
+                <p className="text-primary font-medium text-sm mb-3">
+                  {member.role}
+                </p>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {member.bio}
                 </p>
               </div>
             ))}
