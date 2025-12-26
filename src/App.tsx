@@ -17,6 +17,7 @@ import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
 import PaymentCallback from "./pages/PaymentCallback";
 import OrderTracking from "./pages/OrderTracking";
+import TrackOrder from "./pages/TrackOrder";
 import Wishlist from "./pages/Wishlist";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
@@ -55,6 +56,7 @@ const App = () => (
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/payment/callback" element={<PaymentCallback />} />
                 <Route path="/order/:orderId" element={<OrderTracking />} />
+                <Route path="/track-order" element={<TrackOrder />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/terms" element={<Terms />} />

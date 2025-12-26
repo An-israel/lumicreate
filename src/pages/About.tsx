@@ -429,7 +429,7 @@ const About = () => {
       </section>
 
       {/* Contact Form Section */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      <section id="contact" className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-start max-w-5xl mx-auto">
             <div>
