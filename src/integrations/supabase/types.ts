@@ -246,6 +246,7 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           total_coins: number
           total_naira: number
+          tracking_history: Json | null
           tracking_id: string | null
           updated_at: string
           user_id: string | null
@@ -263,6 +264,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           total_coins: number
           total_naira: number
+          tracking_history?: Json | null
           tracking_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -280,6 +282,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           total_coins?: number
           total_naira?: number
+          tracking_history?: Json | null
           tracking_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -301,6 +304,7 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          image_urls: string[] | null
           in_stock: boolean | null
           is_package: boolean | null
           name: string
@@ -318,6 +322,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           in_stock?: boolean | null
           is_package?: boolean | null
           name: string
@@ -335,6 +340,7 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           in_stock?: boolean | null
           is_package?: boolean | null
           name?: string
@@ -398,6 +404,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wishlist: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
