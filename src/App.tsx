@@ -8,6 +8,7 @@ import { CartProvider } from "@/hooks/useCart";
 import { WishlistProvider } from "@/hooks/useWishlist";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
+import Packages from "./pages/Packages";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
@@ -42,7 +43,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/shop" element={<Shop />} />
-                <Route path="/packages" element={<Shop />} />
+                <Route path="/packages" element={<Packages />} />
                 <Route path="/product/:productId" element={<ProductDetail />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/login" element={<Auth />} />
