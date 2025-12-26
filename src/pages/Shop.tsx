@@ -233,7 +233,7 @@ const Shop = () => {
                 return (
                   <Card 
                     key={product.id} 
-                    className="group h-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30"
+                    className="group flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30"
                   >
                     {/* Image */}
                     <div className="relative aspect-square overflow-hidden bg-muted">
@@ -283,7 +283,7 @@ const Shop = () => {
                       )}
                     </div>
 
-                    <CardContent className="p-4 flex flex-col h-[calc(100%-theme(spacing.64))]">
+                    <CardContent className="p-4 flex flex-col flex-1">
                       {/* Content Types */}
                       {product.content_types && product.content_types.length > 0 && (
                         <div className="mb-2 flex flex-wrap gap-1">
