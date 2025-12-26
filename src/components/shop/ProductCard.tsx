@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart, Coins, Package } from "lucide-react";
+import { ShoppingCart, Coins, Package, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/database";
 import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import { formatNaira, formatCoins } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -19,10 +21,21 @@ const tierColors = {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const isWishlisted = isInWishlist(product.id);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     await addToCart(product.id);
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product.id);
+    }
   };
 
   return (
@@ -52,17 +65,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
             )}
           </div>
 
+          {/* Wishlist Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("absolute top-3 right-3 bg-background/80 hover:bg-background", isWishlisted && "text-red-500")}
+            onClick={handleWishlistToggle}
+          >
+            <Heart className={cn("h-4 w-4", isWishlisted && "fill-current")} />
+          </Button>
+
           {/* Out of Stock Overlay */}
           {!product.in_stock && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/80">
               <Badge variant="destructive">Out of Stock</Badge>
             </div>
           )}
-        </div>
-
-        <CardContent className="p-4">
-          {/* Content Types */}
-          {product.content_types && product.content_types.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-1">
               {product.content_types.slice(0, 3).map((type) => (
                 <Badge key={type} variant="outline" className="text-xs">
