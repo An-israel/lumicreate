@@ -15,8 +15,15 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Package, ShoppingCart, Users, Coins, Plus, Edit, Trash2, Eye, Search } from "lucide-react";
+import { Package, ShoppingCart, Users, Coins, Plus, Edit, Trash2, Eye, Search, Mail, UserX, CheckCircle } from "lucide-react";
 import { Order, Product, Consultation } from "@/types/database";
+
+interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  subscribed_at: string;
+  is_active: boolean;
+}
 import { ORDER_STATUSES, CONTENT_TYPES, formatNaira, formatCoins } from "@/lib/constants";
 
 export default function Admin() {
@@ -25,6 +32,7 @@ export default function Admin() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [consultations, setConsultations] = useState<Consultation[]>([]);
+  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -46,15 +54,17 @@ export default function Admin() {
 
   const fetchData = async () => {
     setIsLoading(true);
-    const [ordersRes, productsRes, consultationsRes] = await Promise.all([
+    const [ordersRes, productsRes, consultationsRes, subscribersRes] = await Promise.all([
       supabase.from("orders").select("*").order("created_at", { ascending: false }),
       supabase.from("products").select("*").order("created_at", { ascending: false }),
       supabase.from("consultations").select("*").order("scheduled_date", { ascending: true }),
+      supabase.from("newsletter_subscribers").select("*").order("subscribed_at", { ascending: false }),
     ]);
 
     if (ordersRes.data) setOrders(ordersRes.data as Order[]);
     if (productsRes.data) setProducts(productsRes.data as Product[]);
     if (consultationsRes.data) setConsultations(consultationsRes.data as Consultation[]);
+    if (subscribersRes.data) setSubscribers(subscribersRes.data as NewsletterSubscriber[]);
     setIsLoading(false);
   };
 
@@ -138,6 +148,40 @@ export default function Admin() {
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredSubscribers = subscribers.filter(
+    (sub) => sub.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const toggleSubscriberStatus = async (id: string, currentStatus: boolean) => {
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .update({ is_active: !currentStatus })
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to update subscriber status");
+    } else {
+      toast.success(currentStatus ? "Subscriber deactivated" : "Subscriber reactivated");
+      fetchData();
+    }
+  };
+
+  const deleteSubscriber = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this subscriber?")) return;
+
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to delete subscriber");
+    } else {
+      toast.success("Subscriber deleted");
+      fetchData();
+    }
+  };
+
   if (authLoading || isLoading) {
     return (
       <Layout>
@@ -156,7 +200,7 @@ export default function Admin() {
     { label: "Total Orders", value: orders.length, icon: ShoppingCart },
     { label: "Products", value: products.length, icon: Package },
     { label: "Consultations", value: consultations.length, icon: Users },
-    { label: "Pending Orders", value: orders.filter(o => o.status === "pending").length, icon: Coins },
+    { label: "Subscribers", value: subscribers.filter(s => s.is_active).length, icon: Mail },
   ];
 
   return (
@@ -189,10 +233,11 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="consultations">Consultations</TabsTrigger>
+            <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
           </TabsList>
 
           {/* Orders Tab */}
@@ -511,6 +556,80 @@ export default function Admin() {
                       <TableCell>{formatCoins(consultation.coins_paid)} 🪙</TableCell>
                     </TableRow>
                   ))}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+
+          {/* Subscribers Tab */}
+          <TabsContent value="subscribers" className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search subscribers..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {subscribers.filter(s => s.is_active).length} active / {subscribers.length} total
+              </div>
+            </div>
+
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Subscribed</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSubscribers.map((subscriber) => (
+                    <TableRow key={subscriber.id}>
+                      <TableCell className="font-medium">{subscriber.email}</TableCell>
+                      <TableCell>{format(new Date(subscriber.subscribed_at), "MMM d, yyyy")}</TableCell>
+                      <TableCell>
+                        <Badge variant={subscriber.is_active ? "default" : "secondary"}>
+                          {subscriber.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleSubscriberStatus(subscriber.id, subscriber.is_active)}
+                            title={subscriber.is_active ? "Deactivate" : "Reactivate"}
+                          >
+                            {subscriber.is_active ? (
+                              <UserX className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 text-primary" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteSubscriber(subscriber.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredSubscribers.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                        No subscribers found
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </Card>
