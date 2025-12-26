@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { initializePayment } from "@/lib/paystack";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { COIN_PACKAGES, formatNaira, formatCoins } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export default function BuyCoins() {
-  const { user, wallet, refreshWallet } = useAuth();
+  const { user, wallet, profile } = useAuth();
   const navigate = useNavigate();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -29,12 +30,31 @@ export default function BuyCoins() {
     setIsProcessing(true);
     setSelectedPackage(packageId);
 
-    // TODO: Integrate with Paystack
-    // For now, show a message that Paystack integration is pending
-    toast.info("Paystack integration coming soon! Coins will be added after payment.");
-    
-    setIsProcessing(false);
-    setSelectedPackage(null);
+    try {
+      const result = await initializePayment({
+        type: "coins",
+        amount: pkg.naira,
+        email: user.email || "",
+        userId: user.id,
+        metadata: {
+          coinPackageId: pkg.id,
+          coinsAmount: pkg.coins,
+          bonusCoins: pkg.bonus,
+        },
+      });
+
+      if (result.success && result.authorization_url) {
+        window.location.href = result.authorization_url;
+      } else {
+        toast.error(result.error || "Failed to initialize payment");
+        setIsProcessing(false);
+        setSelectedPackage(null);
+      }
+    } catch (error) {
+      toast.error("Payment initialization failed");
+      setIsProcessing(false);
+      setSelectedPackage(null);
+    }
   };
 
   const getPackageIcon = (id: string) => {

@@ -14,6 +14,7 @@ import BuyCoins from "./pages/BuyCoins";
 import Consultations from "./pages/Consultations";
 import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
+import PaymentCallback from "./pages/PaymentCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/buy-coins" element={<BuyCoins />} />
               <Route path="/consultations" element={<Consultations />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/payment/callback" element={<PaymentCallback />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

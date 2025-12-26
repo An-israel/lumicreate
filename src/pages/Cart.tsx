@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { supabase } from "@/integrations/supabase/client";
+import { initializePayment } from "@/lib/paystack";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -139,7 +140,36 @@ export default function Cart() {
       return;
     }
 
-    // Clear cart and redirect
+    // If payment method requires Paystack (not full coins)
+    if (paymentMethod === "paystack" || (paymentMethod === "mixed" && finalNaira > 0)) {
+      try {
+        const result = await initializePayment({
+          type: "order",
+          amount: finalNaira,
+          email: user.email || "",
+          userId: user.id,
+          metadata: {
+            orderId: orderData.id,
+          },
+        });
+
+        if (result.success && result.authorization_url) {
+          await clearCart();
+          window.location.href = result.authorization_url;
+          return;
+        } else {
+          toast.error(result.error || "Failed to initialize payment");
+          setIsProcessing(false);
+          return;
+        }
+      } catch (error) {
+        toast.error("Payment initialization failed");
+        setIsProcessing(false);
+        return;
+      }
+    }
+
+    // If paying with coins only, just clear cart and redirect
     await clearCart();
     toast.success("Order placed successfully!");
     navigate("/dashboard");
