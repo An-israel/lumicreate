@@ -81,6 +81,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
               <Badge variant="destructive">Out of Stock</Badge>
             </div>
           )}
+        </div>
+
+        <CardContent className="p-4">
+          {/* Content Types */}
+          {product.content_types && product.content_types.length > 0 && (
             <div className="mb-2 flex flex-wrap gap-1">
               {product.content_types.slice(0, 3).map((type) => (
                 <Badge key={type} variant="outline" className="text-xs">
