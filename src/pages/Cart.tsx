@@ -5,6 +5,7 @@ import { useCart } from "@/hooks/useCart";
 import { supabase } from "@/integrations/supabase/client";
 import { initializePayment } from "@/lib/paystack";
 import Layout from "@/components/layout/Layout";
+import CoinBenefitsBanner from "@/components/shop/CoinBenefitsBanner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -647,6 +648,11 @@ export default function Cart() {
                     )}
                   </div>
                 </div>
+
+                {/* Coin Benefits (only show on cart step) */}
+                {step === "cart" && paymentMethod === "paystack" && (
+                  <CoinBenefitsBanner variant="compact" />
+                )}
 
                 {/* Action Buttons */}
                 <div className="space-y-2 pt-4">

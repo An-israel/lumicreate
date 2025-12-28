@@ -5,6 +5,7 @@ import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import Layout from "@/components/layout/Layout";
 import ImageGallery from "@/components/product/ImageGallery";
+import CoinBenefitsBanner from "@/components/shop/CoinBenefitsBanner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -214,8 +215,14 @@ export default function ProductDetail() {
               <div className="flex items-center gap-2 text-secondary">
                 <Coins className="h-5 w-5" />
                 <span className="text-lg font-semibold">{formatCoins(product.price_coins)} coins</span>
-                <Badge variant="secondary" className="text-xs">Save more with coins!</Badge>
               </div>
+              
+              {/* Coin Benefits Banner */}
+              <CoinBenefitsBanner 
+                productPriceNaira={product.price_naira} 
+                productPriceCoins={product.price_coins}
+                variant="inline" 
+              />
             </div>
 
             <Separator />

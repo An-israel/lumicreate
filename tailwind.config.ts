@@ -69,6 +69,10 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        coin: {
+          DEFAULT: "hsl(var(--coin))",
+          foreground: "hsl(var(--coin-foreground))",
+        },
         luminate: {
           blue: "hsl(var(--luminate-blue))",
           yellow: "hsl(var(--luminate-yellow))",
