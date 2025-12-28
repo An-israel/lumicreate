@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import ProductComparison from "@/components/quiz/ProductComparison";
 import EmailCapture from "@/components/quiz/EmailCapture";
 import ShareResults from "@/components/quiz/ShareResults";
+import AuthRequired from "@/components/auth/AuthRequired";
+import CoinBenefitsBanner from "@/components/shop/CoinBenefitsBanner";
 
 interface Product {
   id: string;
@@ -42,7 +44,7 @@ const QuizResults = () => {
   const [compareProducts, setCompareProducts] = useState<Product[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const { addToCart } = useCart();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
 
   const answers = {
     content_type: searchParams.get("content_type") || "youtube",
@@ -52,6 +54,11 @@ const QuizResults = () => {
     frequency: searchParams.get("frequency") || "weekly",
     budget: searchParams.get("budget") || "mid",
   };
+
+  // Require authentication to view results
+  if (!authLoading && !user) {
+    return <AuthRequired feature="quiz" />;
+  }
 
   // Determine recommended tier based on budget
   const getTierFromBudget = (budget: string): "basic" | "premium" | "diamond" => {
@@ -395,9 +402,16 @@ const QuizResults = () => {
             </div>
           )}
 
-          {/* Email Capture */}
+          {/* Coin Benefits Banner */}
           {!isLoading && recommendations.length > 0 && (
             <div className="mt-12 max-w-2xl mx-auto">
+              <CoinBenefitsBanner variant="card" />
+            </div>
+          )}
+
+          {/* Email Capture */}
+          {!isLoading && recommendations.length > 0 && (
+            <div className="mt-8 max-w-2xl mx-auto">
               <EmailCapture quizAnswers={answers} />
             </div>
           )}

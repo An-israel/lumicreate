@@ -46,6 +46,8 @@
     --radius: 0.75rem;
 
     /* Custom tokens */
+    --coin: 45 93% 47%;
+    --coin-foreground: 0 0% 100%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
@@ -96,6 +98,9 @@
     --border: 218 40% 18%;
     --input: 218 40% 18%;
     --ring: 217 100% 50%;
+
+    --coin: 45 93% 47%;
+    --coin-foreground: 218 58% 9%;
 
     --sidebar-background: 218 50% 8%;
     --sidebar-foreground: 0 0% 98%;
