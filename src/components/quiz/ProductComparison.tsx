@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { formatNaira, formatCoins } from "@/lib/constants";
 
-interface Product {
+// Flexible interface that works with both quiz results and shop products
+interface ComparisonProduct {
   id: string;
   name: string;
   description: string | null;
@@ -13,15 +14,15 @@ interface Product {
   price_coins: number;
   image_url: string | null;
   tier: "basic" | "premium" | "diamond";
-  content_types: string[] | null;
-  is_package: boolean | null;
-  in_stock: boolean | null;
+  content_types?: string[] | null;
+  is_package?: boolean | null;
+  in_stock?: boolean | null;
 }
 
 interface ProductComparisonProps {
-  products: Product[];
+  products: ComparisonProduct[];
   onRemove: (productId: string) => void;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: ComparisonProduct) => void;
   onClose: () => void;
 }
 
@@ -35,14 +36,14 @@ const ProductComparison = ({ products, onRemove, onAddToCart, onClose }: Product
   if (products.length === 0) return null;
 
   const comparisonFeatures = [
-    { label: "Price (Naira)", getValue: (p: Product) => formatNaira(p.price_naira) },
-    { label: "Price (Coins)", getValue: (p: Product) => formatCoins(p.price_coins) },
-    { label: "Tier", getValue: (p: Product) => p.tier.charAt(0).toUpperCase() + p.tier.slice(1) },
-    { label: "Package", getValue: (p: Product) => p.is_package ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground mx-auto" /> },
-    { label: "In Stock", getValue: (p: Product) => p.in_stock ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <X className="h-5 w-5 text-destructive mx-auto" /> },
+    { label: "Price (Naira)", getValue: (p: ComparisonProduct) => formatNaira(p.price_naira) },
+    { label: "Price (Coins)", getValue: (p: ComparisonProduct) => formatCoins(p.price_coins) },
+    { label: "Tier", getValue: (p: ComparisonProduct) => p.tier.charAt(0).toUpperCase() + p.tier.slice(1) },
+    { label: "Package", getValue: (p: ComparisonProduct) => p.is_package ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground mx-auto" /> },
+    { label: "In Stock", getValue: (p: ComparisonProduct) => p.in_stock !== false ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <X className="h-5 w-5 text-destructive mx-auto" /> },
     { 
       label: "Content Types", 
-      getValue: (p: Product) => p.content_types?.length 
+      getValue: (p: ComparisonProduct) => p.content_types?.length 
         ? p.content_types.slice(0, 2).map(t => t.replace("_", " ")).join(", ") 
         : "General"
     },
@@ -122,7 +123,7 @@ const ProductComparison = ({ products, onRemove, onAddToCart, onClose }: Product
                       <Button
                         size="sm"
                         className="gap-2"
-                        disabled={!product.in_stock}
+                        disabled={product.in_stock === false}
                         onClick={() => onAddToCart(product)}
                       >
                         <ShoppingCart className="h-4 w-4" />

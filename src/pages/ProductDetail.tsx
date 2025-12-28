@@ -5,6 +5,8 @@ import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import Layout from "@/components/layout/Layout";
 import ImageGallery from "@/components/product/ImageGallery";
+import ProductReviews from "@/components/product/ProductReviews";
+import RatingStars from "@/components/product/RatingStars";
 import CoinBenefitsBanner from "@/components/shop/CoinBenefitsBanner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import {
 } from "lucide-react";
 import { formatNaira, formatCoins, TIERS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useReviews } from "@/hooks/useReviews";
 
 export default function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
@@ -34,6 +37,7 @@ export default function ProductDetail() {
   const { products: allProducts } = useProducts();
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { stats: reviewStats } = useReviews(productId);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -185,8 +189,22 @@ export default function ProductDetail() {
               </Button>
             </div>
 
-            {/* Title */}
-            <h1 className="text-3xl lg:text-4xl font-bold">{product.name}</h1>
+            {/* Title & Rating */}
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold">{product.name}</h1>
+              {reviewStats.totalReviews > 0 && (
+                <div className="flex items-center gap-2 mt-2">
+                  <RatingStars 
+                    rating={reviewStats.averageRating} 
+                    totalReviews={reviewStats.totalReviews}
+                    size="md"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {reviewStats.averageRating.toFixed(1)} out of 5
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Description */}
             <p className="text-lg text-muted-foreground">{product.description}</p>
@@ -371,6 +389,11 @@ export default function ProductDetail() {
             </div>
           </div>
         )}
+
+        {/* Product Reviews */}
+        <div className="mt-16">
+          <ProductReviews productId={productId!} />
+        </div>
       </div>
     </Layout>
   );
