@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, ArrowLeft, Sparkles, Video, Mic, Camera, Monitor, Radio } from "lucide-react";
+import { ArrowRight, ArrowLeft, Sparkles, Video, Mic, Camera, Monitor, Radio, Home, Building, Users, User, Smartphone, Laptop, Clock, Zap } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
 interface Question {
-  id: number;
+  id: string;
   question: string;
   options: {
     label: string;
@@ -20,38 +20,38 @@ interface Question {
 
 const questions: Question[] = [
   {
-    id: 1,
+    id: "content_type",
     question: "What type of content do you primarily create?",
     options: [
       { label: "YouTube Videos", value: "youtube", icon: Video, description: "Long-form video content" },
       { label: "TikTok/Reels", value: "tiktok", icon: Video, description: "Short-form vertical videos" },
       { label: "Podcasts", value: "podcast", icon: Mic, description: "Audio-focused content" },
-      { label: "Live Streaming", value: "streaming", icon: Radio, description: "Real-time broadcasts" },
+      { label: "Live Streaming", value: "live_streaming", icon: Radio, description: "Real-time broadcasts" },
       { label: "Photography", value: "photography", icon: Camera, description: "Still images & portraits" },
     ],
   },
   {
-    id: 2,
+    id: "experience",
     question: "What's your current experience level?",
     options: [
-      { label: "Just Starting", value: "beginner", description: "New to content creation" },
-      { label: "Some Experience", value: "intermediate", description: "Created content for 6+ months" },
-      { label: "Experienced", value: "advanced", description: "Creating content for 2+ years" },
-      { label: "Professional", value: "professional", description: "Full-time creator or agency" },
+      { label: "Just Starting", value: "beginner", icon: Sparkles, description: "New to content creation" },
+      { label: "Some Experience", value: "intermediate", icon: User, description: "Created content for 6+ months" },
+      { label: "Experienced", value: "advanced", icon: Users, description: "Creating content for 2+ years" },
+      { label: "Professional", value: "professional", icon: Building, description: "Full-time creator or agency" },
     ],
   },
   {
-    id: 3,
-    question: "What's your budget range?",
+    id: "setup_location",
+    question: "Where do you primarily create content?",
     options: [
-      { label: "Under ₦50,000", value: "basic", description: "Starting with essentials" },
-      { label: "₦50,000 - ₦150,000", value: "mid", description: "Ready to invest in quality" },
-      { label: "₦150,000 - ₦300,000", value: "premium", description: "Serious about production" },
-      { label: "₦300,000+", value: "diamond", description: "Professional-grade setup" },
+      { label: "At Home", value: "home", icon: Home, description: "Dedicated home studio or room" },
+      { label: "On the Go", value: "mobile", icon: Smartphone, description: "Various locations, need portability" },
+      { label: "Office/Studio", value: "studio", icon: Building, description: "Professional workspace" },
+      { label: "Mixed", value: "mixed", icon: Laptop, description: "Both indoor and outdoor" },
     ],
   },
   {
-    id: 4,
+    id: "priority",
     question: "What's your biggest challenge right now?",
     options: [
       { label: "Audio Quality", value: "audio", icon: Mic, description: "Sound is unclear or echoes" },
@@ -60,12 +60,34 @@ const questions: Question[] = [
       { label: "Complete Setup", value: "complete", description: "Need everything from scratch" },
     ],
   },
+  {
+    id: "frequency",
+    question: "How often do you create content?",
+    options: [
+      { label: "Daily", value: "daily", icon: Zap, description: "High-volume content production" },
+      { label: "Weekly", value: "weekly", icon: Clock, description: "Consistent weekly schedule" },
+      { label: "A Few Times a Month", value: "monthly", description: "Quality over quantity approach" },
+      { label: "Just Getting Started", value: "starting", icon: Sparkles, description: "Planning to start soon" },
+    ],
+  },
+  {
+    id: "budget",
+    question: "What's your budget range?",
+    options: [
+      { label: "Under ₦50,000", value: "basic", description: "Starting with essentials" },
+      { label: "₦50,000 - ₦150,000", value: "mid", description: "Ready to invest in quality" },
+      { label: "₦150,000 - ₦300,000", value: "premium", description: "Serious about production" },
+      { label: "₦300,000+", value: "diamond", description: "Professional-grade setup" },
+    ],
+  },
 ];
+
+export type QuizAnswers = Record<string, string>;
 
 const Quiz = () => {
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<QuizAnswers>({});
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
   const question = questions[currentQuestion];
@@ -78,16 +100,9 @@ const Quiz = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
     } else {
-      // Determine recommended tier based on answers
-      const budget = answers[3];
-      let tier = "basic";
-      if (budget === "premium" || budget === "diamond") {
-        tier = budget === "diamond" ? "diamond" : "premium";
-      } else if (budget === "mid") {
-        tier = "premium";
-      }
-      
-      navigate(`/packages?tier=${tier}&content=${answers[1]}`);
+      // Navigate to results with answers
+      const params = new URLSearchParams(answers);
+      navigate(`/quiz/results?${params.toString()}`);
     }
   };
 
