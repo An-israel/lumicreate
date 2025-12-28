@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import Quiz from "./pages/Quiz";
+import QuizResults from "./pages/QuizResults";
 import BuyCoins from "./pages/BuyCoins";
 import Consultations from "./pages/Consultations";
 import Cart from "./pages/Cart";
@@ -55,6 +56,7 @@ const App = () => (
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/buy-coins" element={<BuyCoins />} />
                 <Route path="/quiz" element={<Quiz />} />
+                <Route path="/quiz/results" element={<QuizResults />} />
                 <Route path="/consultations" element={<Consultations />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/payment/callback" element={<PaymentCallback />} />
