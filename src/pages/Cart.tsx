@@ -170,10 +170,10 @@ export default function Cart() {
       }
     }
 
-    // If paying with coins only, just clear cart and redirect
+    // If paying with coins only, clear cart and redirect to confirmation
     await clearCart();
     toast.success("Order placed successfully!");
-    navigate("/dashboard");
+    navigate(`/order/${orderData.id}/confirmation?new=true`);
     setIsProcessing(false);
   };
 
