@@ -14,6 +14,7 @@ import { formatNaira, formatCoins } from "@/lib/constants";
 import { toast } from "sonner";
 import ProductComparison from "@/components/quiz/ProductComparison";
 import EmailCapture from "@/components/quiz/EmailCapture";
+import ShareResults from "@/components/quiz/ShareResults";
 
 interface Product {
   id: string;
@@ -258,6 +259,7 @@ const QuizResults = () => {
                   Retake Quiz
                 </Link>
               </Button>
+              <ShareResults quizAnswers={answers} />
               <Button asChild>
                 <Link to="/packages" className="gap-2">
                   Browse All Packages
