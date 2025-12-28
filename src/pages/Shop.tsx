@@ -1,27 +1,19 @@
 import { useState, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Search, SlidersHorizontal, Package, Eye, ShoppingCart, Coins, Heart, Info } from "lucide-react";
+import { Search, Package, Eye, ShoppingCart, Coins, Heart, Mic, Lightbulb, Camera, Headphones } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import ProductFilters from "@/components/shop/ProductFilters";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatNaira, formatCoins } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { Product } from "@/types/database";
 
 const tierColors = {
   basic: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
@@ -29,37 +21,108 @@ const tierColors = {
   diamond: "bg-violet-500/10 text-violet-500 border-violet-500/30",
 };
 
-const Shop = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filtersOpen, setFiltersOpen] = useState(true);
-  
-  // Get initial filter values from URL
-  const initialTier = searchParams.get("tier");
-  const [selectedTiers, setSelectedTiers] = useState<string[]>(
-    initialTier ? [initialTier] : []
-  );
-  const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
-  const [showPackagesOnly, setShowPackagesOnly] = useState(false);
+// Categories for individual products
+const productCategories = [
+  { 
+    id: "all", 
+    label: "All Products", 
+    icon: Package,
+    description: "Browse all individual equipment"
+  },
+  { 
+    id: "microphones", 
+    label: "Microphones", 
+    icon: Mic,
+    description: "From lavaliers to broadcast mics",
+    keywords: ["microphone", "mic", "lavalier", "shotgun", "condenser", "dynamic", "wireless"]
+  },
+  { 
+    id: "key-lights", 
+    label: "Key Lights", 
+    icon: Lightbulb,
+    description: "Main light sources for your setup",
+    keywords: ["key light", "ring light", "sl-60", "120d", "main light"]
+  },
+  { 
+    id: "fill-lights", 
+    label: "Fill Lights", 
+    icon: Lightbulb,
+    description: "Secondary lighting for balance",
+    keywords: ["fill", "secondary", "panel", "660"]
+  },
+  { 
+    id: "background-lights", 
+    label: "Background Lights", 
+    icon: Lightbulb,
+    description: "RGB and ambient lighting",
+    keywords: ["background", "rgb", "strip", "mc", "ambient", "accent"]
+  },
+  { 
+    id: "rim-lights", 
+    label: "Rim Lights", 
+    icon: Lightbulb,
+    description: "Hair and separation lighting",
+    keywords: ["rim", "hair", "separation", "sz150"]
+  },
+  { 
+    id: "stands-mounts", 
+    label: "Stands & Mounts", 
+    icon: Camera,
+    description: "Tripods, C-stands, boom arms",
+    keywords: ["tripod", "stand", "c-stand", "boom arm", "mount"]
+  },
+  { 
+    id: "audio-gear", 
+    label: "Audio Gear", 
+    icon: Headphones,
+    description: "Interfaces, headphones, accessories",
+    keywords: ["interface", "headphones", "audio", "scarlett", "rodecaster", "focusrite"]
+  },
+];
 
-  const { products, isLoading } = useProducts();
+const Shop = () => {
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  
+  const initialTier = searchParams.get("tier");
+  const [selectedTier, setSelectedTier] = useState<string | null>(initialTier);
+
+  const { products, isLoading } = useProducts({ isPackage: false });
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
-  // Separate packages and individual products
-  const { packages, individualProducts } = useMemo(() => {
-    if (!products) return { packages: [], individualProducts: [] };
-    return {
-      packages: products.filter(p => p.is_package),
-      individualProducts: products.filter(p => !p.is_package),
-    };
-  }, [products]);
+  // Categorize products
+  const categorizeProduct = (product: Product): string[] => {
+    const categories: string[] = [];
+    const name = product.name.toLowerCase();
+    const description = (product.description || "").toLowerCase();
+    const specs = product.specifications as Record<string, string> | null;
+    const lightType = specs?.["Light Type"]?.toLowerCase() || "";
+    const type = specs?.["Type"]?.toLowerCase() || "";
 
-  // Filter products
+    for (const category of productCategories) {
+      if (category.id === "all") continue;
+      
+      const keywords = category.keywords || [];
+      const matchesKeyword = keywords.some(keyword => 
+        name.includes(keyword) || 
+        description.includes(keyword) ||
+        lightType.includes(keyword) ||
+        type.includes(keyword)
+      );
+      
+      if (matchesKeyword) {
+        categories.push(category.id);
+      }
+    }
+    
+    return categories.length > 0 ? categories : ["other"];
+  };
+
+  // Filter products by category and search
   const filteredProducts = useMemo(() => {
-    const productsToFilter = showPackagesOnly ? packages : individualProducts;
-
-    return productsToFilter.filter((product) => {
+    return products.filter((product) => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -70,42 +133,35 @@ const Shop = () => {
       }
 
       // Tier filter
-      if (selectedTiers.length > 0 && !selectedTiers.includes(product.tier)) {
+      if (selectedTier && product.tier !== selectedTier) {
         return false;
       }
 
-      // Content type filter
-      if (selectedContentTypes.length > 0) {
-        const productTypes = product.content_types || [];
-        const hasMatchingType = selectedContentTypes.some((type) =>
-          productTypes.includes(type as any)
-        );
-        if (!hasMatchingType) return false;
+      // Category filter
+      if (selectedCategory !== "all") {
+        const productCategories = categorizeProduct(product);
+        if (!productCategories.includes(selectedCategory)) {
+          return false;
+        }
       }
 
       return true;
     });
-  }, [products, searchQuery, selectedTiers, selectedContentTypes, showPackagesOnly, packages, individualProducts]);
+  }, [products, searchQuery, selectedTier, selectedCategory]);
 
-  const handleTierChange = (tier: string) => {
-    setSelectedTiers((prev) =>
-      prev.includes(tier) ? prev.filter((t) => t !== tier) : [...prev, tier]
-    );
-  };
-
-  const handleContentTypeChange = (type: string) => {
-    setSelectedContentTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
-  };
-
-  const handleClearFilters = () => {
-    setSelectedTiers([]);
-    setSelectedContentTypes([]);
-    setShowPackagesOnly(false);
-    setSearchQuery("");
-    setSearchParams({});
-  };
+  // Get counts per category
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: products.length };
+    
+    for (const product of products) {
+      const categories = categorizeProduct(product);
+      for (const cat of categories) {
+        counts[cat] = (counts[cat] || 0) + 1;
+      }
+    }
+    
+    return counts;
+  }, [products]);
 
   const handleAddToCart = async (productId: string) => {
     await addToCart(productId);
@@ -119,24 +175,6 @@ const Shop = () => {
     }
   };
 
-  // Calculate bulk savings for a product (simulated - would need actual package data)
-  const calculateBulkSavings = (product: typeof individualProducts[0]) => {
-    // Find if this product is part of any package
-    const packageWithProduct = packages.find(pkg => 
-      pkg.package_items?.includes(product.id)
-    );
-    
-    if (packageWithProduct && packageWithProduct.original_price_naira) {
-      const savings = packageWithProduct.original_price_naira - packageWithProduct.price_naira;
-      const savingsPercent = Math.round((savings / packageWithProduct.original_price_naira) * 100);
-      return { savings, savingsPercent, packageName: packageWithProduct.name };
-    }
-    
-    // Default bulk savings estimate (15-25% off when buying in packages)
-    const estimatedSavings = Math.round(product.price_naira * 0.20);
-    return { savings: estimatedSavings, savingsPercent: 20, packageName: null };
-  };
-
   return (
     <Layout>
       <div className="bg-muted/30 py-8 md:py-12">
@@ -144,10 +182,10 @@ const Shop = () => {
           {/* Header */}
           <div className="mb-8">
             <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl mb-2">
-              Shop Equipment
+              Individual Equipment
             </h1>
             <p className="text-muted-foreground text-lg mb-4">
-              Browse our curated selection of individual creator equipment
+              Browse and buy individual pieces — microphones, lights, stands, and more
             </p>
             
             {/* Link to Packages */}
@@ -155,14 +193,14 @@ const Shop = () => {
               <div className="inline-flex items-center gap-3 px-4 py-3 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors">
                 <Package className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="font-medium text-foreground">Looking for bundles?</p>
-                  <p className="text-sm text-muted-foreground">Check out our curated packages and save up to 25%</p>
+                  <p className="font-medium text-foreground">Want complete setups?</p>
+                  <p className="text-sm text-muted-foreground">Check our curated packages and save up to 25%</p>
                 </div>
               </div>
             </Link>
           </div>
 
-          {/* Search and Filter Toggle */}
+          {/* Search and Tier Filter */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -173,43 +211,92 @@ const Shop = () => {
                 className="pl-10"
               />
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setFiltersOpen(!filtersOpen)}
-              className="gap-2"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-              {(selectedTiers.length > 0 || selectedContentTypes.length > 0 || showPackagesOnly) && (
-                <Badge variant="secondary" className="ml-1">
-                  {selectedTiers.length + selectedContentTypes.length + (showPackagesOnly ? 1 : 0)}
-                </Badge>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant={selectedTier === null ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTier(null)}
+              >
+                All Tiers
+              </Button>
+              <Button
+                variant={selectedTier === "basic" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTier(selectedTier === "basic" ? null : "basic")}
+                className={selectedTier === "basic" ? "bg-emerald-500 hover:bg-emerald-600" : ""}
+              >
+                Basic
+              </Button>
+              <Button
+                variant={selectedTier === "premium" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTier(selectedTier === "premium" ? null : "premium")}
+              >
+                Premium
+              </Button>
+              <Button
+                variant={selectedTier === "diamond" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTier(selectedTier === "diamond" ? null : "diamond")}
+                className={selectedTier === "diamond" ? "bg-violet-500 hover:bg-violet-600" : ""}
+              >
+                Diamond
+              </Button>
+            </div>
           </div>
 
-          {/* Filters */}
-          <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <CollapsibleContent className="mb-8">
-              <div className="rounded-lg border border-border bg-background p-4">
-                <ProductFilters
-                  selectedTiers={selectedTiers}
-                  selectedContentTypes={selectedContentTypes}
-                  onTierChange={handleTierChange}
-                  onContentTypeChange={handleContentTypeChange}
-                  onClearFilters={handleClearFilters}
-                  showPackagesOnly={showPackagesOnly}
-                  onPackagesOnlyChange={setShowPackagesOnly}
-                />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          {/* Category Tabs */}
+          <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
+            <TabsList className="h-auto flex-wrap gap-2 bg-transparent p-0">
+              {productCategories.map((category) => {
+                const Icon = category.icon;
+                const count = categoryCounts[category.id] || 0;
+                
+                return (
+                  <TabsTrigger
+                    key={category.id}
+                    value={category.id}
+                    className={cn(
+                      "gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
+                      "border border-border rounded-full px-4 py-2"
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {category.label}
+                    <Badge variant="secondary" className="ml-1 text-xs">
+                      {count}
+                    </Badge>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+
+            {/* Category Description */}
+            {selectedCategory !== "all" && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                {productCategories.find(c => c.id === selectedCategory)?.description}
+              </p>
+            )}
+          </Tabs>
 
           {/* Results Count */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {filteredProducts.length} {showPackagesOnly ? "packages" : "products"}
+              Showing {filteredProducts.length} products
             </p>
+            {(searchQuery || selectedTier || selectedCategory !== "all") && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedTier(null);
+                  setSelectedCategory("all");
+                }}
+              >
+                Clear filters
+              </Button>
+            )}
           </div>
 
           {/* Products Grid */}
@@ -227,8 +314,10 @@ const Shop = () => {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredProducts.map((product) => {
                 const isWishlisted = isInWishlist(product.id);
-                const bulkSavings = calculateBulkSavings(product);
                 const specs = product.specifications as Record<string, string> | null;
+                const grade = specs?.["Grade"];
+                const lightType = specs?.["Light Type"];
+                const type = specs?.["Type"];
 
                 return (
                   <Card 
@@ -254,9 +343,6 @@ const Shop = () => {
                         <Badge variant="outline" className={tierColors[product.tier]}>
                           {product.tier.charAt(0).toUpperCase() + product.tier.slice(1)}
                         </Badge>
-                        {product.is_package && (
-                          <Badge variant="secondary">Package</Badge>
-                        )}
                       </div>
 
                       {/* Wishlist Button */}
@@ -284,14 +370,12 @@ const Shop = () => {
                     </div>
 
                     <CardContent className="p-4 flex flex-col flex-1">
-                      {/* Content Types */}
-                      {product.content_types && product.content_types.length > 0 && (
-                        <div className="mb-2 flex flex-wrap gap-1">
-                          {product.content_types.slice(0, 3).map((type) => (
-                            <Badge key={type} variant="outline" className="text-xs">
-                              {type.replace("_", " ")}
-                            </Badge>
-                          ))}
+                      {/* Type/Grade Badge */}
+                      {(grade || lightType || type) && (
+                        <div className="mb-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {lightType || type || grade}
+                          </Badge>
                         </div>
                       )}
 
@@ -300,22 +384,18 @@ const Shop = () => {
                         {product.name}
                       </h3>
 
-                      {/* Description / Specs */}
+                      {/* Description */}
                       {product.description && (
                         <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                           {product.description}
                         </p>
                       )}
 
-                      {/* Key Specifications */}
-                      {specs && Object.keys(specs).length > 0 && (
-                        <div className="mt-2 space-y-1">
-                          {Object.entries(specs).slice(0, 2).map(([key, value]) => (
-                            <p key={key} className="text-xs text-muted-foreground">
-                              <span className="font-medium">{key}:</span> {value}
-                            </p>
-                          ))}
-                        </div>
+                      {/* Key Spec */}
+                      {specs?.["Best For"] && (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          <span className="font-medium">Best for:</span> {specs["Best For"]}
+                        </p>
                       )}
 
                       {/* Pricing */}
@@ -324,41 +404,11 @@ const Shop = () => {
                           <span className="text-lg font-bold text-foreground">
                             {formatNaira(product.price_naira)}
                           </span>
-                          {product.original_price_naira && product.original_price_naira > product.price_naira && (
-                            <span className="text-sm text-muted-foreground line-through">
-                              {formatNaira(product.original_price_naira)}
-                            </span>
-                          )}
                         </div>
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Coins className="h-4 w-4 text-coin" />
                           <span>{formatCoins(product.price_coins)} coins</span>
                         </div>
-
-                        {/* Bulk Savings Indicator */}
-                        {!product.is_package && (
-                          <div className="flex items-center gap-1 pt-1">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="flex items-center gap-1 text-xs text-green-600 cursor-help">
-                                  <Info className="h-3 w-3" />
-                                  <span>Save ~{bulkSavings.savingsPercent}% in bundles</span>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>
-                                  {bulkSavings.packageName 
-                                    ? `Part of "${bulkSavings.packageName}" bundle. Save ${formatNaira(bulkSavings.savings)} when you buy the package!`
-                                    : `Buy this item as part of a bundle and save approximately ${formatNaira(bulkSavings.savings)}.`
-                                  }
-                                </p>
-                                <Link to="/packages" className="text-primary hover:underline text-xs mt-1 block">
-                                  View Packages →
-                                </Link>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        )}
                       </div>
 
                       {/* Actions */}
@@ -393,7 +443,14 @@ const Shop = () => {
               <p className="text-muted-foreground mb-4">
                 Try adjusting your filters or search query
               </p>
-              <Button variant="outline" onClick={handleClearFilters}>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedTier(null);
+                  setSelectedCategory("all");
+                }}
+              >
                 Clear all filters
               </Button>
             </div>
