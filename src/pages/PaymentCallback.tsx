@@ -36,6 +36,12 @@ export default function PaymentCallback() {
           await refreshWallet();
         } else if (result.type === "order") {
           setMessage("Payment successful! Your order is being processed.");
+          // Redirect to order confirmation after a brief delay
+          if (result.orderId) {
+            setTimeout(() => {
+              navigate(`/order/${result.orderId}/confirmation?new=true`);
+            }, 2000);
+          }
         }
       } else {
         setStatus("error");
