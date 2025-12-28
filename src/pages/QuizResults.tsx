@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Sparkles, ShoppingCart, ArrowRight, RotateCcw, Package, Coins, Check } from "lucide-react";
+import { Sparkles, ShoppingCart, ArrowRight, RotateCcw, Package, Coins, Check, GitCompare } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { formatNaira, formatCoins } from "@/lib/constants";
 import { toast } from "sonner";
+import ProductComparison from "@/components/quiz/ProductComparison";
+import EmailCapture from "@/components/quiz/EmailCapture";
 
 interface Product {
   id: string;
@@ -35,6 +38,8 @@ const QuizResults = () => {
   const [searchParams] = useSearchParams();
   const [recommendations, setRecommendations] = useState<RecommendationCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [compareProducts, setCompareProducts] = useState<Product[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
   const { addToCart } = useCart();
   const { user } = useAuth();
 
@@ -169,6 +174,29 @@ const QuizResults = () => {
     toast.success(`${product.name} added to cart`);
   };
 
+  const toggleCompare = (product: Product) => {
+    setCompareProducts((prev) => {
+      const exists = prev.find((p) => p.id === product.id);
+      if (exists) {
+        return prev.filter((p) => p.id !== product.id);
+      }
+      if (prev.length >= 4) {
+        toast.error("You can compare up to 4 products at a time");
+        return prev;
+      }
+      return [...prev, product];
+    });
+    setShowComparison(true);
+  };
+
+  const removeFromCompare = (productId: string) => {
+    setCompareProducts((prev) => prev.filter((p) => p.id !== productId));
+  };
+
+  const isInCompare = (productId: string) => {
+    return compareProducts.some((p) => p.id === productId);
+  };
+
   const getExperienceLabel = (exp: string) => {
     const labels: Record<string, string> = {
       beginner: "Beginner",
@@ -282,7 +310,9 @@ const QuizResults = () => {
                     {category.products.map((product) => (
                       <Card
                         key={product.id}
-                        className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col"
+                        className={`overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col ${
+                          isInCompare(product.id) ? "ring-2 ring-primary" : ""
+                        }`}
                       >
                         {/* Image */}
                         <div className="aspect-square bg-muted relative overflow-hidden">
@@ -308,6 +338,18 @@ const QuizResults = () => {
                           >
                             {product.tier}
                           </Badge>
+                          {/* Compare Checkbox */}
+                          <div
+                            className="absolute bottom-3 left-3 flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-md px-2 py-1 cursor-pointer"
+                            onClick={() => toggleCompare(product)}
+                          >
+                            <Checkbox
+                              checked={isInCompare(product.id)}
+                              onCheckedChange={() => toggleCompare(product)}
+                              className="h-4 w-4"
+                            />
+                            <span className="text-xs font-medium text-foreground">Compare</span>
+                          </div>
                         </div>
 
                         <CardHeader className="pb-2">
@@ -351,6 +393,27 @@ const QuizResults = () => {
             </div>
           )}
 
+          {/* Email Capture */}
+          {!isLoading && recommendations.length > 0 && (
+            <div className="mt-12 max-w-2xl mx-auto">
+              <EmailCapture quizAnswers={answers} />
+            </div>
+          )}
+
+          {/* Compare Button - Floating */}
+          {compareProducts.length > 0 && !showComparison && (
+            <div className="fixed bottom-6 right-6 z-40">
+              <Button
+                size="lg"
+                className="gap-2 shadow-lg"
+                onClick={() => setShowComparison(true)}
+              >
+                <GitCompare className="h-5 w-5" />
+                Compare ({compareProducts.length})
+              </Button>
+            </div>
+          )}
+
           {/* Bottom CTA */}
           {!isLoading && recommendations.length > 0 && (
             <div className="mt-16 text-center">
@@ -378,6 +441,16 @@ const QuizResults = () => {
             </div>
           )}
         </div>
+
+        {/* Product Comparison Panel */}
+        {showComparison && compareProducts.length > 0 && (
+          <ProductComparison
+            products={compareProducts}
+            onRemove={removeFromCompare}
+            onAddToCart={handleAddToCart}
+            onClose={() => setShowComparison(false)}
+          />
+        )}
       </div>
     </Layout>
   );
