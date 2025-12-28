@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Search, Package, Eye, ShoppingCart, Coins, Heart, Mic, Lightbulb, Camera, Headphones } from "lucide-react";
+import { Search, Package, Eye, ShoppingCart, Coins, Heart, Mic, Lightbulb, Camera, Headphones, Scale } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import ProductComparison from "@/components/quiz/ProductComparison";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatNaira, formatCoins } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/database";
+import { toast } from "sonner";
 
 const tierColors = {
   basic: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
@@ -87,10 +90,28 @@ const Shop = () => {
   
   const initialTier = searchParams.get("tier");
   const [selectedTier, setSelectedTier] = useState<string | null>(initialTier);
+  const [compareProducts, setCompareProducts] = useState<Product[]>([]);
 
   const { products, isLoading } = useProducts({ isPackage: false });
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
+  // Toggle product for comparison
+  const toggleCompare = (product: Product) => {
+    setCompareProducts(prev => {
+      const isSelected = prev.some(p => p.id === product.id);
+      if (isSelected) {
+        return prev.filter(p => p.id !== product.id);
+      }
+      if (prev.length >= 3) {
+        toast.error("You can compare up to 3 products");
+        return prev;
+      }
+      return [...prev, product];
+    });
+  };
+
+  const isComparing = (productId: string) => compareProducts.some(p => p.id === productId);
 
   // Categorize products
   const categorizeProduct = (product: Product): string[] => {
@@ -345,6 +366,21 @@ const Shop = () => {
                         </Badge>
                       </div>
 
+                      {/* Compare Checkbox */}
+                      <div 
+                        className="absolute bottom-3 left-3 flex items-center gap-2 bg-background/90 rounded-md px-2 py-1 cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleCompare(product);
+                        }}
+                      >
+                        <Checkbox 
+                          checked={isComparing(product.id)}
+                          onCheckedChange={() => toggleCompare(product)}
+                        />
+                        <span className="text-xs font-medium">Compare</span>
+                      </div>
+
                       {/* Wishlist Button */}
                       <Button
                         variant="ghost"
@@ -457,6 +493,14 @@ const Shop = () => {
           )}
         </div>
       </div>
+
+      {/* Comparison Panel */}
+      <ProductComparison
+        products={compareProducts}
+        onRemove={(productId) => setCompareProducts(prev => prev.filter(p => p.id !== productId))}
+        onAddToCart={(product) => handleAddToCart(product.id)}
+        onClose={() => setCompareProducts([])}
+      />
     </Layout>
   );
 };
