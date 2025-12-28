@@ -60,7 +60,7 @@ const CoinSystem = () => {
             </div>
 
             <Button size="lg" className="gap-2" asChild>
-              <Link to="/coins">
+              <Link to="/buy-coins">
                 <Coins className="h-4 w-4" />
                 Buy Coins Now
               </Link>

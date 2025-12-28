@@ -78,7 +78,7 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground">coins available</p>
                   </div>
                   <Button size="sm" asChild>
-                    <Link to="/coins">
+                    <Link to="/buy-coins">
                       Buy Coins
                       <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
