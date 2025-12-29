@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { Calendar, Clock, ArrowLeft, ArrowRight, User, Share2, BookOpen } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,24 @@ import BlogComments from "@/components/blog/BlogComments";
 import ReactMarkdown from "react-markdown";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { post, isLoading, error } = useBlogPost(slug);
   const { posts: allPosts } = useBlogPosts(true);
+
+  // Increment view count when post is loaded
+  useEffect(() => {
+    if (post?.id) {
+      supabase
+        .from("blog_posts")
+        .update({ view_count: (post.view_count || 0) + 1 })
+        .eq("id", post.id)
+        .then();
+    }
+  }, [post?.id]);
 
   // Get related posts (same category, excluding current)
   const relatedPosts = allPosts

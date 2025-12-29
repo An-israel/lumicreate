@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useBlogPosts, BlogPost } from "@/hooks/useBlogPosts";
 import { Card } from "@/components/ui/card";
@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Plus, Edit, Trash2, Search, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Eye, EyeOff, Star, Heart, MessageSquare, BarChart3 } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 
 const BLOG_CATEGORIES = [
@@ -23,12 +24,52 @@ const BLOG_CATEGORIES = [
   { id: "general", label: "General" },
 ];
 
+interface PostAnalytics {
+  [postId: string]: {
+    likes: number;
+    comments: number;
+  };
+}
+
 export default function BlogManagement() {
   const { posts, isLoading, refetch } = useBlogPosts(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [analytics, setAnalytics] = useState<PostAnalytics>({});
+
+  // Fetch analytics for all posts
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (posts.length === 0) return;
+
+      const postIds = posts.map(p => p.id);
+      
+      // Fetch likes counts
+      const { data: likesData } = await supabase
+        .from("blog_likes")
+        .select("post_id")
+        .in("post_id", postIds);
+
+      // Fetch comments counts
+      const { data: commentsData } = await supabase
+        .from("blog_comments")
+        .select("post_id")
+        .in("post_id", postIds);
+
+      const analyticsMap: PostAnalytics = {};
+      postIds.forEach(id => {
+        analyticsMap[id] = {
+          likes: likesData?.filter(l => l.post_id === id).length || 0,
+          comments: commentsData?.filter(c => c.post_id === id).length || 0,
+        };
+      });
+      setAnalytics(analyticsMap);
+    };
+
+    fetchAnalytics();
+  }, [posts]);
 
   const filteredPosts = posts.filter(
     (post) =>
@@ -117,6 +158,20 @@ export default function BlogManagement() {
       toast.error("Failed to update post");
     } else {
       toast.success(post.is_published ? "Post unpublished" : "Post published");
+      refetch();
+    }
+  };
+
+  const toggleFeatured = async (post: BlogPost) => {
+    const { error } = await supabase
+      .from("blog_posts")
+      .update({ is_featured: !post.is_featured })
+      .eq("id", post.id);
+
+    if (error) {
+      toast.error("Failed to update post");
+    } else {
+      toast.success(post.is_featured ? "Post unfeatured" : "Post featured");
       refetch();
     }
   };
@@ -280,9 +335,12 @@ export default function BlogManagement() {
             <TableRow>
               <TableHead>Title</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Author</TableHead>
+              <TableHead className="text-center">
+                <BarChart3 className="h-4 w-4 inline mr-1" />
+                Analytics
+              </TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Featured</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -298,20 +356,48 @@ export default function BlogManagement() {
                         className="h-10 w-10 rounded-md object-cover"
                       />
                     )}
-                    <span className="font-medium">{post.title}</span>
+                    <div>
+                      <span className="font-medium block">{post.title}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {post.author_name} · {format(new Date(post.created_at), "MMM d, yyyy")}
+                      </span>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="capitalize">{post.category}</Badge>
                 </TableCell>
-                <TableCell>{post.author_name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1" title="Views">
+                      <Eye className="h-3.5 w-3.5" />
+                      <span>{post.view_count || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1" title="Likes">
+                      <Heart className="h-3.5 w-3.5" />
+                      <span>{analytics[post.id]?.likes || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1" title="Comments">
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      <span>{analytics[post.id]?.comments || 0}</span>
+                    </div>
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Badge variant={post.is_published ? "default" : "secondary"}>
                     {post.is_published ? "Published" : "Draft"}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {format(new Date(post.created_at), "MMM d, yyyy")}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => toggleFeatured(post)}
+                    className={post.is_featured ? "text-yellow-500" : "text-muted-foreground"}
+                    title={post.is_featured ? "Unfeature" : "Feature"}
+                  >
+                    <Star className={`h-4 w-4 ${post.is_featured ? "fill-current" : ""}`} />
+                  </Button>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
