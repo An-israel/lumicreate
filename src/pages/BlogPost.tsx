@@ -4,16 +4,36 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { getBlogPost, getRelatedPosts } from "@/lib/blogData";
+import { useBlogPost, useBlogPosts } from "@/hooks/useBlogPosts";
+import BlogLikeButton from "@/components/blog/BlogLikeButton";
+import BlogComments from "@/components/blog/BlogComments";
 import ReactMarkdown from "react-markdown";
+import { format } from "date-fns";
+import { Separator } from "@/components/ui/separator";
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const post = slug ? getBlogPost(slug) : undefined;
-  const relatedPosts = slug ? getRelatedPosts(slug, 3) : [];
+  const { post, isLoading, error } = useBlogPost(slug);
+  const { posts: allPosts } = useBlogPosts(true);
 
-  if (!post) {
+  // Get related posts (same category, excluding current)
+  const relatedPosts = allPosts
+    .filter((p) => p.slug !== slug && p.category === post?.category)
+    .slice(0, 3);
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container py-20 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground mt-4">Loading article...</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!post || error) {
     return (
       <Layout>
         <div className="container py-20 text-center">
@@ -34,7 +54,7 @@ const BlogPost = () => {
       try {
         await navigator.share({
           title: post.title,
-          text: post.excerpt,
+          text: post.excerpt || "",
           url: window.location.href,
         });
       } catch (err) {
@@ -45,16 +65,24 @@ const BlogPost = () => {
     }
   };
 
+  const formattedDate = post.published_at
+    ? format(new Date(post.published_at), "MMMM d, yyyy")
+    : format(new Date(post.created_at), "MMMM d, yyyy");
+
   return (
     <Layout>
       {/* Hero Section */}
       <section className="relative">
         <div className="absolute inset-0 h-[400px] md:h-[500px]">
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
+          {post.image_url ? (
+            <img
+              src={post.image_url}
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
         </div>
 
@@ -68,7 +96,7 @@ const BlogPost = () => {
             Back to Resources
           </Button>
 
-          <Badge className="mb-4 bg-primary text-primary-foreground">
+          <Badge className="mb-4 bg-primary text-primary-foreground capitalize">
             {post.category}
           </Badge>
 
@@ -78,24 +106,31 @@ const BlogPost = () => {
 
           <div className="flex flex-wrap items-center gap-6 text-muted-foreground">
             <div className="flex items-center gap-3">
-              <img
-                src={post.author.avatar}
-                alt={post.author.name}
-                className="w-10 h-10 rounded-full object-cover"
-              />
+              {post.author_avatar ? (
+                <img
+                  src={post.author_avatar}
+                  alt={post.author_name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+              )}
               <div>
-                <p className="text-sm font-medium text-foreground">{post.author.name}</p>
-                <p className="text-xs text-muted-foreground">{post.author.role}</p>
+                <p className="text-sm font-medium text-foreground">{post.author_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              <span className="text-sm">{post.date}</span>
+              <span className="text-sm">{formattedDate}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span className="text-sm">{post.readTime}</span>
-            </div>
+            {post.read_time && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span className="text-sm">{post.read_time}</span>
+              </div>
+            )}
             <Button variant="outline" size="sm" onClick={handleShare}>
               <Share2 className="h-4 w-4 mr-2" />
               Share
@@ -169,23 +204,41 @@ const BlogPost = () => {
               </ReactMarkdown>
             </div>
 
+            {/* Like and Share */}
+            <div className="mt-8 flex items-center gap-4">
+              <BlogLikeButton postId={post.id} />
+              <Button variant="ghost" size="sm" onClick={handleShare}>
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+            </div>
+
             {/* Author Box */}
             <div className="mt-12 p-6 rounded-xl border border-border bg-muted/30">
               <div className="flex items-start gap-4">
-                <img
-                  src={post.author.avatar}
-                  alt={post.author.name}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
+                {post.author_avatar ? (
+                  <img
+                    src={post.author_avatar}
+                    alt={post.author_name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="h-8 w-8 text-primary" />
+                  </div>
+                )}
                 <div>
-                  <p className="font-semibold text-foreground">{post.author.name}</p>
-                  <p className="text-sm text-muted-foreground mb-2">{post.author.role}</p>
+                  <p className="font-semibold text-foreground">{post.author_name}</p>
                   <p className="text-sm text-muted-foreground">
                     Passionate about helping Nigerian creators succeed with the right equipment and strategies.
                   </p>
                 </div>
               </div>
             </div>
+
+            {/* Comments Section */}
+            <Separator className="my-12" />
+            <BlogComments postId={post.id} />
           </div>
         </div>
       </section>
@@ -198,25 +251,37 @@ const BlogPost = () => {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedPosts.map((relatedPost) => (
                 <Card key={relatedPost.id} className="overflow-hidden card-hover">
-                  <Link to={`/resources/${relatedPost.id}`}>
+                  <Link to={`/resources/${relatedPost.slug}`}>
                     <div className="aspect-video relative">
-                      <img
-                        src={relatedPost.image}
-                        alt={relatedPost.title}
-                        className="w-full h-full object-cover"
-                      />
+                      {relatedPost.image_url ? (
+                        <img
+                          src={relatedPost.image_url}
+                          alt={relatedPost.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
+                      )}
                     </div>
                     <CardContent className="p-4">
-                      <Badge variant="outline" className="mb-3 text-xs">
+                      <Badge variant="outline" className="mb-3 text-xs capitalize">
                         {relatedPost.category}
                       </Badge>
                       <h3 className="font-semibold text-foreground mb-2 line-clamp-2">
                         {relatedPost.title}
                       </h3>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span>{relatedPost.date}</span>
-                        <span>•</span>
-                        <span>{relatedPost.readTime}</span>
+                        <span>
+                          {relatedPost.published_at
+                            ? format(new Date(relatedPost.published_at), "MMM d, yyyy")
+                            : format(new Date(relatedPost.created_at), "MMM d, yyyy")}
+                        </span>
+                        {relatedPost.read_time && (
+                          <>
+                            <span>•</span>
+                            <span>{relatedPost.read_time}</span>
+                          </>
+                        )}
                       </div>
                     </CardContent>
                   </Link>
