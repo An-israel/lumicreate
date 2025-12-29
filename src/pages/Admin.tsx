@@ -4,6 +4,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/layout/AdminLayout";
 import StaffManagement from "@/components/admin/StaffManagement";
+import BlogManagement from "@/components/admin/BlogManagement";
+import PageContentEditor from "@/components/admin/PageContentEditor";
+import ImageUpload from "@/components/admin/ImageUpload";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Package, ShoppingCart, Users, Plus, Edit, Trash2, Eye, Search, Mail, UserX, CheckCircle, Shield } from "lucide-react";
+import { Package, ShoppingCart, Users, Plus, Edit, Trash2, Eye, Search, Mail, UserX, CheckCircle, Shield, BookOpen } from "lucide-react";
 import { Order, Product, Consultation } from "@/types/database";
 
 interface NewsletterSubscriber {
@@ -41,6 +44,7 @@ export default function Admin() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productImageUrl, setProductImageUrl] = useState("");
 
   useEffect(() => {
     if (!authLoading && !isStaff) {
@@ -96,7 +100,7 @@ export default function Admin() {
       price_coins: parseInt(formData.get("price_coins") as string),
       tier: formData.get("tier") as Product["tier"],
       content_types: [formData.get("content_type") as string] as Product["content_types"],
-      image_url: formData.get("image_url") as string || null,
+      image_url: productImageUrl || null,
       in_stock: formData.get("in_stock") === "true",
       is_package: formData.get("is_package") === "true",
     };
@@ -210,6 +214,12 @@ export default function Admin() {
       case "staff":
         return <StaffManagement />;
       
+      case "blog":
+        return <BlogManagement />;
+      
+      case "content":
+        return <PageContentEditor />;
+      
       case "orders":
         return (
           <div className="space-y-4">
@@ -287,7 +297,7 @@ export default function Admin() {
               <h2 className="text-2xl font-bold">Products</h2>
               <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button onClick={() => setEditingProduct(null)}>
+                  <Button onClick={() => { setEditingProduct(null); setProductImageUrl(""); }}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
                   </Button>
@@ -369,15 +379,11 @@ export default function Admin() {
                         </Select>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="image_url">Image URL</Label>
-                      <Input
-                        id="image_url"
-                        name="image_url"
-                        defaultValue={editingProduct?.image_url || ""}
-                        placeholder="https://..."
-                      />
-                    </div>
+                    <ImageUpload
+                      value={productImageUrl}
+                      onChange={setProductImageUrl}
+                      label="Product Image"
+                    />
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="in_stock">In Stock</Label>
@@ -473,6 +479,7 @@ export default function Admin() {
                             size="icon"
                             onClick={() => {
                               setEditingProduct(product);
+                              setProductImageUrl(product.image_url || "");
                               setIsProductDialogOpen(true);
                             }}
                           >

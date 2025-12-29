@@ -10,7 +10,9 @@ import {
   Mail, 
   Shield, 
   LogOut,
-  Home
+  Home,
+  FileText,
+  BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +24,8 @@ const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, tab: "overview" },
   { label: "Orders", href: "/admin?tab=orders", icon: ShoppingCart, tab: "orders" },
   { label: "Products", href: "/admin?tab=products", icon: Package, tab: "products" },
+  { label: "Blog Posts", href: "/admin?tab=blog", icon: BookOpen, tab: "blog" },
+  { label: "Page Content", href: "/admin?tab=content", icon: FileText, tab: "content" },
   { label: "Consultations", href: "/admin?tab=consultations", icon: Users, tab: "consultations" },
   { label: "Subscribers", href: "/admin?tab=subscribers", icon: Mail, tab: "subscribers" },
   { label: "Staff", href: "/admin?tab=staff", icon: Shield, tab: "staff" },
