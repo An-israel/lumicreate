@@ -15,7 +15,7 @@ import {
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, profile, wallet, signOut, isAdmin } = useAuth();
+  const { user, profile, wallet, signOut, isAdmin, isStaff } = useAuth();
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
   const navigate = useNavigate();
@@ -131,6 +131,14 @@ const Header = () => {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/admin">Admin Panel</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {isStaff && !isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/staff">Staff Portal</Link>
                       </DropdownMenuItem>
                     </>
                   )}

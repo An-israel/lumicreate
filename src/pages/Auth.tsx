@@ -51,15 +51,21 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showStaffLogin, setShowStaffLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, isAdmin, isStaff, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // Redirect based on user role
   useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
+    if (user && !authLoading) {
+      if (isAdmin) {
+        navigate("/admin");
+      } else if (isStaff) {
+        navigate("/staff");
+      } else {
+        navigate("/dashboard");
+      }
     }
-  }, [user, navigate]);
+  }, [user, isAdmin, isStaff, authLoading, navigate]);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -89,7 +95,7 @@ const Auth = () => {
       }
     } else {
       toast.success("Welcome back!");
-      navigate("/dashboard");
+      // Navigation will be handled by useEffect based on roles
     }
   };
 
@@ -124,7 +130,7 @@ const Auth = () => {
     } else {
       const positionLabel = STAFF_POSITIONS.find(p => p.value === data.position)?.label || data.position;
       toast.success(`Welcome back, ${positionLabel}!`);
-      navigate("/admin");
+      // Navigation will be handled by useEffect based on roles
     }
   };
 

@@ -6,7 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -19,7 +21,8 @@ import {
   Mail,
   LayoutDashboard,
   LogOut,
-  Home
+  Home,
+  Truck
 } from "lucide-react";
 import { Order, Product, Consultation } from "@/types/database";
 import { ORDER_STATUSES, formatNaira } from "@/lib/constants";
@@ -55,6 +58,8 @@ export default function Staff() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
+  const [trackingId, setTrackingId] = useState("");
 
   useEffect(() => {
     if (!authLoading) {
@@ -103,6 +108,39 @@ export default function Staff() {
       toast.error("Failed to update order status");
     } else {
       toast.success("Order status updated");
+      fetchData();
+    }
+  };
+
+  const addTrackingId = async () => {
+    if (!selectedOrder || !trackingId.trim()) return;
+
+    const { error } = await supabase
+      .from("orders")
+      .update({ tracking_id: trackingId.trim() })
+      .eq("id", selectedOrder.id);
+
+    if (error) {
+      toast.error("Failed to add tracking ID");
+    } else {
+      toast.success("Tracking ID added successfully");
+      setTrackingDialogOpen(false);
+      setTrackingId("");
+      setSelectedOrder(null);
+      fetchData();
+    }
+  };
+
+  const updateConsultationStatus = async (consultationId: string, status: Consultation["status"]) => {
+    const { error } = await supabase
+      .from("consultations")
+      .update({ status })
+      .eq("id", consultationId);
+
+    if (error) {
+      toast.error("Failed to update consultation status");
+    } else {
+      toast.success("Consultation status updated");
       fetchData();
     }
   };
@@ -172,7 +210,7 @@ export default function Staff() {
                     <TableHead>Order #</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Total</TableHead>
-                    <TableHead>Payment</TableHead>
+                    <TableHead>Tracking</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -183,7 +221,23 @@ export default function Staff() {
                       <TableCell className="font-medium">{order.order_number}</TableCell>
                       <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
                       <TableCell>{formatNaira(order.total_naira)}</TableCell>
-                      <TableCell className="capitalize">{order.payment_method}</TableCell>
+                      <TableCell>
+                        {order.tracking_id ? (
+                          <span className="text-sm font-mono">{order.tracking_id}</span>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setTrackingDialogOpen(true);
+                            }}
+                          >
+                            <Truck className="h-3 w-3 mr-1" />
+                            Add
+                          </Button>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge className={ORDER_STATUSES[order.status]?.color || "bg-gray-500"}>
                           {ORDER_STATUSES[order.status]?.label || order.status}
@@ -206,9 +260,6 @@ export default function Staff() {
                               <SelectItem value="cancelled">Cancelled</SelectItem>
                             </SelectContent>
                           </Select>
-                          <Button variant="ghost" size="icon" onClick={() => setSelectedOrder(order)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -292,6 +343,7 @@ export default function Staff() {
                     <TableHead>Type</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Coins Paid</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -315,6 +367,22 @@ export default function Staff() {
                         </Badge>
                       </TableCell>
                       <TableCell>{consultation.coins_paid} coins</TableCell>
+                      <TableCell>
+                        <Select
+                          value={consultation.status}
+                          onValueChange={(value) => updateConsultationStatus(consultation.id, value as Consultation["status"])}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -501,6 +569,38 @@ export default function Staff() {
           {renderContent()}
         </div>
       </main>
+
+      {/* Tracking ID Dialog */}
+      <Dialog open={trackingDialogOpen} onOpenChange={setTrackingDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Tracking ID</DialogTitle>
+            <DialogDescription>
+              Add shipping tracking ID for order {selectedOrder?.order_number}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="tracking-id">Tracking ID</Label>
+              <Input
+                id="tracking-id"
+                placeholder="Enter tracking ID..."
+                value={trackingId}
+                onChange={(e) => setTrackingId(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTrackingDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={addTrackingId} disabled={!trackingId.trim()}>
+              <Truck className="h-4 w-4 mr-2" />
+              Save Tracking ID
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
