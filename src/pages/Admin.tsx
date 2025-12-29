@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import Layout from "@/components/layout/Layout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import AdminLayout from "@/components/layout/AdminLayout";
+import StaffManagement from "@/components/admin/StaffManagement";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Package, ShoppingCart, Users, Coins, Plus, Edit, Trash2, Eye, Search, Mail, UserX, CheckCircle } from "lucide-react";
+import { Package, ShoppingCart, Users, Plus, Edit, Trash2, Eye, Search, Mail, UserX, CheckCircle, Shield } from "lucide-react";
 import { Order, Product, Consultation } from "@/types/database";
 
 interface NewsletterSubscriber {
@@ -29,6 +29,9 @@ import { ORDER_STATUSES, CONTENT_TYPES, formatNaira, formatCoins } from "@/lib/c
 export default function Admin() {
   const { isStaff, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const currentTab = searchParams.get("tab") || "overview";
+  
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [consultations, setConsultations] = useState<Consultation[]>([]);
@@ -184,13 +187,11 @@ export default function Admin() {
 
   if (authLoading || isLoading) {
     return (
-      <Layout>
-        <div className="container-main py-12">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
-      </Layout>
+      </AdminLayout>
     );
   }
 
@@ -203,45 +204,16 @@ export default function Admin() {
     { label: "Subscribers", value: subscribers.filter(s => s.is_active).length, icon: Mail },
   ];
 
-  return (
-    <Layout>
-      <div className="container-main py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage orders, products, and consultations</p>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat) => (
-            <Card key={stat.label}>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-primary/10">
-                    <stat.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="consultations">Consultations</TabsTrigger>
-            <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
-          </TabsList>
-
-          {/* Orders Tab */}
-          <TabsContent value="orders" className="space-y-4">
+  // Render content based on current tab
+  const renderContent = () => {
+    switch (currentTab) {
+      case "staff":
+        return <StaffManagement />;
+      
+      case "orders":
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Orders</h2>
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -305,20 +277,14 @@ export default function Admin() {
                 </TableBody>
               </Table>
             </Card>
-          </TabsContent>
+          </div>
+        );
 
-          {/* Products Tab */}
-          <TabsContent value="products" className="space-y-4">
+      case "products":
+        return (
+          <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+              <h2 className="text-2xl font-bold">Products</h2>
               <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => setEditingProduct(null)}>
@@ -448,6 +414,16 @@ export default function Admin() {
               </Dialog>
             </div>
 
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
             <Card>
               <Table>
                 <TableHeader>
@@ -516,10 +492,13 @@ export default function Admin() {
                 </TableBody>
               </Table>
             </Card>
-          </TabsContent>
+          </div>
+        );
 
-          {/* Consultations Tab */}
-          <TabsContent value="consultations" className="space-y-4">
+      case "consultations":
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Consultations</h2>
             <Card>
               <Table>
                 <TableHeader>
@@ -559,10 +538,13 @@ export default function Admin() {
                 </TableBody>
               </Table>
             </Card>
-          </TabsContent>
+          </div>
+        );
 
-          {/* Subscribers Tab */}
-          <TabsContent value="subscribers" className="space-y-4">
+      case "subscribers":
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Newsletter Subscribers</h2>
             <div className="flex items-center justify-between gap-4">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -633,59 +615,135 @@ export default function Admin() {
                 </TableBody>
               </Table>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        );
 
-        {/* Order Details Dialog */}
-        <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Order {selectedOrder?.order_number}</DialogTitle>
-              <DialogDescription>
-                Order details and status
-              </DialogDescription>
-            </DialogHeader>
-            {selectedOrder && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Total (Naira)</p>
-                    <p className="font-medium">{formatNaira(selectedOrder.total_naira)}</p>
+      default:
+        // Overview/Dashboard
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold">Dashboard Overview</h2>
+              <p className="text-muted-foreground">Welcome to the admin dashboard</p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {stats.map((stat) => (
+                <Card key={stat.label}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-full bg-primary/10">
+                        <stat.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Recent Activity */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-4">Recent Orders</h3>
+                  <div className="space-y-3">
+                    {orders.slice(0, 5).map((order) => (
+                      <div key={order.id} className="flex items-center justify-between text-sm">
+                        <span className="font-medium">{order.order_number}</span>
+                        <Badge className={ORDER_STATUSES[order.status]?.color || "bg-gray-500"} variant="secondary">
+                          {ORDER_STATUSES[order.status]?.label || order.status}
+                        </Badge>
+                      </div>
+                    ))}
+                    {orders.length === 0 && (
+                      <p className="text-muted-foreground text-sm">No orders yet</p>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-muted-foreground">Total (Coins)</p>
-                    <p className="font-medium">{formatCoins(selectedOrder.total_coins)} 🪙</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-4">Upcoming Consultations</h3>
+                  <div className="space-y-3">
+                    {consultations.slice(0, 5).map((consultation) => (
+                      <div key={consultation.id} className="flex items-center justify-between text-sm">
+                        <span className="capitalize">{consultation.consultation_type.replace("_", " ")}</span>
+                        <span className="text-muted-foreground">
+                          {format(new Date(consultation.scheduled_date), "MMM d")}
+                        </span>
+                      </div>
+                    ))}
+                    {consultations.length === 0 && (
+                      <p className="text-muted-foreground text-sm">No consultations scheduled</p>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-muted-foreground">Coins Used</p>
-                    <p className="font-medium">{formatCoins(selectedOrder.coins_used || 0)} 🪙</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Naira Paid</p>
-                    <p className="font-medium">{formatNaira(selectedOrder.naira_paid || 0)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Payment Method</p>
-                    <p className="font-medium capitalize">{selectedOrder.payment_method}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Status</p>
-                    <Badge className={ORDER_STATUSES[selectedOrder.status]?.color || "bg-gray-500"}>
-                      {ORDER_STATUSES[selectedOrder.status]?.label || selectedOrder.status}
-                    </Badge>
-                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <AdminLayout>
+      {renderContent()}
+
+      {/* Order Details Dialog */}
+      <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Order {selectedOrder?.order_number}</DialogTitle>
+            <DialogDescription>
+              Order details and status
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Total (Naira)</p>
+                  <p className="font-medium">{formatNaira(selectedOrder.total_naira)}</p>
                 </div>
-                {selectedOrder.notes && (
-                  <div>
-                    <p className="text-muted-foreground text-sm">Notes</p>
-                    <p className="text-sm">{selectedOrder.notes}</p>
-                  </div>
-                )}
+                <div>
+                  <p className="text-muted-foreground">Total (Coins)</p>
+                  <p className="font-medium">{formatCoins(selectedOrder.total_coins)} 🪙</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Coins Used</p>
+                  <p className="font-medium">{formatCoins(selectedOrder.coins_used || 0)} 🪙</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Naira Paid</p>
+                  <p className="font-medium">{formatNaira(selectedOrder.naira_paid || 0)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Payment Method</p>
+                  <p className="font-medium capitalize">{selectedOrder.payment_method}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Status</p>
+                  <Badge className={ORDER_STATUSES[selectedOrder.status]?.color || "bg-gray-500"}>
+                    {ORDER_STATUSES[selectedOrder.status]?.label || selectedOrder.status}
+                  </Badge>
+                </div>
               </div>
-            )}
-          </DialogContent>
-        </Dialog>
-      </div>
-    </Layout>
+              {selectedOrder.notes && (
+                <div>
+                  <p className="text-muted-foreground text-sm">Notes</p>
+                  <p className="text-sm">{selectedOrder.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </AdminLayout>
   );
 }
