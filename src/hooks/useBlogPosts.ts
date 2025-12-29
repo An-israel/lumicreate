@@ -13,6 +13,8 @@ export interface BlogPost {
   author_avatar: string | null;
   read_time: string | null;
   is_published: boolean;
+  is_featured: boolean;
+  view_count: number;
   published_at: string | null;
   created_at: string;
   updated_at: string;

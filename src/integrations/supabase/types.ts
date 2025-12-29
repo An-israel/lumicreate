@@ -94,12 +94,14 @@ export type Database = {
           excerpt: string | null
           id: string
           image_url: string | null
+          is_featured: boolean
           is_published: boolean
           published_at: string | null
           read_time: string | null
           slug: string
           title: string
           updated_at: string
+          view_count: number
         }
         Insert: {
           author_avatar?: string | null
@@ -110,12 +112,14 @@ export type Database = {
           excerpt?: string | null
           id?: string
           image_url?: string | null
+          is_featured?: boolean
           is_published?: boolean
           published_at?: string | null
           read_time?: string | null
           slug: string
           title: string
           updated_at?: string
+          view_count?: number
         }
         Update: {
           author_avatar?: string | null
@@ -126,12 +130,14 @@ export type Database = {
           excerpt?: string | null
           id?: string
           image_url?: string | null
+          is_featured?: boolean
           is_published?: boolean
           published_at?: string | null
           read_time?: string | null
           slug?: string
           title?: string
           updated_at?: string
+          view_count?: number
         }
         Relationships: []
       }
