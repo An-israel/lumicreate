@@ -6,45 +6,54 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { blogPosts } from "@/lib/blogData";
+import { useBlogPosts } from "@/hooks/useBlogPosts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-const categories = [
-  { name: "All", count: blogPosts.length },
-  { name: "Equipment Guide", count: blogPosts.filter(p => p.category === "Equipment Guide").length },
-  { name: "Tutorial", count: blogPosts.filter(p => p.category === "Tutorial").length },
-  { name: "Growth Strategy", count: blogPosts.filter(p => p.category === "Growth Strategy").length },
-  { name: "Resources", count: blogPosts.filter(p => p.category === "Resources").length },
-];
+import { format } from "date-fns";
 
 const Resources = () => {
   const { toast } = useToast();
+  const { posts: blogPosts, isLoading: postsLoading } = useBlogPosts(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
 
+  // Generate categories dynamically from posts
+  const categories = useMemo(() => {
+    const categoryMap: Record<string, number> = {};
+    blogPosts.forEach((post) => {
+      categoryMap[post.category] = (categoryMap[post.category] || 0) + 1;
+    });
+    return [
+      { name: "All", count: blogPosts.length },
+      ...Object.entries(categoryMap).map(([name, count]) => ({ name, count })),
+    ];
+  }, [blogPosts]);
+
   // Filter posts based on search and category
   const filteredPosts = useMemo(() => {
-    return blogPosts.filter(post => {
-      const matchesSearch = searchQuery === "" || 
+    return blogPosts.filter((post) => {
+      const matchesSearch =
+        searchQuery === "" ||
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
-      
+        (post.excerpt || "").toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesCategory =
+        selectedCategory === "All" || post.category === selectedCategory;
+
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [blogPosts, searchQuery, selectedCategory]);
 
-  const featuredPosts = filteredPosts.filter(p => p.featured);
-  const regularPosts = filteredPosts.filter(p => !p.featured);
+  // For now, mark first 2 posts as featured
+  const featuredPosts = filteredPosts.slice(0, 2);
+  const regularPosts = filteredPosts.slice(2);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email.trim()) {
       toast({
         title: "Email required",
@@ -54,7 +63,6 @@ const Resources = () => {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast({
@@ -67,7 +75,7 @@ const Resources = () => {
 
     setIsSubscribing(true);
     const trimmedEmail = email.trim().toLowerCase();
-    
+
     try {
       const { error } = await supabase
         .from("newsletter_subscribers")
@@ -83,15 +91,16 @@ const Resources = () => {
           throw error;
         }
       } else {
-        // Send welcome email (fire and forget - don't block UI)
-        supabase.functions.invoke("send-newsletter-welcome", {
-          body: { email: trimmedEmail },
-        }).then(({ error: emailError }) => {
-          if (emailError) {
-            console.error("Failed to send welcome email:", emailError);
-          }
-        });
-        
+        supabase.functions
+          .invoke("send-newsletter-welcome", {
+            body: { email: trimmedEmail },
+          })
+          .then(({ error: emailError }) => {
+            if (emailError) {
+              console.error("Failed to send welcome email:", emailError);
+            }
+          });
+
         setIsSubscribed(true);
         setEmail("");
         toast({
@@ -110,6 +119,17 @@ const Resources = () => {
       setIsSubscribing(false);
     }
   };
+
+  if (postsLoading) {
+    return (
+      <Layout>
+        <div className="container py-20 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground mt-4">Loading articles...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -135,8 +155,8 @@ const Resources = () => {
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Tutorials, equipment guides, and growth strategies to help Nigerian creators succeed. 
-              Learn from the best and elevate your content.
+              Tutorials, equipment guides, and growth strategies to help Nigerian
+              creators succeed. Learn from the best and elevate your content.
             </p>
 
             {/* Search Bar */}
@@ -162,7 +182,7 @@ const Resources = () => {
               <Badge
                 key={category.name}
                 variant={selectedCategory === category.name ? "default" : "outline"}
-                className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors px-4 py-1.5"
+                className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors px-4 py-1.5 capitalize"
                 onClick={() => setSelectedCategory(category.name)}
               >
                 {category.name} ({category.count})
@@ -178,7 +198,8 @@ const Resources = () => {
           <div className="container">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                Found {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""}
+                Found {filteredPosts.length} article
+                {filteredPosts.length !== 1 ? "s" : ""}
                 {searchQuery && ` for "${searchQuery}"`}
                 {selectedCategory !== "All" && ` in ${selectedCategory}`}
               </p>
@@ -203,20 +224,26 @@ const Resources = () => {
       {featuredPosts.length > 0 && (
         <section className="py-12 md:py-16">
           <div className="container">
-            <h2 className="text-2xl font-bold text-foreground mb-8">Featured Articles</h2>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              {featuredPosts.map((post, index) => (
-                <Card key={post.id} className={`overflow-hidden card-hover ${index === 0 && featuredPosts.length >= 3 ? "md:col-span-2 md:row-span-2" : ""}`}>
-                  <Link to={`/resources/${post.id}`}>
-                    <div className={`relative ${index === 0 && featuredPosts.length >= 3 ? "aspect-[16/9] md:aspect-[16/10]" : "aspect-video"}`}>
-                      <img
-                        src={post.image}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
+            <h2 className="text-2xl font-bold text-foreground mb-8">
+              Featured Articles
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {featuredPosts.map((post) => (
+                <Card key={post.id} className="overflow-hidden card-hover">
+                  <Link to={`/resources/${post.slug}`}>
+                    <div className="aspect-video relative">
+                      {post.image_url ? (
+                        <img
+                          src={post.image_url}
+                          alt={post.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
+                      <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground capitalize">
                         {post.category}
                       </Badge>
                     </div>
@@ -224,14 +251,18 @@ const Resources = () => {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          {post.date}
+                          {post.published_at
+                            ? format(new Date(post.published_at), "MMM d, yyyy")
+                            : format(new Date(post.created_at), "MMM d, yyyy")}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {post.readTime}
-                        </span>
+                        {post.read_time && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {post.read_time}
+                          </span>
+                        )}
                       </div>
-                      <h3 className={`font-semibold text-foreground mb-2 ${index === 0 && featuredPosts.length >= 3 ? "text-xl md:text-2xl" : "text-lg"}`}>
+                      <h3 className="font-semibold text-foreground mb-2 text-lg">
                         {post.title}
                       </h3>
                       <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
@@ -253,21 +284,27 @@ const Resources = () => {
       {regularPosts.length > 0 && (
         <section className="py-12 md:py-16 bg-muted/30">
           <div className="container">
-            <h2 className="text-2xl font-bold text-foreground mb-8">All Articles</h2>
-            
+            <h2 className="text-2xl font-bold text-foreground mb-8">
+              All Articles
+            </h2>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {regularPosts.map((post) => (
-                <Link key={post.id} to={`/resources/${post.id}`}>
+                <Link key={post.id} to={`/resources/${post.slug}`}>
                   <Card className="overflow-hidden card-hover h-full">
                     <div className="aspect-video relative">
-                      <img
-                        src={post.image}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
+                      {post.image_url ? (
+                        <img
+                          src={post.image_url}
+                          alt={post.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
+                      )}
                     </div>
                     <CardContent className="p-4">
-                      <Badge variant="outline" className="mb-3 text-xs">
+                      <Badge variant="outline" className="mb-3 text-xs capitalize">
                         {post.category}
                       </Badge>
                       <h3 className="font-semibold text-foreground mb-2 line-clamp-2">
@@ -277,9 +314,17 @@ const Resources = () => {
                         {post.excerpt}
                       </p>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span>{post.date}</span>
-                        <span>•</span>
-                        <span>{post.readTime}</span>
+                        <span>
+                          {post.published_at
+                            ? format(new Date(post.published_at), "MMM d, yyyy")
+                            : format(new Date(post.created_at), "MMM d, yyyy")}
+                        </span>
+                        {post.read_time && (
+                          <>
+                            <span>•</span>
+                            <span>{post.read_time}</span>
+                          </>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -295,11 +340,18 @@ const Resources = () => {
         <section className="py-20">
           <div className="container text-center">
             <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">No articles found</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-2">
+              No articles found
+            </h2>
             <p className="text-muted-foreground mb-6">
               Try adjusting your search or filter to find what you're looking for.
             </p>
-            <Button onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }}>
+            <Button
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("All");
+              }}
+            >
               Clear filters
             </Button>
           </div>
@@ -318,14 +370,15 @@ const Resources = () => {
                   <Lightbulb className="h-8 w-8 text-primary" />
                 )}
               </div>
-              
+
               {isSubscribed ? (
                 <>
                   <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                     You're on the List!
                   </h2>
                   <p className="text-muted-foreground max-w-xl mx-auto">
-                    Thanks for subscribing! You'll receive our latest creator tips and guides directly in your inbox.
+                    Thanks for subscribing! You'll receive our latest creator tips
+                    and guides directly in your inbox.
                   </p>
                 </>
               ) : (
@@ -334,10 +387,14 @@ const Resources = () => {
                     Get Creator Tips in Your Inbox
                   </h2>
                   <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-                    Join 5,000+ Nigerian creators receiving weekly tips on equipment, content strategy, 
-                    and growing your audience. No spam, just value.
+                    Join 5,000+ Nigerian creators receiving weekly tips on
+                    equipment, content strategy, and growing your audience. No
+                    spam, just value.
                   </p>
-                  <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                  <form
+                    onSubmit={handleSubscribe}
+                    className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+                  >
                     <Input
                       type="email"
                       placeholder="Enter your email"
@@ -367,11 +424,13 @@ const Resources = () => {
       {/* Quick Links */}
       <section className="py-12 md:py-16 bg-muted/30">
         <div className="container">
-          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Popular Topics</h2>
-          
+          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
+            Popular Topics
+          </h2>
+
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <button 
-              onClick={() => setSelectedCategory("Equipment Guide")}
+            <button
+              onClick={() => setSelectedCategory("equipment")}
               className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
             >
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -379,12 +438,14 @@ const Resources = () => {
               </div>
               <div>
                 <p className="font-medium text-foreground">Camera Guides</p>
-                <p className="text-sm text-muted-foreground">Find your perfect camera</p>
+                <p className="text-sm text-muted-foreground">
+                  Find your perfect camera
+                </p>
               </div>
             </button>
-            
-            <button 
-              onClick={() => setSelectedCategory("Tutorial")}
+
+            <button
+              onClick={() => setSelectedCategory("tutorials")}
               className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
             >
               <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
@@ -395,9 +456,9 @@ const Resources = () => {
                 <p className="text-sm text-muted-foreground">Sound like a pro</p>
               </div>
             </button>
-            
-            <button 
-              onClick={() => setSelectedCategory("Tutorial")}
+
+            <button
+              onClick={() => setSelectedCategory("tips")}
               className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
             >
               <div className="w-12 h-12 rounded-lg bg-secondary/30 flex items-center justify-center">
@@ -405,20 +466,24 @@ const Resources = () => {
               </div>
               <div>
                 <p className="font-medium text-foreground">Lighting Tips</p>
-                <p className="text-sm text-muted-foreground">Master your lighting</p>
+                <p className="text-sm text-muted-foreground">
+                  Master your lighting
+                </p>
               </div>
             </button>
-            
-            <button 
-              onClick={() => setSelectedCategory("Growth Strategy")}
+
+            <button
+              onClick={() => setSelectedCategory("news")}
               className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
             >
               <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                 <TrendingUp className="h-6 w-6 text-emerald-500" />
               </div>
               <div>
-                <p className="font-medium text-foreground">Growth Strategies</p>
-                <p className="text-sm text-muted-foreground">Grow your audience</p>
+                <p className="font-medium text-foreground">Growth Strategy</p>
+                <p className="text-sm text-muted-foreground">
+                  Grow your audience
+                </p>
               </div>
             </button>
           </div>
