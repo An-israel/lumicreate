@@ -41,11 +41,7 @@ type StaffLoginFormData = z.infer<typeof staffLoginSchema>;
 
 const STAFF_POSITIONS = [
   { value: "admin", label: "Admin" },
-  { value: "coo", label: "Chief Operations Officer" },
-  { value: "sales", label: "Sales" },
-  { value: "csm", label: "Customer Success Manager" },
-  { value: "marketing", label: "Marketing" },
-  { value: "support", label: "Support" },
+  { value: "staff", label: "Staff" },
 ];
 
 const Auth = () => {
