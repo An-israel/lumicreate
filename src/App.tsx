@@ -13,6 +13,7 @@ import TierPackages from "./pages/TierPackages";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import Staff from "./pages/Staff";
 import Quiz from "./pages/Quiz";
 import QuizResults from "./pages/QuizResults";
 import BuyCoins from "./pages/BuyCoins";
@@ -57,6 +58,7 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/staff" element={<Staff />} />
                 <Route path="/buy-coins" element={<BuyCoins />} />
                 <Route path="/quiz" element={<Quiz />} />
                 <Route path="/quiz/results" element={<QuizResults />} />
