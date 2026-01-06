@@ -47,6 +47,8 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { metadata } = verifyData.data;
     const userId = metadata.user_id;
+    const customerEmail = verifyData.data.customer?.email;
+    const amountPaid = verifyData.data.amount / 100; // Convert from kobo
 
     // Handle based on payment type
     if (metadata.type === "coins") {
@@ -85,6 +87,37 @@ const handler = async (req: Request): Promise<Response> => {
         description: `Purchased ${coinsAmount} coins + ${bonusCoins} bonus`,
         reference_id: reference,
       });
+
+      // Get user profile for email personalization
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("user_id", userId)
+        .single();
+
+      // Send coin receipt email (fire and forget)
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+      
+      if (customerEmail && supabaseAnonKey) {
+        fetch(`${supabaseUrl}/functions/v1/send-coin-receipt`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseAnonKey}`,
+          },
+          body: JSON.stringify({
+            email: customerEmail,
+            customerName: profile?.full_name,
+            coinsAdded: coinsAmount,
+            bonusCoins,
+            totalCoins,
+            newBalance,
+            amountPaid,
+            reference,
+          }),
+        }).catch(err => console.error("Failed to send receipt email:", err));
+      }
 
       return new Response(
         JSON.stringify({
