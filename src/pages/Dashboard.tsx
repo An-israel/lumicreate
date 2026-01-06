@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useOrders } from "@/hooks/useOrders";
 import { useConsultations } from "@/hooks/useConsultations";
+import { CoinTransactionHistory } from "@/components/dashboard/CoinTransactionHistory";
 import { formatNaira, formatCoins, ORDER_STATUSES } from "@/lib/constants";
 
 const Dashboard = () => {
@@ -186,7 +187,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-3">
             {/* Recent Orders */}
             <Card>
               <CardHeader>
@@ -237,6 +238,9 @@ const Dashboard = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Coin Transaction History */}
+            <CoinTransactionHistory limit={4} showViewAll={false} />
 
             {/* Upcoming Consultations */}
             <Card>
