@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { initializePayment } from "@/lib/paystack";
@@ -6,16 +6,50 @@ import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Coins, Check, Sparkles, Zap, Crown, Star } from "lucide-react";
+import { Coins, Check, Sparkles, Zap, Crown, Star, Calculator } from "lucide-react";
 import { COIN_PACKAGES, formatNaira, formatCoins } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
+// Bonus calculation tiers
+const BONUS_TIERS = [
+  { minNaira: 20000, bonusPercent: 30 },
+  { minNaira: 10000, bonusPercent: 20 },
+  { minNaira: 5000, bonusPercent: 10 },
+  { minNaira: 0, bonusPercent: 0 },
+];
+
+const NAIRA_TO_COINS_RATE = 10; // 1 Naira = 0.1 coins, so 10 Naira = 1 coin
+
+function calculateCoinsFromNaira(naira: number) {
+  const baseCoins = Math.floor(naira / NAIRA_TO_COINS_RATE);
+  const bonusTier = BONUS_TIERS.find(tier => naira >= tier.minNaira);
+  const bonusPercent = bonusTier?.bonusPercent || 0;
+  const bonusCoins = Math.floor(baseCoins * (bonusPercent / 100));
+  
+  return {
+    baseCoins,
+    bonusCoins,
+    bonusPercent,
+    totalCoins: baseCoins + bonusCoins,
+  };
+}
+
 export default function BuyCoins() {
-  const { user, wallet, profile } = useAuth();
+  const { user, wallet } = useAuth();
   const navigate = useNavigate();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [customAmount, setCustomAmount] = useState<string>("");
+  const [showCustom, setShowCustom] = useState(false);
+
+  const customCalculation = useMemo(() => {
+    const amount = parseInt(customAmount) || 0;
+    if (amount < 100) return null;
+    return calculateCoinsFromNaira(amount);
+  }, [customAmount]);
 
   const handlePurchase = async (packageId: string) => {
     if (!user) {
@@ -40,6 +74,51 @@ export default function BuyCoins() {
           coinPackageId: pkg.id,
           coinsAmount: pkg.coins,
           bonusCoins: pkg.bonus,
+        },
+      });
+
+      if (result.success && result.authorization_url) {
+        window.location.href = result.authorization_url;
+      } else {
+        toast.error(result.error || "Failed to initialize payment");
+        setIsProcessing(false);
+        setSelectedPackage(null);
+      }
+    } catch (error) {
+      toast.error("Payment initialization failed");
+      setIsProcessing(false);
+      setSelectedPackage(null);
+    }
+  };
+
+  const handleCustomPurchase = async () => {
+    if (!user) {
+      toast.error("Please sign in to purchase coins");
+      navigate("/auth");
+      return;
+    }
+
+    const amount = parseInt(customAmount) || 0;
+    if (amount < 100) {
+      toast.error("Minimum amount is ₦100");
+      return;
+    }
+
+    if (!customCalculation) return;
+
+    setIsProcessing(true);
+    setSelectedPackage("custom");
+
+    try {
+      const result = await initializePayment({
+        type: "coins",
+        amount: amount,
+        email: user.email || "",
+        userId: user.id,
+        metadata: {
+          coinPackageId: "custom",
+          coinsAmount: customCalculation.baseCoins,
+          bonusCoins: customCalculation.bonusCoins,
         },
       });
 
@@ -102,7 +181,7 @@ export default function BuyCoins() {
         </div>
 
         {/* Coin Packages */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {COIN_PACKAGES.map((pkg) => {
             const Icon = getPackageIcon(pkg.id);
             const isSelected = selectedPackage === pkg.id;
@@ -191,6 +270,90 @@ export default function BuyCoins() {
               </Card>
             );
           })}
+        </div>
+
+        {/* Custom Amount Section */}
+        <div className="max-w-2xl mx-auto mb-12">
+          <Card className={cn(
+            "border-dashed transition-all duration-300",
+            showCustom && "border-solid border-primary"
+          )}>
+            <CardHeader className="text-center cursor-pointer" onClick={() => setShowCustom(!showCustom)}>
+              <div className="mx-auto p-4 rounded-full mb-4 bg-primary/10">
+                <Calculator className="h-8 w-8 text-primary" />
+              </div>
+              <CardTitle className="text-xl">Custom Amount</CardTitle>
+              <CardDescription>
+                Enter any amount and we'll calculate your bonus coins automatically
+              </CardDescription>
+            </CardHeader>
+
+            {showCustom && (
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="customAmount">Amount in Naira (₦)</Label>
+                  <Input
+                    id="customAmount"
+                    type="number"
+                    min={100}
+                    step={100}
+                    placeholder="Enter amount (min ₦100)"
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                    className="text-lg"
+                  />
+                </div>
+
+                {customCalculation && (
+                  <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Base Coins:</span>
+                      <span className="font-semibold">{formatCoins(customCalculation.baseCoins)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">
+                        Bonus ({customCalculation.bonusPercent}%):
+                      </span>
+                      <span className="font-semibold text-secondary">
+                        +{formatCoins(customCalculation.bonusCoins)}
+                      </span>
+                    </div>
+                    <hr className="border-border" />
+                    <div className="flex justify-between items-center text-lg">
+                      <span className="font-semibold">Total Coins:</span>
+                      <span className="font-bold text-primary">
+                        {formatCoins(customCalculation.totalCoins)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bonus tiers info */}
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p className="font-medium">Bonus Tiers:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>₦5,000+ → <span className="text-secondary">10% bonus</span></li>
+                    <li>₦10,000+ → <span className="text-secondary">20% bonus</span></li>
+                    <li>₦20,000+ → <span className="text-secondary">30% bonus</span></li>
+                  </ul>
+                </div>
+
+                <Button
+                  className="w-full gradient-primary"
+                  size="lg"
+                  onClick={handleCustomPurchase}
+                  disabled={isProcessing || !customCalculation}
+                >
+                  {isProcessing && selectedPackage === "custom" 
+                    ? "Processing..." 
+                    : customCalculation 
+                      ? `Pay ${formatNaira(parseInt(customAmount))} for ${formatCoins(customCalculation.totalCoins)} coins`
+                      : "Enter amount to continue"
+                  }
+                </Button>
+              </CardContent>
+            )}
+          </Card>
         </div>
 
         {/* Benefits */}
