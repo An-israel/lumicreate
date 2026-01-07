@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 import { Instagram, Twitter, Youtube, Mail } from "lucide-react";
-import logoWithName from "@/assets/logo-with-name.png";
+import { useTheme } from "@/components/theme/ThemeProvider";
 import logoIcon from "@/assets/logo-icon.png";
+import logoLight from "@/assets/logo-light.png";
 import brandPattern from "@/assets/brand-pattern.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { theme } = useTheme();
+  
+  // Use light logo for dark mode, dark logo for light mode
+  const currentLogo = theme === "dark" ? logoIcon : logoLight;
 
   const footerLinks = {
     shop: [
@@ -52,9 +57,9 @@ const Footer = () => {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src={logoIcon} alt="Luminate" className="h-9 w-9" />
-              <img src={logoWithName} alt="Luminate Creators" className="h-6" />
+            <Link to="/" className="flex items-center gap-3 mb-4">
+              <img src={currentLogo} alt="Luminate Creators" className="h-9 w-9" />
+              <span className="font-display font-bold text-lg">Luminate Creators</span>
             </Link>
             <p className="text-sm text-muted-foreground mb-4 max-w-xs">
               Empowering Nigerian content creators with curated equipment packages and expert guidance.

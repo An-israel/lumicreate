@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
+import { useTheme } from "@/components/theme/ThemeProvider";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,17 +14,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import logoWithName from "@/assets/logo-with-name.png";
 import logoIcon from "@/assets/logo-icon.png";
+import logoLight from "@/assets/logo-light.png";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, profile, wallet, signOut, isAdmin, isStaff } = useAuth();
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   
   const coinBalance = wallet?.balance ?? 0;
+
+  // Use light logo for dark mode, dark logo for light mode
+  const currentLogo = theme === "dark" ? logoIcon : logoLight;
 
   const navLinks = [
     { name: "Shop", href: "/shop" },
@@ -42,8 +48,8 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <img src={logoIcon} alt="Luminate" className="h-8 w-8" />
-          <img src={logoWithName} alt="Luminate Creators" className="h-6 hidden sm:block" />
+          <img src={currentLogo} alt="Luminate Creators" className="h-8 w-8" />
+          <span className="font-display font-bold text-lg hidden sm:block">Luminate Creators</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -61,6 +67,8 @@ const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
+          
           {user ? (
             <>
               {/* Coin Balance */}
@@ -161,16 +169,19 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            className="p-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
