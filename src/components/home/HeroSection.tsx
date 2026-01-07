@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import brandPattern from "@/assets/brand-pattern.png";
 
 const HeroSection = () => {
   return (
@@ -10,6 +11,15 @@ const HeroSection = () => {
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-secondary/20 blur-3xl" />
+        {/* Brand Pattern Overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `url(${brandPattern})`,
+            backgroundSize: '120px',
+            backgroundRepeat: 'repeat',
+          }}
+        />
       </div>
 
       <div className="container relative">

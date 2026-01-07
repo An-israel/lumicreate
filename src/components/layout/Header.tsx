@@ -12,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import logoWithName from "@/assets/logo-with-name.png";
+import logoIcon from "@/assets/logo-icon.png";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -40,12 +42,8 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-            <span className="text-lg font-bold text-primary-foreground">L</span>
-          </div>
-          <span className="text-xl font-display font-bold text-foreground">
-            Luminate
-          </span>
+          <img src={logoIcon} alt="Luminate" className="h-8 w-8" />
+          <img src={logoWithName} alt="Luminate Creators" className="h-6 hidden sm:block" />
         </Link>
 
         {/* Desktop Navigation */}

@@ -123,7 +123,8 @@ const handler = async (req: Request): Promise<Response> => {
         JSON.stringify({
           success: true,
           type: "coins",
-          coinsAdded: totalCoins,
+          coinsAdded: coinsAmount,
+          bonusCoins: bonusCoins,
           newBalance,
         }),
         {

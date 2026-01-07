@@ -25,6 +25,7 @@ interface VerifyResponse {
   success: boolean;
   type?: string;
   coinsAdded?: number;
+  bonusCoins?: number;
   newBalance?: number;
   orderId?: string;
   error?: string;

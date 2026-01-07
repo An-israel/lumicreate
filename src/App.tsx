@@ -32,6 +32,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Resources from "./pages/Resources";
 import BlogPost from "./pages/BlogPost";
+import CoinPurchaseSuccess from "./pages/CoinPurchaseSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,7 @@ const App = () => (
                 <Route path="/consultations" element={<Consultations />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/payment/callback" element={<PaymentCallback />} />
+                <Route path="/coins/success" element={<CoinPurchaseSuccess />} />
                 <Route path="/order/:orderId" element={<OrderTracking />} />
                 <Route path="/order/:orderId/confirmation" element={<OrderConfirmation />} />
                 <Route path="/track-order" element={<TrackOrder />} />
