@@ -7,6 +7,7 @@ import StaffManagement from "@/components/admin/StaffManagement";
 import BlogManagement from "@/components/admin/BlogManagement";
 import PageContentEditor from "@/components/admin/PageContentEditor";
 import ImageUpload from "@/components/admin/ImageUpload";
+import PaymentAlerts from "@/components/admin/PaymentAlerts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -85,6 +86,14 @@ export default function Admin() {
       toast.error("Failed to update order status");
     } else {
       toast.success("Order status updated");
+      
+      // Send email notification for status update
+      if (["shipped", "delivered", "cancelled"].includes(status)) {
+        supabase.functions.invoke("send-order-email", {
+          body: { orderId, type: "status_update", newStatus: status }
+        }).catch(err => console.error("Failed to send status email:", err));
+      }
+      
       fetchData();
     }
   };
@@ -216,6 +225,9 @@ export default function Admin() {
       
       case "blog":
         return <BlogManagement />;
+      
+      case "alerts":
+        return <PaymentAlerts />;
       
       case "content":
         return <PageContentEditor />;

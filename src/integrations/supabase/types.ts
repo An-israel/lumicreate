@@ -472,6 +472,48 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_alerts: {
+        Row: {
+          amount: number | null
+          created_at: string
+          details: Json | null
+          id: string
+          is_resolved: boolean | null
+          order_id: string | null
+          reference: string
+          resolved_at: string | null
+          resolved_by: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          is_resolved?: boolean | null
+          order_id?: string | null
+          reference: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          is_resolved?: boolean | null
+          order_id?: string | null
+          reference?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       product_reviews: {
         Row: {
           created_at: string
