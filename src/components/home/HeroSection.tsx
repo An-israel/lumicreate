@@ -1,26 +1,13 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import brandPattern from "@/assets/brand-pattern.png";
 
 const HeroSection = () => {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-muted/30 py-16 md:py-24 lg:py-32">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-secondary/20 blur-3xl" />
-        {/* Brand Pattern Overlay */}
-        <div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `url(${brandPattern})`,
-            backgroundSize: '120px',
-            backgroundRepeat: 'repeat',
-          }}
-        />
-      </div>
+    <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
+      {/* Clean Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-accent/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
       <div className="container relative">
         <div className="mx-auto max-w-4xl text-center">
