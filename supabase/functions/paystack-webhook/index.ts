@@ -125,8 +125,18 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "charge.failed": {
         // Payment failed
-        const { reference, metadata } = event.data;
+        const { reference, metadata, amount } = event.data;
         console.log(`Payment failed for reference: ${reference}`);
+
+        // Create alert for admin
+        await supabase.from("payment_alerts").insert({
+          type: "failed_payment",
+          reference,
+          amount: amount / 100,
+          user_id: metadata?.user_id || null,
+          order_id: metadata?.orderId || null,
+          details: event.data,
+        });
 
         if (metadata?.type === "order" && metadata?.orderId) {
           // Mark order as failed/cancelled
@@ -145,6 +155,14 @@ const handler = async (req: Request): Promise<Response> => {
         // Refund was processed
         const { reference, amount } = event.data;
         console.log(`Refund processed for reference: ${reference}, amount: ${amount}`);
+
+        // Create alert for admin
+        await supabase.from("payment_alerts").insert({
+          type: "refund",
+          reference,
+          amount: amount / 100,
+          details: event.data,
+        });
 
         // Find the original transaction
         const { data: originalTx } = await supabase
@@ -186,11 +204,16 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "chargeback.create": {
         // Chargeback initiated
-        const { reference } = event.data;
+        const { reference, amount } = event.data;
         console.log(`Chargeback initiated for reference: ${reference}`);
         
-        // You might want to flag the user or order for review
-        // For now, just log it
+        // Create alert for admin
+        await supabase.from("payment_alerts").insert({
+          type: "chargeback",
+          reference,
+          amount: amount ? amount / 100 : null,
+          details: event.data,
+        });
         break;
       }
 
