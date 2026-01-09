@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const loginSchema = z.object({
@@ -51,6 +52,9 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showStaffLogin, setShowStaffLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const { user, signIn, signUp, isAdmin, isStaff, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -131,6 +135,27 @@ const Auth = () => {
       const positionLabel = STAFF_POSITIONS.find(p => p.value === data.position)?.label || data.position;
       toast.success(`Welcome back, ${positionLabel}!`);
       // Navigation will be handled by useEffect based on roles
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!forgotPasswordEmail.trim()) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    setIsSendingReset(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+      redirectTo: `${window.location.origin}/auth?mode=reset`,
+    });
+    setIsSendingReset(false);
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Password reset link sent! Check your email.");
+      setShowForgotPassword(false);
+      setForgotPasswordEmail("");
     }
   };
 
@@ -338,6 +363,49 @@ const Auth = () => {
                         </p>
                       )}
                     </div>
+                    
+                    {/* Forgot Password */}
+                    {!showForgotPassword ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-xs text-primary hover:underline self-end"
+                      >
+                        Forgot password?
+                      </button>
+                    ) : (
+                      <div className="space-y-2 p-3 rounded-lg bg-muted/50 border">
+                        <Label htmlFor="reset-email" className="text-sm">Enter your email to reset password</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="reset-email"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={forgotPasswordEmail}
+                            onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={handleForgotPassword}
+                            disabled={isSendingReset}
+                          >
+                            {isSendingReset ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
+                          </Button>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowForgotPassword(false);
+                            setForgotPasswordEmail("");
+                          }}
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                   </CardContent>
 
                   <CardFooter className="flex-col gap-4">

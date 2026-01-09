@@ -13,7 +13,8 @@ import {
   Home,
   FileText,
   BookOpen,
-  AlertTriangle
+  AlertTriangle,
+  Coins
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, tab: "overview" },
   { label: "Orders", href: "/admin?tab=orders", icon: ShoppingCart, tab: "orders" },
   { label: "Products", href: "/admin?tab=products", icon: Package, tab: "products" },
+  { label: "Coin Management", href: "/admin?tab=coins", icon: Coins, tab: "coins" },
   { label: "Payment Alerts", href: "/admin?tab=alerts", icon: AlertTriangle, tab: "alerts" },
   { label: "Blog Posts", href: "/admin?tab=blog", icon: BookOpen, tab: "blog" },
   { label: "Page Content", href: "/admin?tab=content", icon: FileText, tab: "content" },
