@@ -8,6 +8,7 @@ import BlogManagement from "@/components/admin/BlogManagement";
 import PageContentEditor from "@/components/admin/PageContentEditor";
 import ImageUpload from "@/components/admin/ImageUpload";
 import PaymentAlerts from "@/components/admin/PaymentAlerts";
+import CoinManagement from "@/components/admin/CoinManagement";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -228,6 +229,9 @@ export default function Admin() {
       
       case "alerts":
         return <PaymentAlerts />;
+      
+      case "coins":
+        return <CoinManagement />;
       
       case "content":
         return <PageContentEditor />;
