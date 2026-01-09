@@ -52,9 +52,48 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Handle based on payment type
     if (metadata.type === "coins") {
+      // Get coins info from metadata (set during payment initialization)
       const coinsAmount = metadata.coinsAmount || 0;
       const bonusCoins = metadata.bonusCoins || 0;
       const totalCoins = coinsAmount + bonusCoins;
+
+      // CRITICAL: Check if this transaction was already processed
+      const { data: existingTx, error: txCheckError } = await supabase
+        .from("coin_transactions")
+        .select("id")
+        .eq("reference_id", reference)
+        .maybeSingle();
+
+      if (txCheckError) {
+        console.error("Error checking existing transaction:", txCheckError);
+      }
+
+      if (existingTx) {
+        // Transaction already processed (likely by webhook)
+        // Get current balance and return success without double-crediting
+        const { data: wallet } = await supabase
+          .from("coin_wallets")
+          .select("balance")
+          .eq("user_id", userId)
+          .single();
+
+        console.log(`Verify: Transaction ${reference} already processed, returning existing balance`);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            type: "coins",
+            coinsAdded: coinsAmount,
+            bonusCoins: bonusCoins,
+            newBalance: wallet?.balance || 0,
+            alreadyProcessed: true,
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
 
       // Get current wallet balance
       const { data: wallet, error: walletError } = await supabase
@@ -88,6 +127,8 @@ const handler = async (req: Request): Promise<Response> => {
         reference_id: reference,
       });
 
+      console.log(`Verify: Credited ${totalCoins} coins to user ${userId}, new balance: ${newBalance}`);
+
       // Get user profile for email personalization
       const { data: profile } = await supabase
         .from("profiles")
@@ -96,7 +137,6 @@ const handler = async (req: Request): Promise<Response> => {
         .single();
 
       // Send coin receipt email (fire and forget)
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
       
       if (customerEmail && supabaseAnonKey) {
@@ -134,6 +174,29 @@ const handler = async (req: Request): Promise<Response> => {
       );
     } else if (metadata.type === "order") {
       const orderId = metadata.orderId;
+
+      // Check if order was already processed
+      const { data: order } = await supabase
+        .from("orders")
+        .select("status")
+        .eq("id", orderId)
+        .single();
+
+      if (order?.status !== "pending") {
+        // Order already processed
+        return new Response(
+          JSON.stringify({
+            success: true,
+            type: "order",
+            orderId,
+            alreadyProcessed: true,
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
 
       // Update order status
       const { error: orderError } = await supabase
