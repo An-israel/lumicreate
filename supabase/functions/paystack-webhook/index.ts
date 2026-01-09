@@ -60,49 +60,56 @@ const handler = async (req: Request): Promise<Response> => {
 
     switch (event.event) {
       case "charge.success": {
-        // Payment was successful - this is a backup confirmation
-        const { reference, metadata, amount, customer } = event.data;
+        // Payment was successful - this is a BACKUP confirmation
+        // Primary processing happens in paystack-verify
+        const { reference, metadata, amount } = event.data;
         const userId = metadata?.user_id;
 
         if (metadata?.type === "coins" && userId) {
+          // Get coins info from metadata (passed during initialization)
           const coinsAmount = metadata.coinsAmount || 0;
           const bonusCoins = metadata.bonusCoins || 0;
           const totalCoins = coinsAmount + bonusCoins;
 
-          // Check if transaction was already processed
-          const { data: existingTx } = await supabase
+          // Check if transaction was ALREADY processed (by verify or previous webhook)
+          const { data: existingTx, error: txCheckError } = await supabase
             .from("coin_transactions")
             .select("id")
             .eq("reference_id", reference)
+            .maybeSingle();
+
+          if (txCheckError) {
+            console.error("Error checking existing transaction:", txCheckError);
+          }
+
+          if (existingTx) {
+            console.log(`Webhook: Transaction ${reference} already processed, skipping`);
+            break;
+          }
+
+          // Process the transaction (only if not already done)
+          const { data: wallet } = await supabase
+            .from("coin_wallets")
+            .select("balance")
+            .eq("user_id", userId)
             .single();
 
-          if (!existingTx) {
-            // Process the transaction
-            const { data: wallet } = await supabase
-              .from("coin_wallets")
-              .select("balance")
-              .eq("user_id", userId)
-              .single();
+          const newBalance = (wallet?.balance || 0) + totalCoins;
 
-            const newBalance = (wallet?.balance || 0) + totalCoins;
+          await supabase
+            .from("coin_wallets")
+            .update({ balance: newBalance })
+            .eq("user_id", userId);
 
-            await supabase
-              .from("coin_wallets")
-              .update({ balance: newBalance })
-              .eq("user_id", userId);
+          await supabase.from("coin_transactions").insert({
+            user_id: userId,
+            amount: totalCoins,
+            type: "purchase",
+            description: `Purchased ${coinsAmount} coins + ${bonusCoins} bonus (webhook)`,
+            reference_id: reference,
+          });
 
-            await supabase.from("coin_transactions").insert({
-              user_id: userId,
-              amount: totalCoins,
-              type: "purchase",
-              description: `Purchased ${coinsAmount} coins + ${bonusCoins} bonus (webhook)`,
-              reference_id: reference,
-            });
-
-            console.log(`Webhook: Credited ${totalCoins} coins to user ${userId}`);
-          } else {
-            console.log(`Webhook: Transaction ${reference} already processed`);
-          }
+          console.log(`Webhook: Credited ${totalCoins} coins to user ${userId}`);
         } else if (metadata?.type === "order" && metadata?.orderId) {
           // Update order status if not already updated
           const { data: order } = await supabase
@@ -203,8 +210,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       case "chargeback.create": {
-        // Chargeback initiated
-        const { reference, amount } = event.data;
+        // Chargeback initiated - CRITICAL ALERT
+        const { reference, amount, customer } = event.data;
         console.log(`Chargeback initiated for reference: ${reference}`);
         
         // Create alert for admin
@@ -214,6 +221,29 @@ const handler = async (req: Request): Promise<Response> => {
           amount: amount ? amount / 100 : null,
           details: event.data,
         });
+
+        // Send email notification to admins
+        const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+        if (supabaseAnonKey) {
+          try {
+            await fetch(`${supabaseUrl}/functions/v1/send-admin-alert`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${supabaseAnonKey}`,
+              },
+              body: JSON.stringify({
+                alertType: "chargeback",
+                reference,
+                amount: amount ? amount / 100 : null,
+                customerEmail: customer?.email,
+                details: event.data,
+              }),
+            });
+          } catch (err) {
+            console.error("Failed to send admin alert email:", err);
+          }
+        }
         break;
       }
 
