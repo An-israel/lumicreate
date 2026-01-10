@@ -52,10 +52,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Handle based on payment type
     if (metadata.type === "coins") {
-      // Get coins info from metadata (set during payment initialization)
-      const coinsAmount = metadata.coinsAmount || 0;
-      const bonusCoins = metadata.bonusCoins || 0;
+      // CRITICAL: Parse coins info as integers to avoid string concatenation
+      // Paystack metadata values can come back as strings
+      const coinsAmount = parseInt(String(metadata.coinsAmount)) || 0;
+      const bonusCoins = parseInt(String(metadata.bonusCoins)) || 0;
       const totalCoins = coinsAmount + bonusCoins;
+
+      console.log(`Verify: Processing coin purchase - base: ${coinsAmount}, bonus: ${bonusCoins}, total: ${totalCoins}`);
 
       // CRITICAL: Check if this transaction was already processed
       const { data: existingTx, error: txCheckError } = await supabase
@@ -77,7 +80,7 @@ const handler = async (req: Request): Promise<Response> => {
           .eq("user_id", userId)
           .single();
 
-        console.log(`Verify: Transaction ${reference} already processed, returning existing balance`);
+        console.log(`Verify: Transaction ${reference} already processed, returning existing balance: ${wallet?.balance}`);
 
         return new Response(
           JSON.stringify({
@@ -106,7 +109,11 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error("Failed to fetch wallet");
       }
 
-      const newBalance = (wallet?.balance || 0) + totalCoins;
+      // CRITICAL: Ensure numeric addition, not string concatenation
+      const currentBalance = Number(wallet?.balance) || 0;
+      const newBalance = currentBalance + totalCoins;
+
+      console.log(`Verify: Updating balance - current: ${currentBalance}, adding: ${totalCoins}, new: ${newBalance}`);
 
       // Update wallet balance
       const { error: updateError } = await supabase
@@ -127,7 +134,7 @@ const handler = async (req: Request): Promise<Response> => {
         reference_id: reference,
       });
 
-      console.log(`Verify: Credited ${totalCoins} coins to user ${userId}, new balance: ${newBalance}`);
+      console.log(`Verify: Successfully credited ${totalCoins} coins to user ${userId}, new balance: ${newBalance}`);
 
       // Get user profile for email personalization
       const { data: profile } = await supabase
