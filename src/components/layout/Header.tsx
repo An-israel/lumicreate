@@ -31,6 +31,7 @@ const Header = () => {
   const currentLogo = theme === "dark" ? logoIcon : logoLight;
 
   const navLinks = [
+    { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
     { name: "Packages", href: "/packages" },
     { name: "Consultations", href: "/consultations" },

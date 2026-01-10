@@ -66,10 +66,13 @@ const handler = async (req: Request): Promise<Response> => {
         const userId = metadata?.user_id;
 
         if (metadata?.type === "coins" && userId) {
-          // Get coins info from metadata (passed during initialization)
-          const coinsAmount = metadata.coinsAmount || 0;
-          const bonusCoins = metadata.bonusCoins || 0;
+          // CRITICAL: Parse coins info as integers to avoid string concatenation
+          // Paystack metadata values can come back as strings
+          const coinsAmount = parseInt(String(metadata.coinsAmount)) || 0;
+          const bonusCoins = parseInt(String(metadata.bonusCoins)) || 0;
           const totalCoins = coinsAmount + bonusCoins;
+
+          console.log(`Webhook: Processing coin purchase - base: ${coinsAmount}, bonus: ${bonusCoins}, total: ${totalCoins}`);
 
           // Check if transaction was ALREADY processed (by verify or previous webhook)
           const { data: existingTx, error: txCheckError } = await supabase
@@ -94,7 +97,11 @@ const handler = async (req: Request): Promise<Response> => {
             .eq("user_id", userId)
             .single();
 
-          const newBalance = (wallet?.balance || 0) + totalCoins;
+          // CRITICAL: Ensure numeric addition, not string concatenation
+          const currentBalance = Number(wallet?.balance) || 0;
+          const newBalance = currentBalance + totalCoins;
+
+          console.log(`Webhook: Updating balance - current: ${currentBalance}, adding: ${totalCoins}, new: ${newBalance}`);
 
           await supabase
             .from("coin_wallets")
@@ -109,7 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
             reference_id: reference,
           });
 
-          console.log(`Webhook: Credited ${totalCoins} coins to user ${userId}`);
+          console.log(`Webhook: Successfully credited ${totalCoins} coins to user ${userId}`);
         } else if (metadata?.type === "order" && metadata?.orderId) {
           // Update order status if not already updated
           const { data: order } = await supabase
@@ -181,7 +188,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         if (originalTx) {
           // Deduct the refunded coins
-          const refundedCoins = originalTx.amount;
+          const refundedCoins = Number(originalTx.amount) || 0;
           
           const { data: wallet } = await supabase
             .from("coin_wallets")
@@ -189,7 +196,8 @@ const handler = async (req: Request): Promise<Response> => {
             .eq("user_id", originalTx.user_id)
             .single();
 
-          const newBalance = Math.max(0, (wallet?.balance || 0) - refundedCoins);
+          const currentBalance = Number(wallet?.balance) || 0;
+          const newBalance = Math.max(0, currentBalance - refundedCoins);
 
           await supabase
             .from("coin_wallets")
