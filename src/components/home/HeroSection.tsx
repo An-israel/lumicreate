@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
-      {/* Rich Gradient Background */}
+      {/* Animated Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/15" />
       <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-secondary/5 to-primary/10" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-      {/* Gradient orbs for depth */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+      
+      {/* Animated gradient orbs for depth */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 animate-gradient-shift" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 animate-gradient-shift-reverse" />
+      <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" />
 
       <div className="container relative">
         <div className="mx-auto max-w-4xl text-center">
