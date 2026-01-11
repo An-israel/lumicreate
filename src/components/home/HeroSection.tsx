@@ -5,9 +5,13 @@ import { Button } from "@/components/ui/button";
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
-      {/* Clean Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-accent/10" />
+      {/* Rich Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/15" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-secondary/5 to-primary/10" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+      {/* Gradient orbs for depth */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
 
       <div className="container relative">
         <div className="mx-auto max-w-4xl text-center">

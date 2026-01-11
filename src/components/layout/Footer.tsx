@@ -3,7 +3,6 @@ import { Instagram, Twitter, Youtube, Mail } from "lucide-react";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import logoIcon from "@/assets/logo-icon.png";
 import logoLight from "@/assets/logo-light.png";
-import brandPattern from "@/assets/brand-pattern.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -43,16 +42,6 @@ const Footer = () => {
 
   return (
     <footer className="border-t border-border bg-muted/30 relative overflow-hidden">
-      {/* Brand Pattern Background */}
-      <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `url(${brandPattern})`,
-          backgroundSize: '150px',
-          backgroundRepeat: 'repeat',
-        }}
-      />
-      
       <div className="container py-12 md:py-16 relative z-10">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           {/* Brand Column */}
