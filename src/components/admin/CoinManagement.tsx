@@ -66,30 +66,34 @@ export default function CoinManagement() {
   const fetchData = async () => {
     setIsLoading(true);
 
-    // Fetch wallets with user profiles
+    // Fetch wallets with user profiles (using left join, not inner)
     const { data: walletsData, error: walletsError } = await supabase
       .from("coin_wallets")
       .select(`
         user_id,
         balance,
         created_at,
-        updated_at,
-        profiles!inner(full_name)
+        updated_at
       `)
       .order("balance", { ascending: false });
 
     if (walletsError) {
       console.error("Error fetching wallets:", walletsError);
     } else {
-      // Get user emails from auth
+      // Fetch profiles separately to avoid inner join issues
       const userIds = walletsData?.map(w => w.user_id) || [];
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
       
-      // Create the wallets with available data
+      const profileMap = new Map((profilesData || []).map(p => [p.id, p.full_name]));
+      
       const walletsWithEmail: UserWallet[] = (walletsData || []).map((w: any) => ({
         user_id: w.user_id,
         balance: w.balance,
-        full_name: w.profiles?.full_name || null,
-        email: null, // Will be populated if needed
+        full_name: profileMap.get(w.user_id) || `User ${w.user_id.slice(0, 8)}...`,
+        email: null,
         created_at: w.created_at,
         updated_at: w.updated_at,
       }));
@@ -97,22 +101,28 @@ export default function CoinManagement() {
       setWallets(walletsWithEmail);
     }
 
-    // Fetch recent transactions
+    // Fetch recent transactions (without inner join)
     const { data: txData, error: txError } = await supabase
       .from("coin_transactions")
-      .select(`
-        *,
-        profiles!inner(full_name)
-      `)
+      .select("*")
       .order("created_at", { ascending: false })
       .limit(100);
 
     if (txError) {
       console.error("Error fetching transactions:", txError);
     } else {
+      // Fetch profiles for transactions
+      const txUserIds = [...new Set((txData || []).map(tx => tx.user_id))];
+      const { data: txProfilesData } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", txUserIds);
+      
+      const txProfileMap = new Map((txProfilesData || []).map(p => [p.id, p.full_name]));
+      
       setTransactions((txData || []).map((tx: any) => ({
         ...tx,
-        full_name: tx.profiles?.full_name || null,
+        full_name: txProfileMap.get(tx.user_id) || `User ${tx.user_id.slice(0, 8)}...`,
       })));
     }
 
