@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Coins, CheckCircle, ShoppingBag, LayoutDashboard, Sparkles } from "lucide-react";
 import { formatCoins } from "@/lib/constants";
 import confetti from "canvas-confetti";
-import brandPattern from "@/assets/brand-pattern.png";
 
 export default function CoinPurchaseSuccess() {
   const [searchParams] = useSearchParams();
@@ -59,17 +58,11 @@ export default function CoinPurchaseSuccess() {
 
   return (
     <Layout>
-      <div 
-        className="min-h-[80vh] flex items-center justify-center py-12 relative overflow-hidden"
-        style={{
-          backgroundImage: `url(${brandPattern})`,
-          backgroundSize: '200px',
-          backgroundRepeat: 'repeat',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Overlay for better readability */}
-        <div className="absolute inset-0 bg-background/95" />
+      <div className="min-h-[80vh] flex items-center justify-center py-12 relative overflow-hidden">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-secondary/10" />
+        <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-coin/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl" />
         
         <div className="container-main relative z-10">
           <Card className="max-w-lg mx-auto glass">
