@@ -16,7 +16,6 @@ import Admin from "./pages/Admin";
 import Staff from "./pages/Staff";
 import Quiz from "./pages/Quiz";
 import QuizResults from "./pages/QuizResults";
-import BuyCoins from "./pages/BuyCoins";
 import Consultations from "./pages/Consultations";
 import Cart from "./pages/Cart";
 import ProductDetail from "./pages/ProductDetail";
@@ -32,7 +31,6 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Resources from "./pages/Resources";
 import BlogPost from "./pages/BlogPost";
-import CoinPurchaseSuccess from "./pages/CoinPurchaseSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,13 +58,11 @@ const App = () => (
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/staff" element={<Staff />} />
-                <Route path="/buy-coins" element={<BuyCoins />} />
                 <Route path="/quiz" element={<Quiz />} />
                 <Route path="/quiz/results" element={<QuizResults />} />
                 <Route path="/consultations" element={<Consultations />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/payment/callback" element={<PaymentCallback />} />
-                <Route path="/coins/success" element={<CoinPurchaseSuccess />} />
                 <Route path="/order/:orderId" element={<OrderTracking />} />
                 <Route path="/order/:orderId/confirmation" element={<OrderConfirmation />} />
                 <Route path="/track-order" element={<TrackOrder />} />

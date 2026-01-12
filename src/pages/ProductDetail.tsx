@@ -7,7 +7,6 @@ import Layout from "@/components/layout/Layout";
 import ImageGallery from "@/components/product/ImageGallery";
 import ProductReviews from "@/components/product/ProductReviews";
 import RatingStars from "@/components/product/RatingStars";
-import CoinBenefitsBanner from "@/components/shop/CoinBenefitsBanner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +15,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { 
   ShoppingCart, 
-  Coins, 
   Package, 
   Check, 
   ArrowLeft, 
@@ -26,7 +24,7 @@ import {
   ChevronRight,
   Heart
 } from "lucide-react";
-import { formatNaira, formatCoins, TIERS } from "@/lib/constants";
+import { formatNaira, TIERS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useReviews } from "@/hooks/useReviews";
 
@@ -230,17 +228,6 @@ export default function ProductDetail() {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-secondary">
-                <Coins className="h-5 w-5" />
-                <span className="text-lg font-semibold">{formatCoins(product.price_coins)} coins</span>
-              </div>
-              
-              {/* Coin Benefits Banner */}
-              <CoinBenefitsBanner 
-                productPriceNaira={product.price_naira} 
-                productPriceCoins={product.price_coins}
-                variant="inline" 
-              />
             </div>
 
             <Separator />
@@ -376,11 +363,8 @@ export default function ProductDetail() {
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-semibold line-clamp-1">{relatedProduct.name}</h3>
-                      <div className="flex items-center justify-between mt-2">
+                      <div className="mt-2">
                         <span className="font-bold">{formatNaira(relatedProduct.price_naira)}</span>
-                        <span className="text-sm text-secondary">
-                          {formatCoins(relatedProduct.price_coins)} 🪙
-                        </span>
                       </div>
                     </CardContent>
                   </Card>

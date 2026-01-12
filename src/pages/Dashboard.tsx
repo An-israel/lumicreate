@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Coins, ShoppingBag, Calendar, Package, ArrowRight, TrendingUp, User, Settings } from "lucide-react";
+import { ShoppingBag, Calendar, Package, ArrowRight, Settings } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,11 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useOrders } from "@/hooks/useOrders";
 import { useConsultations } from "@/hooks/useConsultations";
-import { CoinTransactionHistory } from "@/components/dashboard/CoinTransactionHistory";
-import { formatNaira, formatCoins, ORDER_STATUSES } from "@/lib/constants";
+import { formatNaira, ORDER_STATUSES } from "@/lib/constants";
 
 const Dashboard = () => {
-  const { user, profile, wallet, isLoading: authLoading } = useAuth();
+  const { user, profile, isLoading: authLoading } = useAuth();
   const { orders, isLoading: ordersLoading } = useOrders();
   const { consultations, isLoading: consultationsLoading } = useConsultations();
   const navigate = useNavigate();
@@ -29,8 +28,8 @@ const Dashboard = () => {
       <Layout>
         <div className="container py-8">
           <Skeleton className="h-8 w-48 mb-8" />
-          <div className="grid gap-6 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
+          <div className="grid gap-6 md:grid-cols-2">
+            {[1, 2].map((i) => (
               <Skeleton key={i} className="h-32" />
             ))}
           </div>
@@ -39,12 +38,10 @@ const Dashboard = () => {
     );
   }
 
-  const recentOrders = orders?.slice(0, 3) || [];
+  const recentOrders = orders?.slice(0, 5) || [];
   const upcomingConsultations = consultations?.filter(
     (c) => c.status === "pending" || c.status === "confirmed"
   ).slice(0, 3) || [];
-
-  const coinBalance = wallet?.balance ?? 0;
 
   return (
     <Layout>
@@ -61,33 +58,7 @@ const Dashboard = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-3 mb-8">
-            {/* Coin Balance */}
-            <Card className="bg-gradient-to-br from-coin/10 via-background to-primary/5 border-coin/20">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <Coins className="h-4 w-4 text-coin" />
-                  Coin Balance
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="text-3xl font-bold text-foreground">
-                      {formatCoins(coinBalance)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">coins available</p>
-                  </div>
-                  <Button size="sm" asChild>
-                    <Link to="/buy-coins">
-                      Buy Coins
-                      <ArrowRight className="ml-1 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
+          <div className="grid gap-4 md:grid-cols-2 mb-8">
             {/* Active Orders */}
             <Card>
               <CardHeader className="pb-2">
@@ -138,22 +109,13 @@ const Dashboard = () => {
           {/* Quick Actions */}
           <div className="mb-8">
             <h2 className="font-semibold text-lg text-foreground mb-4">Quick Actions</h2>
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-5">
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
               <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
                 <Link to="/shop">
                   <ShoppingBag className="h-5 w-5 text-primary" />
                   <div className="text-left">
                     <p className="font-medium">Browse Equipment</p>
                     <p className="text-xs text-muted-foreground">Find your next upgrade</p>
-                  </div>
-                </Link>
-              </Button>
-              <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
-                <Link to="/buy-coins">
-                  <Coins className="h-5 w-5 text-coin" />
-                  <div className="text-left">
-                    <p className="font-medium">Buy Coins</p>
-                    <p className="text-xs text-muted-foreground">Get bonus value</p>
                   </div>
                 </Link>
               </Button>
@@ -187,7 +149,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-2">
             {/* Recent Orders */}
             <Card>
               <CardHeader>
@@ -208,9 +170,10 @@ const Dashboard = () => {
                 ) : recentOrders.length > 0 ? (
                   <div className="space-y-3">
                     {recentOrders.map((order) => (
-                      <div
+                      <Link
                         key={order.id}
-                        className="flex items-center justify-between rounded-lg border border-border p-3"
+                        to={`/order/${order.id}`}
+                        className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/50 transition-colors"
                       >
                         <div>
                           <p className="font-medium text-sm">{order.order_number}</p>
@@ -224,7 +187,7 @@ const Dashboard = () => {
                         >
                           {ORDER_STATUSES[order.status]?.label}
                         </Badge>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : (
@@ -238,9 +201,6 @@ const Dashboard = () => {
                 )}
               </CardContent>
             </Card>
-
-            {/* Coin Transaction History */}
-            <CoinTransactionHistory limit={4} showViewAll={false} />
 
             {/* Upcoming Consultations */}
             <Card>
