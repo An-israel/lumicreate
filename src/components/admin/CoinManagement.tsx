@@ -84,19 +84,22 @@ export default function CoinManagement() {
       const userIds = walletsData?.map(w => w.user_id) || [];
       const { data: profilesData } = await supabase
         .from("profiles")
-        .select("id, full_name")
+        .select("id, full_name, email")
         .in("id", userIds);
       
-      const profileMap = new Map((profilesData || []).map(p => [p.id, p.full_name]));
+      const profileMap = new Map((profilesData || []).map(p => [p.id, { full_name: p.full_name, email: p.email }]));
       
-      const walletsWithEmail: UserWallet[] = (walletsData || []).map((w: any) => ({
-        user_id: w.user_id,
-        balance: w.balance,
-        full_name: profileMap.get(w.user_id) || `User ${w.user_id.slice(0, 8)}...`,
-        email: null,
-        created_at: w.created_at,
-        updated_at: w.updated_at,
-      }));
+      const walletsWithEmail: UserWallet[] = (walletsData || []).map((w: any) => {
+        const profile = profileMap.get(w.user_id);
+        return {
+          user_id: w.user_id,
+          balance: w.balance,
+          full_name: profile?.full_name || `User ${w.user_id.slice(0, 8)}...`,
+          email: profile?.email || null,
+          created_at: w.created_at,
+          updated_at: w.updated_at,
+        };
+      });
       
       setWallets(walletsWithEmail);
     }
@@ -429,6 +432,9 @@ export default function CoinManagement() {
                     <TableCell>
                       <div>
                         <p className="font-medium">{wallet.full_name || "Unknown"}</p>
+                        {wallet.email && (
+                          <p className="text-xs text-muted-foreground">{wallet.email}</p>
+                        )}
                         <p className="text-xs text-muted-foreground font-mono">{wallet.user_id.slice(0, 8)}...</p>
                       </div>
                     </TableCell>
