@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Sparkles, ShoppingCart, ArrowRight, RotateCcw, Package, Coins, Check, GitCompare } from "lucide-react";
+import { Sparkles, ShoppingCart, ArrowRight, RotateCcw, Package, Check, GitCompare } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,13 +10,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
-import { formatNaira, formatCoins } from "@/lib/constants";
+import { formatNaira } from "@/lib/constants";
 import { toast } from "sonner";
 import ProductComparison from "@/components/quiz/ProductComparison";
 import EmailCapture from "@/components/quiz/EmailCapture";
 import ShareResults from "@/components/quiz/ShareResults";
 import AuthRequired from "@/components/auth/AuthRequired";
-import CoinBenefitsBanner from "@/components/shop/CoinBenefitsBanner";
 
 interface Product {
   id: string;
@@ -375,10 +374,6 @@ const QuizResults = () => {
                             <p className="text-xl font-bold text-foreground">
                               {formatNaira(product.price_naira)}
                             </p>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Coins className="h-4 w-4 text-coin" />
-                              <span>{formatCoins(product.price_coins)} coins</span>
-                            </div>
                           </div>
                         </CardContent>
 
@@ -399,13 +394,6 @@ const QuizResults = () => {
                   </div>
                 </section>
               ))}
-            </div>
-          )}
-
-          {/* Coin Benefits Banner */}
-          {!isLoading && recommendations.length > 0 && (
-            <div className="mt-12 max-w-2xl mx-auto">
-              <CoinBenefitsBanner variant="card" />
             </div>
           )}
 

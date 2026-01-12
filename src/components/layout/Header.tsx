@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart, Coins, User, LogOut, Heart } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
@@ -19,13 +19,11 @@ import logoLight from "@/assets/logo-light.png";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, profile, wallet, signOut, isAdmin, isStaff } = useAuth();
+  const { user, profile, signOut, isAdmin, isStaff } = useAuth();
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  
-  const coinBalance = wallet?.balance ?? 0;
 
   // Use light logo for dark mode, dark logo for light mode
   const currentLogo = theme === "dark" ? logoIcon : logoLight;
@@ -72,15 +70,6 @@ const Header = () => {
           
           {user ? (
             <>
-              {/* Coin Balance */}
-              <Link
-                to="/buy-coins"
-                className="flex items-center gap-2 rounded-full bg-secondary/50 px-3 py-1.5 text-sm font-medium text-secondary-foreground hover:bg-secondary transition-colors"
-              >
-                <Coins className="h-4 w-4 text-coin" />
-                <span>{coinBalance.toLocaleString()}</span>
-              </Link>
-
               {/* Wishlist */}
               <Link to="/wishlist" className="relative">
                 <Button variant="ghost" size="icon">
@@ -129,9 +118,6 @@ const Header = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/profile">Profile Settings</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/buy-coins">Buy Coins</Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <>
@@ -202,14 +188,6 @@ const Header = () => {
             <div className="pt-4 border-t border-border space-y-2">
               {user ? (
                 <>
-                  <Link
-                    to="/buy-coins"
-                    className="flex items-center gap-2 py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Coins className="h-5 w-5 text-coin" />
-                    <span>{coinBalance.toLocaleString()} Coins</span>
-                  </Link>
                   <Link
                     to="/wishlist"
                     className="flex items-center gap-2 py-2"
