@@ -406,7 +406,7 @@ export type Database = {
           id?: string
           naira_paid?: number | null
           notes?: string | null
-          order_number: string
+          order_number?: string
           payment_method: string
           paystack_reference?: string | null
           status?: Database["public"]["Enums"]["order_status"]
