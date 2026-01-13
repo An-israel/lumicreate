@@ -8,7 +8,6 @@ import BlogManagement from "@/components/admin/BlogManagement";
 import PageContentEditor from "@/components/admin/PageContentEditor";
 import ImageUpload from "@/components/admin/ImageUpload";
 import PaymentAlerts from "@/components/admin/PaymentAlerts";
-import CoinManagement from "@/components/admin/CoinManagement";
 import RealtimePaymentAlerts from "@/components/admin/RealtimePaymentAlerts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,7 @@ interface NewsletterSubscriber {
   subscribed_at: string;
   is_active: boolean;
 }
-import { ORDER_STATUSES, CONTENT_TYPES, formatNaira, formatCoins } from "@/lib/constants";
+import { ORDER_STATUSES, CONTENT_TYPES, formatNaira } from "@/lib/constants";
 
 export default function Admin() {
   const { isStaff, isLoading: authLoading } = useAuth();
@@ -230,9 +229,6 @@ export default function Admin() {
       
       case "alerts":
         return <PaymentAlerts />;
-      
-      case "coins":
-        return <CoinManagement />;
       
       case "content":
         return <PageContentEditor />;
@@ -483,7 +479,7 @@ export default function Admin() {
                         <Badge variant="outline" className="capitalize">{product.tier}</Badge>
                       </TableCell>
                       <TableCell>{formatNaira(product.price_naira)}</TableCell>
-                      <TableCell>{formatCoins(product.price_coins)} 🪙</TableCell>
+                      <TableCell>{product.price_coins.toLocaleString()} coins</TableCell>
                       <TableCell>
                         <Badge variant={product.in_stock ? "default" : "destructive"}>
                           {product.in_stock ? "In Stock" : "Out of Stock"}
@@ -556,7 +552,7 @@ export default function Admin() {
                           {consultation.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>{formatCoins(consultation.coins_paid)} 🪙</TableCell>
+                      <TableCell>{formatNaira(consultation.coins_paid)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -734,14 +730,6 @@ export default function Admin() {
                 <div>
                   <p className="text-muted-foreground">Total (Naira)</p>
                   <p className="font-medium">{formatNaira(selectedOrder.total_naira)}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Total (Coins)</p>
-                  <p className="font-medium">{formatCoins(selectedOrder.total_coins)} 🪙</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Coins Used</p>
-                  <p className="font-medium">{formatCoins(selectedOrder.coins_used || 0)} 🪙</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Naira Paid</p>

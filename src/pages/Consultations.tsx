@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useConsultations } from "@/hooks/useConsultations";
+import { supabase } from "@/integrations/supabase/client";
+import { initializePayment } from "@/lib/paystack";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { format, addDays, isBefore, startOfToday } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Coins, Check, Star, Users, Mic, Video } from "lucide-react";
-import { CONSULTATION_TYPES, formatNaira, formatCoins } from "@/lib/constants";
+import { Calendar as CalendarIcon, Clock, Check, Star, Users, Mic, Video, CreditCard } from "lucide-react";
+import { CONSULTATION_TYPES, formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const TIME_SLOTS = [
@@ -21,8 +22,7 @@ const TIME_SLOTS = [
 ];
 
 export default function Consultations() {
-  const { user, wallet } = useAuth();
-  const { bookConsultation } = useConsultations();
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -46,30 +46,56 @@ export default function Consultations() {
   const handleBooking = async () => {
     if (!selectedConsultation || !selectedDate || !selectedTime || !user) return;
 
-    const coinBalance = wallet?.balance || 0;
-    if (coinBalance < selectedConsultation.coins) {
-      toast.error("Insufficient coins. Please purchase more coins first.");
-      navigate("/buy-coins");
-      return;
-    }
-
     setIsProcessing(true);
     
-    const { error } = await bookConsultation(
-      selectedConsultation.id as any,
-      format(selectedDate, "yyyy-MM-dd"),
-      selectedTime,
-      selectedConsultation.coins
-    );
+    try {
+      // Create the consultation record first (pending payment)
+      const { data: consultationData, error: consultationError } = await supabase
+        .from("consultations")
+        .insert({
+          user_id: user.id,
+          consultation_type: selectedConsultation.id,
+          scheduled_date: format(selectedDate, "yyyy-MM-dd"),
+          scheduled_time: selectedTime,
+          coins_paid: selectedConsultation.nairaValue, // Store naira value in coins_paid field for now
+          status: "pending",
+        })
+        .select()
+        .single();
 
-    setIsProcessing(false);
+      if (consultationError) {
+        console.error("Consultation creation error:", consultationError);
+        toast.error("Failed to book consultation. Please try again.");
+        setIsProcessing(false);
+        return;
+      }
 
-    if (!error) {
-      setIsBookingOpen(false);
-      setSelectedType(null);
-      setSelectedDate(undefined);
-      setSelectedTime("");
-      navigate("/dashboard");
+      // Initialize Paystack payment
+      const result = await initializePayment({
+        type: "order", // Reuse order type for consultations
+        amount: selectedConsultation.nairaValue,
+        email: user.email || "",
+        userId: user.id,
+        metadata: {
+          orderId: consultationData.id, // Use consultation ID
+        },
+      });
+
+      if (result.success && result.authorization_url) {
+        window.location.href = result.authorization_url;
+        return;
+      } else {
+        console.error("Payment initialization error:", result.error);
+        // Delete the consultation if payment failed to initialize
+        await supabase.from("consultations").delete().eq("id", consultationData.id);
+        toast.error(result.error || "Failed to initialize payment. Please try again.");
+        setIsProcessing(false);
+        return;
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      toast.error("Something went wrong. Please try again.");
+      setIsProcessing(false);
     }
   };
 
@@ -103,17 +129,6 @@ export default function Consultations() {
             Get personalized advice from our content creation experts.
             From equipment selection to full content strategy.
           </p>
-
-          {/* Coin Balance */}
-          {user && (
-            <div className="mt-8 inline-flex items-center gap-3 px-6 py-3 rounded-full bg-card border border-border">
-              <Coins className="h-6 w-6 text-secondary" />
-              <div className="text-left">
-                <p className="text-sm text-muted-foreground">Your Balance</p>
-                <p className="text-2xl font-bold">{formatCoins(wallet?.balance || 0)} coins</p>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Consultation Types */}
@@ -152,13 +167,9 @@ export default function Consultations() {
                       />
                     </div>
                     <div className="text-right">
-                      <div className="flex items-center gap-1 text-secondary font-bold">
-                        <Coins className="h-4 w-4" />
-                        {formatCoins(type.coins)}
+                      <div className="flex items-center gap-1 text-primary font-bold text-lg">
+                        {formatNaira(type.nairaValue)}
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Value: {formatNaira(type.nairaValue)}
-                      </p>
                     </div>
                   </div>
                   <CardTitle className="text-xl">{type.name}</CardTitle>
@@ -202,6 +213,7 @@ export default function Consultations() {
                     className={cn("w-full", isRecommended && "gradient-primary")}
                     onClick={() => handleSelectType(type.id)}
                   >
+                    <CreditCard className="h-4 w-4 mr-2" />
                     Book Now
                   </Button>
                 </CardContent>
@@ -281,13 +293,9 @@ export default function Consultations() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <div className="flex items-center gap-1 text-secondary font-bold">
-                          <Coins className="h-4 w-4" />
-                          {formatCoins(selectedConsultation.coins)}
+                        <div className="flex items-center gap-1 text-primary font-bold">
+                          {formatNaira(selectedConsultation.nairaValue)}
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Balance: {formatCoins(wallet?.balance || 0)}
-                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -303,7 +311,7 @@ export default function Consultations() {
                 onClick={handleBooking}
                 disabled={!selectedDate || !selectedTime || isProcessing}
               >
-                {isProcessing ? "Booking..." : "Confirm Booking"}
+                {isProcessing ? "Processing..." : "Pay with Paystack"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -315,7 +323,7 @@ export default function Consultations() {
             <Card className="max-w-md mx-auto">
               <CardContent className="pt-6">
                 <p className="text-muted-foreground mb-4">
-                  Sign in to book a consultation and pay with coins
+                  Sign in to book a consultation
                 </p>
                 <Button onClick={() => navigate("/auth")}>
                   Sign In to Continue

@@ -218,6 +218,23 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error("Failed to update order status");
       }
 
+      // Send order confirmation email (fire and forget)
+      const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+      
+      if (supabaseAnonKey) {
+        fetch(`${supabaseUrl}/functions/v1/send-order-email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseAnonKey}`,
+          },
+          body: JSON.stringify({
+            orderId,
+            type: "confirmation",
+          }),
+        }).catch(err => console.error("Failed to send order confirmation email:", err));
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
