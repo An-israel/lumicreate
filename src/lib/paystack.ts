@@ -1,15 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 
 interface InitializePaymentParams {
-  type: "coins" | "order";
+  type: "order";
   amount: number;
   email: string;
   userId: string;
   metadata?: {
-    coinPackageId?: string;
     orderId?: string;
-    coinsAmount?: number;
-    bonusCoins?: number;
   };
 }
 
@@ -24,9 +21,6 @@ interface PaymentResponse {
 interface VerifyResponse {
   success: boolean;
   type?: string;
-  coinsAdded?: number;
-  bonusCoins?: number;
-  newBalance?: number;
   orderId?: string;
   error?: string;
   message?: string;

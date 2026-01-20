@@ -24,26 +24,6 @@ export interface UserRole {
   created_at: string;
 }
 
-export interface CoinWallet {
-  id: string;
-  user_id: string;
-  balance: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CoinTransaction {
-  id: string;
-  user_id: string;
-  amount: number;
-  type: "purchase" | "spend" | "refund" | "bonus";
-  description: string | null;
-  reference_id: string | null;
-  created_at: string;
-}
-
-// Product interface moved to after Order to avoid duplication
-
 export interface DeliveryAddress {
   id: string;
   user_id: string;
@@ -64,7 +44,7 @@ export interface Order {
   status: OrderStatus;
   total_naira: number;
   total_coins: number;
-  payment_method: "coins" | "paystack" | "hybrid";
+  payment_method: "paystack";
   coins_used: number;
   naira_paid: number;
   paystack_reference: string | null;
