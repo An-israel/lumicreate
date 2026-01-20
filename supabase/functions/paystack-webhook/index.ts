@@ -62,62 +62,9 @@ const handler = async (req: Request): Promise<Response> => {
       case "charge.success": {
         // Payment was successful - this is a BACKUP confirmation
         // Primary processing happens in paystack-verify
-        const { reference, metadata, amount } = event.data;
-        const userId = metadata?.user_id;
+        const { reference, metadata } = event.data;
 
-        if (metadata?.type === "coins" && userId) {
-          // CRITICAL: Parse coins info as integers to avoid string concatenation
-          // Paystack metadata values can come back as strings
-          const coinsAmount = parseInt(String(metadata.coinsAmount)) || 0;
-          const bonusCoins = parseInt(String(metadata.bonusCoins)) || 0;
-          const totalCoins = coinsAmount + bonusCoins;
-
-          console.log(`Webhook: Processing coin purchase - base: ${coinsAmount}, bonus: ${bonusCoins}, total: ${totalCoins}`);
-
-          // Check if transaction was ALREADY processed (by verify or previous webhook)
-          const { data: existingTx, error: txCheckError } = await supabase
-            .from("coin_transactions")
-            .select("id")
-            .eq("reference_id", reference)
-            .maybeSingle();
-
-          if (txCheckError) {
-            console.error("Error checking existing transaction:", txCheckError);
-          }
-
-          if (existingTx) {
-            console.log(`Webhook: Transaction ${reference} already processed, skipping`);
-            break;
-          }
-
-          // Process the transaction (only if not already done)
-          const { data: wallet } = await supabase
-            .from("coin_wallets")
-            .select("balance")
-            .eq("user_id", userId)
-            .single();
-
-          // CRITICAL: Ensure numeric addition, not string concatenation
-          const currentBalance = Number(wallet?.balance) || 0;
-          const newBalance = currentBalance + totalCoins;
-
-          console.log(`Webhook: Updating balance - current: ${currentBalance}, adding: ${totalCoins}, new: ${newBalance}`);
-
-          await supabase
-            .from("coin_wallets")
-            .update({ balance: newBalance })
-            .eq("user_id", userId);
-
-          await supabase.from("coin_transactions").insert({
-            user_id: userId,
-            amount: totalCoins,
-            type: "purchase",
-            description: `Purchased ${coinsAmount} coins + ${bonusCoins} bonus (webhook)`,
-            reference_id: reference,
-          });
-
-          console.log(`Webhook: Successfully credited ${totalCoins} coins to user ${userId}`);
-        } else if (metadata?.type === "order" && metadata?.orderId) {
+        if (metadata?.type === "order" && metadata?.orderId) {
           // Update order status if not already updated
           const { data: order } = await supabase
             .from("orders")
@@ -177,43 +124,6 @@ const handler = async (req: Request): Promise<Response> => {
           amount: amount / 100,
           details: event.data,
         });
-
-        // Find the original transaction
-        const { data: originalTx } = await supabase
-          .from("coin_transactions")
-          .select("user_id, amount")
-          .eq("reference_id", reference)
-          .eq("type", "purchase")
-          .single();
-
-        if (originalTx) {
-          // Deduct the refunded coins
-          const refundedCoins = Number(originalTx.amount) || 0;
-          
-          const { data: wallet } = await supabase
-            .from("coin_wallets")
-            .select("balance")
-            .eq("user_id", originalTx.user_id)
-            .single();
-
-          const currentBalance = Number(wallet?.balance) || 0;
-          const newBalance = Math.max(0, currentBalance - refundedCoins);
-
-          await supabase
-            .from("coin_wallets")
-            .update({ balance: newBalance })
-            .eq("user_id", originalTx.user_id);
-
-          await supabase.from("coin_transactions").insert({
-            user_id: originalTx.user_id,
-            amount: -refundedCoins,
-            type: "refund",
-            description: `Refund for transaction ${reference}`,
-            reference_id: `refund_${reference}`,
-          });
-
-          console.log(`Webhook: Refunded ${refundedCoins} coins from user ${originalTx.user_id}`);
-        }
         break;
       }
 

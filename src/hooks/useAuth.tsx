@@ -1,14 +1,13 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { Profile, UserRole, CoinWallet } from "@/types/database";
+import { Profile, UserRole } from "@/types/database";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
   roles: UserRole[];
-  wallet: CoinWallet | null;
   isLoading: boolean;
   isAdmin: boolean;
   isStaff: boolean;
@@ -16,7 +15,6 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
-  refreshWallet: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +24,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<UserRole[]>([]);
-  const [wallet, setWallet] = useState<CoinWallet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
@@ -46,26 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return (data || []) as UserRole[];
   };
 
-  const fetchWallet = async (userId: string) => {
-    const { data } = await supabase
-      .from("coin_wallets")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
-    return data as CoinWallet | null;
-  };
-
   const refreshProfile = async () => {
     if (user) {
       const profileData = await fetchProfile(user.id);
       setProfile(profileData);
-    }
-  };
-
-  const refreshWallet = async () => {
-    if (user) {
-      const walletData = await fetchWallet(user.id);
-      setWallet(walletData);
     }
   };
 
@@ -77,20 +58,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           setTimeout(async () => {
-            const [profileData, rolesData, walletData] = await Promise.all([
+            const [profileData, rolesData] = await Promise.all([
               fetchProfile(session.user.id),
               fetchRoles(session.user.id),
-              fetchWallet(session.user.id),
             ]);
             setProfile(profileData);
             setRoles(rolesData);
-            setWallet(walletData);
             setIsLoading(false);
           }, 0);
         } else {
           setProfile(null);
           setRoles([]);
-          setWallet(null);
           setIsLoading(false);
         }
       }
@@ -104,11 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         Promise.all([
           fetchProfile(session.user.id),
           fetchRoles(session.user.id),
-          fetchWallet(session.user.id),
-        ]).then(([profileData, rolesData, walletData]) => {
+        ]).then(([profileData, rolesData]) => {
           setProfile(profileData);
           setRoles(rolesData);
-          setWallet(walletData);
           setIsLoading(false);
         });
       } else {
@@ -143,7 +119,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setProfile(null);
     setRoles([]);
-    setWallet(null);
   };
 
   const isAdmin = roles.some((r) => r.role === "admin");
@@ -156,7 +131,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         profile,
         roles,
-        wallet,
         isLoading,
         isAdmin,
         isStaff,
@@ -164,7 +138,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         refreshProfile,
-        refreshWallet,
       }}
     >
       {children}

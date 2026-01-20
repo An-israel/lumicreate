@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
-import { CheckCircle2, Package, Truck, ArrowRight, ShoppingBag, Coins, Copy, Check, Share2 } from "lucide-react";
+import { CheckCircle2, Package, Truck, ShoppingBag, Copy, Check } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOrder } from "@/hooks/useOrders";
-import { useAuth } from "@/hooks/useAuth";
-import { formatNaira, formatCoins } from "@/lib/constants";
+import { formatNaira } from "@/lib/constants";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import confetti from "canvas-confetti";
@@ -18,7 +17,6 @@ export default function OrderConfirmation() {
   const { orderId } = useParams<{ orderId: string }>();
   const [searchParams] = useSearchParams();
   const { order, orderItems, isLoading } = useOrder(orderId);
-  const { user, wallet } = useAuth();
   const [copied, setCopied] = useState(false);
 
   const isNewOrder = searchParams.get("new") === "true";
@@ -156,15 +154,6 @@ export default function OrderConfirmation() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>{formatNaira(order.total_naira)}</span>
                 </div>
-                {order.coins_used && order.coins_used > 0 && (
-                  <div className="flex justify-between text-sm text-coin">
-                    <span className="flex items-center gap-1">
-                      <Coins className="h-4 w-4" />
-                      Coins Applied
-                    </span>
-                    <span>-{formatCoins(order.coins_used)} coins</span>
-                  </div>
-                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="text-emerald-600">Free</span>
@@ -243,26 +232,6 @@ export default function OrderConfirmation() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Coin Balance Reminder */}
-          {wallet && (
-            <Card className="mb-6 bg-gradient-to-r from-coin/5 via-background to-coin/5 border-coin/20">
-              <CardContent className="py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Coins className="h-6 w-6 text-coin" />
-                    <div>
-                      <p className="font-medium">Your Coin Balance</p>
-                      <p className="text-2xl font-bold text-coin">{formatCoins(wallet.balance)} coins</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" asChild className="border-coin/50 text-coin hover:bg-coin/10">
-                    <Link to="/buy-coins">Buy More Coins</Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

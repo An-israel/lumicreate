@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { Loader2, XCircle } from "lucide-react";
 export default function PaymentCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { refreshWallet } = useAuth();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
 
@@ -29,17 +27,16 @@ export default function PaymentCallback() {
       if (result.success) {
         setStatus("success");
         
-        if (result.type === "coins") {
-          await refreshWallet();
-          // Redirect to dedicated success page with coin details
-          navigate(`/coins/success?coins=${result.coinsAdded || 0}&bonus=${result.bonusCoins || 0}&balance=${result.newBalance || 0}`, { replace: true });
-        } else if (result.type === "order") {
+        if (result.type === "order") {
           // Redirect to order confirmation
           if (result.orderId) {
             navigate(`/order/${result.orderId}/confirmation?new=true`, { replace: true });
           } else {
             navigate("/orders", { replace: true });
           }
+        } else {
+          // Fallback to orders page
+          navigate("/orders", { replace: true });
         }
       } else {
         setStatus("error");
@@ -48,7 +45,7 @@ export default function PaymentCallback() {
     };
 
     verifyTransaction();
-  }, [searchParams, refreshWallet, navigate]);
+  }, [searchParams, navigate]);
 
   return (
     <Layout>
