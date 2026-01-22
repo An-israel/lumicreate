@@ -8,8 +8,8 @@ import {
 
 const faqs = [
   {
-    question: "How does the coin system work?",
-    answer: "Coins are our rewards currency. You buy coins with Naira and get bonus coins on larger purchases (up to 20% extra). Use coins to pay for any product - they never expire and can be combined with direct payments if you don't have enough.",
+    question: "What payment methods do you accept?",
+    answer: "We accept all major payment methods through Paystack including credit/debit cards, bank transfers, and USSD. All payments are processed securely.",
   },
   {
     question: "What areas do you deliver to?",
@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     question: "Can I book a consultation before buying?",
-    answer: "Absolutely! Our consultation service helps you choose the right equipment for your content type and budget. Book a session with our experts who understand the Nigerian creator landscape. Consultations are paid with coins.",
+    answer: "Absolutely! Our consultation service helps you choose the right equipment for your content type and budget. Book a session with our experts who understand the Nigerian creator landscape.",
   },
   {
     question: "What if I'm not satisfied with my purchase?",
@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     question: "Do you offer payment plans or installments?",
-    answer: "Currently, we support full payments via Paystack (cards, bank transfer, USSD) or coins. You can gradually accumulate coins over time to save up for bigger packages without any expiration worries.",
+    answer: "Currently, we support full payments via Paystack (cards, bank transfer, USSD). We're working on adding installment options in the future.",
   },
   {
     question: "What content types are your packages designed for?",

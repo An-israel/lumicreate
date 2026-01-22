@@ -300,12 +300,6 @@ export default function OrderTracking() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>{formatNaira(order.total_naira)}</span>
                 </div>
-                {order.coins_used && order.coins_used > 0 && (
-                  <div className="flex justify-between text-sm text-secondary">
-                    <span>Coins Used</span>
-                    <span>-{order.coins_used} coins</span>
-                  </div>
-                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="text-green-600">Free</span>

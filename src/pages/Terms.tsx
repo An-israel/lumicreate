@@ -46,33 +46,21 @@ const Terms = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">4. Coin System</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Our coin system allows you to purchase coins that can be used for products and services:
-              </p>
-              <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
-                <li>Coins are non-refundable once purchased</li>
-                <li>Coins do not expire</li>
-                <li>Coins cannot be transferred to other accounts</li>
-                <li>Bonus coins may be granted at our discretion</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">5. Orders and Payments</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">4. Orders and Payments</h2>
               <p className="text-muted-foreground leading-relaxed">
                 When you place an order:
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Prices are in Nigerian Naira (₦) unless otherwise stated</li>
                 <li>Payment must be completed before order processing</li>
+                <li>We accept payments via Paystack (cards, bank transfer, USSD)</li>
                 <li>We reserve the right to cancel orders for any reason</li>
                 <li>Delivery times are estimates and not guaranteed</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">6. Returns and Refunds</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">5. Returns and Refunds</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Products may be returned within 7 days of delivery if:
               </p>
@@ -87,15 +75,15 @@ const Terms = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">7. Consultations</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">6. Consultations</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Consultation bookings are subject to availability. Cancellations must be made at least 24 hours 
-                before the scheduled time for a full coin refund. No-shows will not be refunded.
+                before the scheduled time for a full refund. No-shows will not be refunded.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">8. Limitation of Liability</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">7. Limitation of Liability</h2>
               <p className="text-muted-foreground leading-relaxed">
                 To the maximum extent permitted by law, Luminate Creators shall not be liable for any indirect, 
                 incidental, special, or consequential damages arising from your use of our services.
@@ -103,7 +91,7 @@ const Terms = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">9. Contact Us</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">8. Contact Us</h2>
               <p className="text-muted-foreground leading-relaxed">
                 If you have questions about these Terms, please contact us at{" "}
                 <a href="mailto:hello@luminatecreators.com" className="text-primary hover:underline">

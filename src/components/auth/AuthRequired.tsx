@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { UserPlus, Lock, Sparkles, Coins, ShoppingCart, Gift } from "lucide-react";
+import { UserPlus, Lock, Sparkles, ShoppingCart, Gift, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/layout/Layout";
@@ -25,7 +25,7 @@ const AuthRequired = ({
       benefits: [
         "View personalized product recommendations",
         "Save your quiz results for later",
-        "Get exclusive coin discounts on recommended items",
+        "Get exclusive discounts on recommended items",
         "Track your purchases and orders"
       ]
     },
@@ -35,7 +35,7 @@ const AuthRequired = ({
       description: "Create an account to add items to your cart and enjoy exclusive benefits.",
       benefits: [
         "Add items to your cart",
-        "Save up to 30% with coins",
+        "Save items for later",
         "Track your orders in real-time",
         "Access exclusive member deals"
       ]
@@ -56,10 +56,10 @@ const AuthRequired = ({
       title: "Sign In Required",
       description: "Please sign in to access this feature.",
       benefits: [
-        "Save up to 30% with coin purchases",
+        "Access exclusive member benefits",
         "Track orders and deliveries",
         "Personalized recommendations",
-        "Exclusive member benefits"
+        "Save your favorites"
       ]
     }
   };
@@ -93,7 +93,7 @@ const AuthRequired = ({
               {/* Benefits */}
               <div className="bg-muted/50 rounded-xl p-4 mb-6 text-left">
                 <p className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                  <Coins className="h-4 w-4 text-coin" />
+                  <Star className="h-4 w-4 text-primary" />
                   Member Benefits:
                 </p>
                 <ul className="space-y-2">
@@ -121,12 +121,12 @@ const AuthRequired = ({
                 </Button>
               </div>
 
-              {/* Coin Promo */}
-              <div className="mt-6 p-3 rounded-lg bg-gradient-to-r from-coin/10 to-primary/10 border border-coin/20">
+              {/* Promo */}
+              <div className="mt-6 p-3 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
                 <p className="text-sm text-foreground">
-                  <span className="font-medium">💰 New users get bonus coins!</span>
+                  <span className="font-medium">🎉 New users get exclusive deals!</span>
                   <br />
-                  <span className="text-muted-foreground">Sign up and save more with our coin system</span>
+                  <span className="text-muted-foreground">Sign up and start shopping today</span>
                 </p>
               </div>
             </CardContent>

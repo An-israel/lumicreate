@@ -94,12 +94,6 @@ const Orders = () => {
                             <p className="text-muted-foreground">Payment</p>
                             <p className="font-medium capitalize">{order.payment_method}</p>
                           </div>
-                          {order.coins_used > 0 && (
-                            <div>
-                              <p className="text-muted-foreground">Coins Used</p>
-                              <p className="font-medium">{order.coins_used.toLocaleString()}</p>
-                            </div>
-                          )}
                           {order.tracking_id && (
                             <div>
                               <p className="text-muted-foreground">Tracking</p>

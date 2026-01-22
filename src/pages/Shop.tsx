@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Search, Package, Eye, ShoppingCart, Coins, Heart, Mic, Lightbulb, Camera, Headphones, Scale } from "lucide-react";
+import { Search, Package, Eye, ShoppingCart, Heart, Mic, Lightbulb, Camera, Headphones, Scale } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import ProductComparison from "@/components/quiz/ProductComparison";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
-import { formatNaira, formatCoins } from "@/lib/constants";
+import { formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/database";
 import { toast } from "sonner";
@@ -440,10 +440,6 @@ const Shop = () => {
                           <span className="text-lg font-bold text-foreground">
                             {formatNaira(product.price_naira)}
                           </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Coins className="h-4 w-4 text-coin" />
-                          <span>{formatCoins(product.price_coins)} coins</span>
                         </div>
                       </div>
 

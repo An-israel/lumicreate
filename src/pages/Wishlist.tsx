@@ -14,9 +14,8 @@ import {
   Package,
   Trash2,
   ChevronRight,
-  Coins,
 } from "lucide-react";
-import { formatNaira, formatCoins } from "@/lib/constants";
+import { formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export default function Wishlist() {
@@ -159,10 +158,6 @@ export default function Wishlist() {
                             {formatNaira(product!.original_price_naira)}
                           </span>
                         )}
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-secondary">
-                      <Coins className="h-4 w-4" />
-                      <span>{formatCoins(product!.price_coins)} coins</span>
                     </div>
                   </div>
 
