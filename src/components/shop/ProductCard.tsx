@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart, Coins, Package, Heart } from "lucide-react";
+import { ShoppingCart, Package, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/database";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
-import { formatNaira, formatCoins } from "@/lib/constants";
+import { formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -118,10 +118,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                   {formatNaira(product.original_price_naira)}
                 </span>
               )}
-            </div>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Coins className="h-4 w-4 text-coin" />
-              <span>{formatCoins(product.price_coins)} coins</span>
             </div>
           </div>
         </CardContent>

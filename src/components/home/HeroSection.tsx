@@ -19,7 +19,7 @@ const HeroSection = () => {
         <div className="mx-auto max-w-4xl text-center">
           {/* Badge */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm backdrop-blur-sm animate-fade-in">
-            <Sparkles className="h-4 w-4 text-coin" />
+            <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-muted-foreground">Trusted by 500+ Nigerian creators</span>
           </div>
 
@@ -70,7 +70,7 @@ const HeroSection = () => {
             <div className="flex items-center gap-2">
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <span key={i} className="text-coin">★</span>
+                  <span key={i} className="text-warning">★</span>
                 ))}
               </div>
               <span className="text-sm">4.9/5 rating</span>

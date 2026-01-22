@@ -13,7 +13,6 @@ interface CartContextType {
   clearCart: () => Promise<void>;
   totalItems: number;
   totalNaira: number;
-  totalCoins: number;
   refreshCart: () => Promise<void>;
 }
 
@@ -135,10 +134,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (sum, item) => sum + item.product.price_naira * item.quantity,
     0
   );
-  const totalCoins = items.reduce(
-    (sum, item) => sum + item.product.price_coins * item.quantity,
-    0
-  );
 
   return (
     <CartContext.Provider
@@ -151,7 +146,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         totalItems,
         totalNaira,
-        totalCoins,
         refreshCart: fetchCart,
       }}
     >

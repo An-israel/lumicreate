@@ -10,7 +10,6 @@ const tiers = [
     icon: Sparkles,
     description: "Perfect for beginners starting their content journey",
     priceRange: "₦15,000 - ₦50,000",
-    coinRange: "1,500 - 5,000",
     features: [
       "Ring lights & basic lighting",
       "Smartphone tripods",
@@ -28,7 +27,6 @@ const tiers = [
     icon: Crown,
     description: "For creators ready to level up their production quality",
     priceRange: "₦50,000 - ₦200,000",
-    coinRange: "5,000 - 20,000",
     features: [
       "LED panel lighting systems",
       "USB condenser microphones",
@@ -47,7 +45,6 @@ const tiers = [
     icon: Gem,
     description: "Professional-grade equipment for serious creators",
     priceRange: "₦200,000+",
-    coinRange: "20,000+",
     features: [
       "Softbox & studio lighting",
       "XLR microphone setups",
@@ -109,9 +106,6 @@ const PackageTiers = () => {
               <CardContent className="pb-4">
                 <div className="mb-6">
                   <p className="text-2xl font-bold text-foreground">{tier.priceRange}</p>
-                  <p className="text-sm text-muted-foreground">
-                    or {tier.coinRange} coins
-                  </p>
                 </div>
 
                 <ul className="space-y-3">

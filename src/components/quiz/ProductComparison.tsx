@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { formatNaira, formatCoins } from "@/lib/constants";
+import { formatNaira } from "@/lib/constants";
 
 // Flexible interface that works with both quiz results and shop products
 interface ComparisonProduct {
@@ -36,8 +36,7 @@ const ProductComparison = ({ products, onRemove, onAddToCart, onClose }: Product
   if (products.length === 0) return null;
 
   const comparisonFeatures = [
-    { label: "Price (Naira)", getValue: (p: ComparisonProduct) => formatNaira(p.price_naira) },
-    { label: "Price (Coins)", getValue: (p: ComparisonProduct) => formatCoins(p.price_coins) },
+    { label: "Price", getValue: (p: ComparisonProduct) => formatNaira(p.price_naira) },
     { label: "Tier", getValue: (p: ComparisonProduct) => p.tier.charAt(0).toUpperCase() + p.tier.slice(1) },
     { label: "Package", getValue: (p: ComparisonProduct) => p.is_package ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <Minus className="h-5 w-5 text-muted-foreground mx-auto" /> },
     { label: "In Stock", getValue: (p: ComparisonProduct) => p.in_stock !== false ? <Check className="h-5 w-5 text-emerald-500 mx-auto" /> : <X className="h-5 w-5 text-destructive mx-auto" /> },

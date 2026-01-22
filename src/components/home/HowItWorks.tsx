@@ -11,8 +11,8 @@ const steps = [
   {
     number: "02",
     icon: ShoppingBag,
-    title: "Shop with Coins",
-    description: "Purchase coins for bonus value, or pay directly. Coins never expire and work across all products.",
+    title: "Shop & Pay",
+    description: "Browse equipment packages or individual items. Pay securely with Paystack.",
   },
   {
     number: "03",

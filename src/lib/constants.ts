@@ -1,51 +1,10 @@
 // Luminate Creators Constants
 
-export const COIN_PACKAGES = [
-  {
-    id: "starter",
-    name: "Starter",
-    naira: 1000,
-    coins: 100,
-    bonus: 0,
-    description: "Perfect for testing Luminate or small purchases",
-  },
-  {
-    id: "popular",
-    name: "Popular",
-    naira: 5000,
-    coins: 550,
-    bonus: 50,
-    bonusPercent: 10,
-    description: "Entry equipment or consultations",
-    popular: true,
-  },
-  {
-    id: "value",
-    name: "Value",
-    naira: 10000,
-    coins: 1200,
-    bonus: 200,
-    bonusPercent: 20,
-    description: "Mid-tier equipment packages",
-  },
-  {
-    id: "best-deal",
-    name: "Best Deal",
-    naira: 20000,
-    coins: 2600,
-    bonus: 600,
-    bonusPercent: 30,
-    description: "Premium setups or multiple items",
-    bestValue: true,
-  },
-] as const;
-
 export const CONSULTATION_TYPES = [
   {
     id: "equipment_selection",
     name: "Equipment Selection",
     duration: "15 minutes",
-    coins: 500,
     nairaValue: 5000,
     description: "Quick equipment advice for specific questions",
     features: [
@@ -60,7 +19,6 @@ export const CONSULTATION_TYPES = [
     id: "setup_support",
     name: "Setup Support",
     duration: "30 minutes",
-    coins: 1500,
     nairaValue: 15000,
     description: "Unboxing help, technical setup, and troubleshooting",
     features: [
@@ -76,7 +34,6 @@ export const CONSULTATION_TYPES = [
     id: "content_strategy",
     name: "Content Strategy",
     duration: "1 hour",
-    coins: 3000,
     nairaValue: 30000,
     description: "Content niche, growth, and monetization strategy",
     features: [
@@ -96,7 +53,6 @@ export const CONSULTATION_TYPES = [
     id: "complete_package",
     name: "Complete Consultation",
     duration: "2 hours",
-    coins: 4500,
     nairaValue: 45000,
     description: "Full equipment audit, content strategy, and action plan",
     features: [
@@ -120,14 +76,12 @@ export const TIERS = {
   basic: {
     name: "Basic",
     priceRange: "₦50,000 - ₦100,000",
-    coinsRange: "5,000 - 10,000 coins",
     perfectFor: "Smartphone creators, TikTokers, Instagram content creators just getting started",
     color: "bg-emerald-500",
   },
   premium: {
     name: "Premium",
     priceRange: "₦100,000 - ₦250,000",
-    coinsRange: "10,000 - 25,000 coins",
     perfectFor: "YouTubers, podcasters, serious content creators ready to upgrade their quality",
     color: "bg-primary",
     popular: true,
@@ -135,7 +89,6 @@ export const TIERS = {
   diamond: {
     name: "Diamond",
     priceRange: "₦250,000 - ₦500,000+",
-    coinsRange: "25,000 - 50,000+ coins",
     perfectFor: "Professional creators, brand partnerships, multi-platform content production",
     color: "bg-violet-500",
   },
@@ -175,8 +128,4 @@ export const formatNaira = (amount: number) => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
-};
-
-export const formatCoins = (amount: number) => {
-  return new Intl.NumberFormat("en-NG").format(amount);
 };

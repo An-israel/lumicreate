@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProducts } from "@/hooks/useProducts";
-import { formatNaira, formatCoins, TIERS } from "@/lib/constants";
+import { formatNaira, TIERS } from "@/lib/constants";
 import { 
   Check, 
   ArrowRight, 
@@ -15,7 +15,6 @@ import {
   Zap,
   Crown,
   ShoppingCart,
-  Coins,
   Lightbulb,
   Mic,
   Camera
@@ -295,10 +294,6 @@ const TierPackages = () => {
                               {formatNaira(pkg.original_price_naira)}
                             </span>
                           )}
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Coins className="h-5 w-5 text-coin" />
-                          <span className="text-lg">{formatCoins(pkg.price_coins)} coins</span>
                         </div>
                         {savings > 0 && (
                           <p className="text-green-600 font-semibold">

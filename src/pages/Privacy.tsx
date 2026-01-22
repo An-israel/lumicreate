@@ -44,7 +44,7 @@ const Privacy = () => {
               </p>
               <ul className="list-disc list-inside text-muted-foreground mt-2 space-y-1">
                 <li>Process and fulfill your orders</li>
-                <li>Manage your account and coin balance</li>
+                <li>Manage your account</li>
                 <li>Schedule and conduct consultations</li>
                 <li>Send order updates and delivery notifications</li>
                 <li>Respond to your inquiries and support requests</li>
