@@ -76,7 +76,7 @@ export default function SectionVisibilityManager() {
     try {
       // Save visibility for each page
       for (const [pageKey, sections] of Object.entries(visibility)) {
-        await supabase.from("page_content").upsert(
+        const { error } = await supabase.from("page_content").upsert(
           {
             page_key: pageKey,
             section_key: "_visibility",
@@ -84,10 +84,18 @@ export default function SectionVisibilityManager() {
           },
           { onConflict: "page_key,section_key" }
         );
+
+        if (error) {
+          console.error("Error saving visibility:", error);
+          toast.error(`Failed to save: ${error.message}`);
+          setIsSaving(false);
+          return;
+        }
       }
 
       toast.success("Section visibility saved");
     } catch (error) {
+      console.error("Unexpected error:", error);
       toast.error("Failed to save visibility settings");
     }
 
