@@ -3,8 +3,9 @@ import { Check, Sparkles, Crown, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
-const tiers = [
+const defaultTiers = [
   {
     name: "Basic",
     icon: Sparkles,
@@ -19,7 +20,6 @@ const tiers = [
     ],
     color: "from-emerald-500 to-teal-500",
     borderColor: "border-emerald-500/30",
-    badgeColor: "bg-emerald-500/10 text-emerald-500",
     popular: false,
   },
   {
@@ -37,7 +37,6 @@ const tiers = [
     ],
     color: "from-primary to-accent",
     borderColor: "border-primary/30",
-    badgeColor: "bg-primary/10 text-primary",
     popular: true,
   },
   {
@@ -55,12 +54,22 @@ const tiers = [
     ],
     color: "from-violet-500 to-purple-500",
     borderColor: "border-violet-500/30",
-    badgeColor: "bg-violet-500/10 text-violet-500",
     popular: false,
   },
 ];
 
 const PackageTiers = () => {
+  const { content } = usePageContent("home", "package_tiers");
+  const { isSectionVisible } = useSectionVisibility("home");
+
+  // Don't render if section is hidden
+  if (!isSectionVisible("package_tiers")) {
+    return null;
+  }
+
+  const title = content?.title || "Choose Your Tier";
+  const subtitle = content?.subtitle || "Curated packages designed for every stage of your creator journey. All equipment is carefully selected for Nigerian creators.";
+
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="container">
@@ -70,17 +79,16 @@ const PackageTiers = () => {
             Equipment Packages
           </Badge>
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl mb-4">
-            Choose Your Tier
+            {title}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Curated packages designed for every stage of your creator journey. 
-            All equipment is carefully selected for Nigerian creators.
+            {subtitle}
           </p>
         </div>
 
         {/* Tier Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-          {tiers.map((tier) => (
+          {defaultTiers.map((tier) => (
             <Card
               key={tier.name}
               className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${tier.borderColor} ${

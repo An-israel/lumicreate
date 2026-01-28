@@ -5,8 +5,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
-const faqs = [
+const defaultFaqs = [
   {
     question: "What payment methods do you accept?",
     answer: "We accept all major payment methods through Paystack including credit/debit cards, bank transfers, and USSD. All payments are processed securely.",
@@ -34,6 +35,20 @@ const faqs = [
 ];
 
 const FAQ = () => {
+  const { content } = usePageContent("home", "faq");
+  const { isSectionVisible } = useSectionVisibility("home");
+
+  // Don't render if section is hidden
+  if (!isSectionVisible("faq")) {
+    return null;
+  }
+
+  const title = content?.title || "Frequently Asked Questions";
+  const subtitle = content?.subtitle || "Everything you need to know about Luminate Creators";
+  
+  // Use CMS FAQs if available, otherwise use defaults
+  const faqs = content?.questions?.length > 0 ? content.questions : defaultFaqs;
+
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="container">
@@ -44,16 +59,16 @@ const FAQ = () => {
               Got Questions?
             </Badge>
             <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
-              Frequently Asked Questions
+              {title}
             </h2>
             <p className="text-lg text-muted-foreground">
-              Everything you need to know about Luminate Creators
+              {subtitle}
             </p>
           </div>
 
           {/* FAQ Accordion */}
           <Accordion type="single" collapsible className="w-full">
-            {faqs.map((faq, index) => (
+            {faqs.map((faq: { question: string; answer: string }, index: number) => (
               <AccordionItem key={index} value={`item-${index}`}>
                 <AccordionTrigger className="text-left text-base font-medium hover:text-primary">
                   {faq.question}

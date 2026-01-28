@@ -7,6 +7,7 @@ import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { usePageContent } from "@/hooks/usePageContent";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,25 +18,33 @@ import {
 import logoIcon from "@/assets/logo-icon.png";
 import logoLight from "@/assets/logo-light.png";
 
+const defaultNavLinks = [
+  { name: "Home", href: "/" },
+  { name: "Shop", href: "/shop" },
+  { name: "Packages", href: "/packages" },
+  { name: "Consultations", href: "/consultations" },
+  { name: "Resources", href: "/resources" },
+  { name: "About", href: "/about" },
+];
+
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, profile, signOut, isAdmin, isStaff } = useAuth();
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { theme } = useTheme();
+  const { content } = usePageContent("global", "header");
   const navigate = useNavigate();
 
-  // Use light logo for dark mode, dark logo for light mode
-  const currentLogo = theme === "dark" ? logoIcon : logoLight;
+  // Use CMS content or defaults
+  const brandName = content?.brand_name || "Luminate Creators";
+  const navLinks = content?.nav_links?.length > 0 ? content.nav_links : defaultNavLinks;
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Shop", href: "/shop" },
-    { name: "Packages", href: "/packages" },
-    { name: "Consultations", href: "/consultations" },
-    { name: "Resources", href: "/resources" },
-    { name: "About", href: "/about" },
-  ];
+  // Use CMS logos if provided, otherwise use defaults
+  // Use light logo for dark mode, dark logo for light mode
+  const currentLogo = theme === "dark" 
+    ? (content?.logo_dark || logoIcon)
+    : (content?.logo_light || logoLight);
 
   const handleSignOut = async () => {
     await signOut();
@@ -47,13 +56,13 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <img src={currentLogo} alt="Luminate Creators" className="h-8 w-8" />
-          <span className="font-display font-bold text-lg hidden sm:block">Luminate Creators</span>
+          <img src={currentLogo} alt={brandName} className="h-8 w-8" />
+          <span className="font-display font-bold text-lg hidden sm:block">{brandName}</span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
+          {navLinks.map((link: { name: string; href: string }) => (
             <Link
               key={link.name}
               to={link.href}
@@ -175,7 +184,7 @@ const Header = () => {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-background">
           <nav className="container py-4 space-y-3">
-            {navLinks.map((link) => (
+            {navLinks.map((link: { name: string; href: string }) => (
               <Link
                 key={link.name}
                 to={link.href}

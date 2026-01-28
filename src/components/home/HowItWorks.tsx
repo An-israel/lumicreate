@@ -1,7 +1,8 @@
 import { Search, ShoppingBag, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
-const steps = [
+const defaultSteps = [
   {
     number: "01",
     icon: Search,
@@ -23,6 +24,27 @@ const steps = [
 ];
 
 const HowItWorks = () => {
+  const { content } = usePageContent("home", "how_it_works");
+  const { isSectionVisible } = useSectionVisibility("home");
+
+  // Don't render if section is hidden
+  if (!isSectionVisible("how_it_works")) {
+    return null;
+  }
+
+  const title = content?.title || "How It Works";
+  const subtitle = content?.subtitle || "From discovery to delivery, we make upgrading your setup effortless.";
+  
+  // Use CMS steps if available, otherwise use defaults
+  const steps = content?.steps?.length > 0
+    ? content.steps.map((step: any, index: number) => ({
+        number: String(index + 1).padStart(2, "0"),
+        icon: [Search, ShoppingBag, Truck][index] || Search,
+        title: step.title,
+        description: step.description,
+      }))
+    : defaultSteps;
+
   return (
     <section className="py-16 md:py-24 bg-muted/30">
       <div className="container">
@@ -32,16 +54,16 @@ const HowItWorks = () => {
             Simple Process
           </Badge>
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
-            How It Works
+            {title}
           </h2>
           <p className="text-lg text-muted-foreground">
-            From discovery to delivery, we make upgrading your setup effortless.
+            {subtitle}
           </p>
         </div>
 
         {/* Steps */}
         <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
-          {steps.map((step, index) => (
+          {steps.map((step: any, index: number) => (
             <div
               key={step.number}
               className="relative group"
