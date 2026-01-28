@@ -37,21 +37,28 @@ export function usePageContent(pageKey: string, sectionKey: string) {
 }
 
 export function useSectionVisibility(pageKey: string) {
-  const [visibility, setVisibility] = useState<Record<string, boolean>>({});
+  const [visibility, setVisibility] = useState<Record<string, boolean> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchVisibility = async () => {
       setIsLoading(true);
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("page_content")
         .select("content")
         .eq("page_key", pageKey)
         .eq("section_key", "_visibility")
         .maybeSingle();
 
-      if (data) {
+      if (error) {
+        console.error("Error fetching visibility:", error);
+      }
+      
+      if (data && data.content) {
         setVisibility(data.content as Record<string, boolean>);
+      } else {
+        // No visibility settings found, all sections visible by default
+        setVisibility({});
       }
       setIsLoading(false);
     };
@@ -60,11 +67,16 @@ export function useSectionVisibility(pageKey: string) {
   }, [pageKey]);
 
   const isSectionVisible = (sectionKey: string): boolean => {
-    // Default to true if no visibility setting exists
-    return visibility[sectionKey] !== false;
+    // While loading or if no visibility data, show all sections
+    if (visibility === null) return true;
+    // If section key exists in visibility, use its value; otherwise default to true
+    if (sectionKey in visibility) {
+      return visibility[sectionKey] === true;
+    }
+    return true;
   };
 
-  return { visibility, isSectionVisible, isLoading };
+  return { visibility: visibility || {}, isSectionVisible, isLoading };
 }
 
 export function useAllPageContent() {
