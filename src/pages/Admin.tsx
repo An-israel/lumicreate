@@ -107,7 +107,7 @@ export default function Admin() {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       price_naira: parseInt(formData.get("price_naira") as string),
-      price_coins: parseInt(formData.get("price_coins") as string),
+      price_coins: Math.round(parseInt(formData.get("price_naira") as string) / 100), // Auto-calculate based on Naira
       tier: formData.get("tier") as Product["tier"],
       content_types: [formData.get("content_type") as string] as Product["content_types"],
       image_url: productImageUrl || null,
@@ -352,18 +352,6 @@ export default function Admin() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="price_coins">Price (Coins)</Label>
-                        <Input
-                          id="price_coins"
-                          name="price_coins"
-                          type="number"
-                          defaultValue={editingProduct?.price_coins}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
                         <Label htmlFor="tier">Tier</Label>
                         <Select name="tier" defaultValue={editingProduct?.tier || "basic"}>
                           <SelectTrigger>
@@ -376,21 +364,21 @@ export default function Admin() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="content_type">Content Type</Label>
-                        <Select name="content_type" defaultValue={editingProduct?.content_types?.[0] || "general"}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CONTENT_TYPES.map((type) => (
-                              <SelectItem key={type.id} value={type.id}>
-                                {type.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="content_type">Content Type</Label>
+                      <Select name="content_type" defaultValue={editingProduct?.content_types?.[0] || "general"}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CONTENT_TYPES.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <ImageUpload
                       value={productImageUrl}
@@ -450,7 +438,6 @@ export default function Admin() {
                     <TableHead>Product</TableHead>
                     <TableHead>Tier</TableHead>
                     <TableHead>Price (₦)</TableHead>
-                    <TableHead>Price (Coins)</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -479,7 +466,6 @@ export default function Admin() {
                         <Badge variant="outline" className="capitalize">{product.tier}</Badge>
                       </TableCell>
                       <TableCell>{formatNaira(product.price_naira)}</TableCell>
-                      <TableCell>{product.price_coins.toLocaleString()} coins</TableCell>
                       <TableCell>
                         <Badge variant={product.in_stock ? "default" : "destructive"}>
                           {product.in_stock ? "In Stock" : "Out of Stock"}
@@ -527,7 +513,7 @@ export default function Admin() {
                     <TableHead>Time</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Coins Paid</TableHead>
+                    <TableHead>Amount Paid</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

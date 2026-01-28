@@ -3,8 +3,9 @@ import { ArrowRight, BookOpen, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
-const blogPosts = [
+const defaultBlogPosts = [
   {
     id: "best-cameras-nigerian-creators-2024",
     title: "Best Cameras for Nigerian Content Creators in 2024",
@@ -32,6 +33,19 @@ const blogPosts = [
 ];
 
 const ResourcesSection = () => {
+  const { content } = usePageContent("home", "resources");
+  const { isSectionVisible } = useSectionVisibility("home");
+
+  // Don't render if section is hidden
+  if (!isSectionVisible("resources")) {
+    return null;
+  }
+
+  const title = content?.title || "Learn & Grow";
+  const subtitle = content?.subtitle || "Equipment guides, tutorials, and growth strategies to help you create better content.";
+  const ctaText = content?.cta_text || "View All Articles";
+  const ctaLink = content?.cta_link || "/resources";
+
   return (
     <section className="py-16 md:py-24 bg-muted/30">
       <div className="container">
@@ -42,22 +56,22 @@ const ResourcesSection = () => {
               <span className="text-muted-foreground">Creator Resources</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              Learn & Grow
+              {title}
             </h2>
             <p className="text-muted-foreground mt-2 max-w-lg">
-              Equipment guides, tutorials, and growth strategies to help you create better content.
+              {subtitle}
             </p>
           </div>
           <Button variant="outline" asChild>
-            <Link to="/resources">
-              View All Articles
+            <Link to={ctaLink}>
+              {ctaText}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </Button>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {blogPosts.map((post) => (
+          {defaultBlogPosts.map((post) => (
             <Card key={post.id} className="overflow-hidden card-hover group">
               <div className="aspect-video relative overflow-hidden">
                 <img

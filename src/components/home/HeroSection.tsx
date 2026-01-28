@@ -1,8 +1,30 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
 const HeroSection = () => {
+  const { content } = usePageContent("home", "hero");
+  const { isSectionVisible } = useSectionVisibility("home");
+
+  // Don't render if section is hidden
+  if (!isSectionVisible("hero")) {
+    return null;
+  }
+
+  // Default values
+  const badgeText = content?.badge_text || "Trusted by 500+ Nigerian creators";
+  const titleLine1 = content?.title_line1 || "Your Content.";
+  const titleHighlight = content?.title_highlight || "Elevated.";
+  const subtitle = content?.subtitle || "Curated equipment packages designed specifically for Nigerian content creators. From beginner to pro, we've got your setup covered.";
+  const ctaPrimaryText = content?.cta_primary_text || "Find My Equipment";
+  const ctaPrimaryLink = content?.cta_primary_link || "/quiz";
+  const ctaSecondaryText = content?.cta_secondary_text || "Browse Packages";
+  const ctaSecondaryLink = content?.cta_secondary_link || "/packages";
+  const trustCreators = content?.trust_creators || "500+ creators";
+  const trustRating = content?.trust_rating || "4.9/5 rating";
+  const trustDelivery = content?.trust_delivery || "24hr Lagos delivery";
+
   return (
     <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
       {/* Animated Gradient Background */}
@@ -20,35 +42,34 @@ const HeroSection = () => {
           {/* Badge */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm backdrop-blur-sm animate-fade-in">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-muted-foreground">Trusted by 500+ Nigerian creators</span>
+            <span className="text-muted-foreground">{badgeText}</span>
           </div>
 
           {/* Headline */}
           <h1 className="mb-6 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Your Content.{" "}
+            {titleLine1}{" "}
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Elevated.
+              {titleHighlight}
             </span>
           </h1>
 
           {/* Subheadline */}
           <p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Curated equipment packages designed specifically for Nigerian content creators. 
-            From beginner to pro, we've got your setup covered.
+            {subtitle}
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <Button size="lg" className="w-full sm:w-auto gap-2 text-base" asChild>
-              <Link to="/quiz">
-                Find My Equipment
+              <Link to={ctaPrimaryLink}>
+                {ctaPrimaryText}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 text-base" asChild>
-              <Link to="/packages">
+              <Link to={ctaSecondaryLink}>
                 <Play className="h-4 w-4" />
-                Browse Packages
+                {ctaSecondaryText}
               </Link>
             </Button>
           </div>
@@ -64,7 +85,7 @@ const HeroSection = () => {
                   />
                 ))}
               </div>
-              <span className="text-sm">500+ creators</span>
+              <span className="text-sm">{trustCreators}</span>
             </div>
             <div className="h-4 w-px bg-border hidden sm:block" />
             <div className="flex items-center gap-2">
@@ -73,11 +94,12 @@ const HeroSection = () => {
                   <span key={i} className="text-warning">★</span>
                 ))}
               </div>
-              <span className="text-sm">4.9/5 rating</span>
+              <span className="text-sm">{trustRating}</span>
             </div>
             <div className="h-4 w-px bg-border hidden sm:block" />
             <div className="text-sm">
-              <span className="font-semibold text-foreground">24hr</span> Lagos delivery
+              <span className="font-semibold text-foreground">{trustDelivery.split(" ")[0]}</span>{" "}
+              {trustDelivery.split(" ").slice(1).join(" ")}
             </div>
           </div>
         </div>

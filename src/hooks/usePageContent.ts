@@ -36,6 +36,37 @@ export function usePageContent(pageKey: string, sectionKey: string) {
   return { content, isLoading };
 }
 
+export function useSectionVisibility(pageKey: string) {
+  const [visibility, setVisibility] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVisibility = async () => {
+      setIsLoading(true);
+      const { data } = await supabase
+        .from("page_content")
+        .select("content")
+        .eq("page_key", pageKey)
+        .eq("section_key", "_visibility")
+        .maybeSingle();
+
+      if (data) {
+        setVisibility(data.content as Record<string, boolean>);
+      }
+      setIsLoading(false);
+    };
+
+    fetchVisibility();
+  }, [pageKey]);
+
+  const isSectionVisible = (sectionKey: string): boolean => {
+    // Default to true if no visibility setting exists
+    return visibility[sectionKey] !== false;
+  };
+
+  return { visibility, isSectionVisible, isLoading };
+}
+
 export function useAllPageContent() {
   const [pages, setPages] = useState<PageContent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,7 +123,7 @@ export function useAllPageContent() {
   return { pages, isLoading, upsertContent, deleteContent, refetch: fetchContent };
 }
 
-// Default content structure for different pages
+// Legacy PAGE_SECTIONS for backward compatibility - use CMS_PAGES from cmsConfig.ts instead
 export const PAGE_SECTIONS = {
   home: {
     label: "Homepage",
