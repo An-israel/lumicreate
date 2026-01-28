@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionVisibility } from "@/hooks/usePageContent";
 import { z } from "zod";
 import { 
   Target, 
@@ -34,6 +35,7 @@ const contactSchema = z.object({
 });
 
 const About = () => {
+  const { isSectionVisible } = useSectionVisibility("about");
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -194,6 +196,7 @@ const About = () => {
   return (
     <Layout>
       {/* Hero Section */}
+      {isSectionVisible("hero") && (
       <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-muted/30 py-16 md:py-24">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
@@ -221,8 +224,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Stats Section */}
+      {isSectionVisible("stats") && (
       <section className="py-12 bg-muted/30">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -237,8 +242,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Mission Section */}
+      {isSectionVisible("mission") && (
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -285,8 +292,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Values Section */}
+      {isSectionVisible("values") && (
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <div className="text-center mb-12">
@@ -318,8 +327,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* What We Offer Section */}
+      {isSectionVisible("offerings") && (
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="text-center mb-12">
@@ -351,8 +362,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Testimonials Section */}
+      {isSectionVisible("testimonials") && (
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <div className="text-center mb-12">
@@ -389,8 +402,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Team Section */}
+      {isSectionVisible("team") && (
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="text-center mb-12">
@@ -427,8 +442,10 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Contact Form Section */}
+      {isSectionVisible("contact") && (
       <section id="contact" className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-start max-w-5xl mx-auto">
@@ -542,6 +559,7 @@ const About = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
