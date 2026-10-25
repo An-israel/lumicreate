@@ -1,73 +1,65 @@
-# Welcome to your Lovable project
+# Luminate Creators
 
-## Project info
+Equipment shop for Nigerian content creators. React + Vite frontend (hosted on
+Vercel), Supabase backend (Postgres, Auth, Storage, Edge Functions), Paystack
+payments and Resend email.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Local development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+cp .env.example .env   # fill in your Supabase URL and anon key
+npm run dev            # http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+## Backend setup (new Supabase project)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Everything the backend needs lives in `supabase/`:
 
-**Use GitHub Codespaces**
+- `migrations/` — full database schema, row-level security policies, triggers
+  and the `product-images` storage bucket, applied in filename order.
+- `functions/` — Edge Functions: `paystack-initialize`, `paystack-verify`,
+  `paystack-webhook`, `send-order-email`, `send-contact-email`,
+  `send-admin-alert`, `send-newsletter-welcome`, `send-coin-receipt`.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+With the [Supabase CLI](https://supabase.com/docs/guides/cli):
 
-## What technologies are used for this project?
+```sh
+supabase login
+supabase link --project-ref <your-project-ref>   # also set project_id in supabase/config.toml
+supabase db push                                  # applies every migration
+supabase functions deploy                         # deploys all Edge Functions
+supabase secrets set PAYSTACK_SECRET_KEY=sk_test_... RESEND_API_KEY=re_...
+```
 
-This project is built with:
+`SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are provided
+to Edge Functions automatically.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Then in the Supabase dashboard:
 
-## How can I deploy this project?
+1. **Authentication → URL Configuration**: set *Site URL* to your Vercel domain
+   and add `https://<your-domain>/**` to *Redirect URLs* (needed for email
+   confirmation and password reset links).
+2. **Paystack dashboard → Settings → API Keys & Webhooks**: set the webhook URL
+   to `https://<your-project-ref>.supabase.co/functions/v1/paystack-webhook`.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Making yourself an admin
 
-## Can I connect a custom domain to my Lovable project?
+Sign up on the site, then run this in the Supabase SQL editor:
 
-Yes, you can!
+```sql
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'admin' FROM auth.users WHERE email = 'you@example.com'
+ON CONFLICT DO NOTHING;
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Deploying the frontend (Vercel)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+1. Import this GitHub repository in Vercel. The framework (Vite), build command
+   and SPA routing come from `vercel.json`.
+2. Add environment variables (Production and Preview):
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY` (the project's anon public key)
+   - `VITE_SUPABASE_PROJECT_ID`
+3. Deploy. Redeploy after changing environment variables — they are baked in at
+   build time.

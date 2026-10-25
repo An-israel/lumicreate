@@ -1,4 +1,5 @@
-project_id = "bdqjnmpvurtkbmwftlfn"
+# Set this to your Supabase project ref (Project Settings → General → Reference ID)
+project_id = "your-project-ref"
 
 [functions.send-newsletter-welcome]
 verify_jwt = false
