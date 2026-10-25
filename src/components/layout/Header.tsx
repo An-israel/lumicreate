@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingCart, User, LogOut, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,6 +8,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { usePageContent } from "@/hooks/usePageContent";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +36,10 @@ const Header = () => {
   const { theme } = useTheme();
   const { content } = usePageContent("global", "header");
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href.split("?")[0]);
 
   // Use CMS content or defaults
   const brandName = content?.brand_name || "Luminate Creators";
@@ -52,21 +57,26 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
+      <div className="container flex h-14 items-center justify-between gap-6">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <img src={currentLogo} alt={brandName} className="h-8 w-8" />
-          <span className="font-display font-bold text-lg hidden sm:block">{brandName}</span>
+        <Link to="/" className="flex shrink-0 items-center gap-2">
+          <img src={currentLogo} alt={brandName} className="h-7 w-7" />
+          <span className="hidden text-[15px] font-semibold tracking-tight sm:block">{brandName}</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link: { name: string; href: string }) => (
             <Link
               key={link.name}
               to={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className={cn(
+                "rounded-full px-3 py-1.5 text-sm transition-colors",
+                isActive(link.href)
+                  ? "text-foreground font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
             >
               {link.name}
             </Link>
@@ -74,7 +84,7 @@ const Header = () => {
         </nav>
 
         {/* Desktop Actions */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-1">
           <ThemeToggle />
           
           {user ? (
@@ -82,9 +92,9 @@ const Header = () => {
               {/* Wishlist */}
               <Link to="/wishlist" className="relative">
                 <Button variant="ghost" size="icon">
-                  <Heart className="h-5 w-5" />
+                  <Heart className="h-[18px] w-[18px]" />
                   {wishlistItems.length > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                    <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-medium text-background">
                       {wishlistItems.length}
                     </span>
                   )}
@@ -94,9 +104,9 @@ const Header = () => {
               {/* Cart */}
               <Link to="/cart" className="relative">
                 <Button variant="ghost" size="icon">
-                  <ShoppingCart className="h-5 w-5" />
+                  <ShoppingCart className="h-[18px] w-[18px]" />
                   {totalItems > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                    <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
                       {totalItems}
                     </span>
                   )}
@@ -107,10 +117,10 @@ const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
+                    <User className="h-[18px] w-[18px]" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-52 rounded-xl">
                   <div className="px-2 py-1.5">
                     <p className="text-sm font-medium">{profile?.full_name || "Creator"}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
@@ -154,11 +164,11 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
-                <Link to="/login">Sign In</Link>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/login">Sign in</Link>
               </Button>
-              <Button asChild>
-                <Link to="/signup">Get Started</Link>
+              <Button size="sm" className="ml-1" asChild>
+                <Link to="/signup">Get started</Link>
               </Button>
             </>
           )}
@@ -168,13 +178,15 @@ const Header = () => {
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <button
-            className="p-2"
+            className="-mr-2 p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5" />
             ) : (
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5" />
             )}
           </button>
         </div>
@@ -183,18 +195,21 @@ const Header = () => {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-background">
-          <nav className="container py-4 space-y-3">
+          <nav className="container py-4 space-y-1">
             {navLinks.map((link: { name: string; href: string }) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="block py-2 text-base font-medium text-foreground"
+                className={cn(
+                  "block py-2.5 text-lg",
+                  isActive(link.href) ? "font-medium text-foreground" : "text-muted-foreground"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="pt-4 border-t border-border space-y-2">
+            <div className="mt-3 pt-4 border-t border-border space-y-1">
               {user ? (
                 <>
                   <Link
@@ -235,12 +250,12 @@ const Header = () => {
                 <>
                   <Button variant="outline" className="w-full" asChild>
                     <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                      Sign In
+                      Sign in
                     </Link>
                   </Button>
                   <Button className="w-full" asChild>
                     <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                      Get Started
+                      Get started
                     </Link>
                   </Button>
                 </>

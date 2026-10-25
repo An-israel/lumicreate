@@ -254,7 +254,7 @@ const Profile = () => {
     <Layout>
       <div className="bg-muted/30 min-h-screen py-8 md:py-12">
         <div className="container max-w-4xl">
-          <h1 className="font-display text-3xl font-bold text-foreground mb-8">
+          <h1 className="font-display text-3xl font-semibold text-foreground mb-8">
             Profile Settings
           </h1>
 

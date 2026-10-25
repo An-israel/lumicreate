@@ -49,7 +49,7 @@ const Dashboard = () => {
         <div className="container">
           {/* Welcome Header */}
           <div className="mb-8">
-            <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+            <h1 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
               Welcome back, {profile?.full_name?.split(" ")[0] || "Creator"}!
             </h1>
             <p className="text-muted-foreground text-lg mt-1">
@@ -70,7 +70,7 @@ const Dashboard = () => {
               <CardContent>
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-3xl font-bold text-foreground">
+                    <p className="text-3xl font-semibold text-foreground">
                       {orders?.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length || 0}
                     </p>
                     <p className="text-sm text-muted-foreground">in progress</p>
@@ -93,7 +93,7 @@ const Dashboard = () => {
               <CardContent>
                 <div className="flex items-end justify-between">
                   <div>
-                    <p className="text-3xl font-bold text-foreground">
+                    <p className="text-3xl font-semibold text-foreground">
                       {upcomingConsultations.length}
                     </p>
                     <p className="text-sm text-muted-foreground">upcoming</p>
@@ -121,7 +121,7 @@ const Dashboard = () => {
               </Button>
               <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
                 <Link to="/consultations">
-                  <Calendar className="h-5 w-5 text-accent" />
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
                   <div className="text-left">
                     <p className="font-medium">Book Consultation</p>
                     <p className="text-xs text-muted-foreground">Get expert advice</p>

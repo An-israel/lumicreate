@@ -1,37 +1,16 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProducts } from "@/hooks/useProducts";
 import { formatNaira, TIERS } from "@/lib/constants";
-import { 
-  Check, 
-  ArrowRight, 
-  ArrowLeft,
-  Package, 
-  Star,
-  Zap,
-  Crown,
-  ShoppingCart,
-  Lightbulb,
-  Mic,
-  Camera
-} from "lucide-react";
+import { Check, ArrowRight, ArrowLeft, Package, ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 import { ProductTier } from "@/types/database";
 
 const tierConfig = {
   basic: {
-    icon: Zap,
-    gradient: "from-emerald-500 to-teal-500",
-    borderColor: "border-emerald-500/30 hover:border-emerald-500/50",
-    bgColor: "bg-emerald-500/5",
-    accentColor: "text-emerald-500",
-    badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
-    heroGradient: "from-emerald-500/20 via-background to-teal-500/10",
     description: "Perfect for smartphone creators, TikTokers, and Instagram content creators just getting started. These packages include the essentials to dramatically improve your content quality without overwhelming complexity.",
     idealFor: [
       "TikTok and Instagram Reels creators",
@@ -42,13 +21,6 @@ const tierConfig = {
     lightingGuide: "Basic packages include 2-3 lights: a key light for main illumination, plus fill or background lighting for dimension.",
   },
   premium: {
-    icon: Star,
-    gradient: "from-primary to-accent",
-    borderColor: "border-primary/30 hover:border-primary/50",
-    bgColor: "bg-primary/5",
-    accentColor: "text-primary",
-    badgeColor: "bg-primary/10 text-primary border-primary/30",
-    heroGradient: "from-primary/20 via-background to-accent/10",
     description: "For YouTubers, podcasters, and serious content creators ready to upgrade their quality. These setups deliver professional results that compete with established channels.",
     idealFor: [
       "YouTubers building their channel",
@@ -59,13 +31,6 @@ const tierConfig = {
     lightingGuide: "Premium packages include 3-4 lights: key light, fill light, background light, plus optional rim lighting for cinematic depth.",
   },
   diamond: {
-    icon: Crown,
-    gradient: "from-violet-500 to-purple-500",
-    borderColor: "border-violet-500/30 hover:border-violet-500/50",
-    bgColor: "bg-violet-500/5",
-    accentColor: "text-violet-500",
-    badgeColor: "bg-violet-500/10 text-violet-500 border-violet-500/30",
-    heroGradient: "from-violet-500/20 via-background to-purple-500/10",
     description: "The definitive setups for professional creators, brand partnerships, and commercial production. These are the tools used by full-time content professionals and small production studios.",
     idealFor: [
       "Full-time professional creators",
@@ -77,112 +42,84 @@ const tierConfig = {
   },
 };
 
+const isProductTier = (value?: string): value is ProductTier =>
+  !!value && ["basic", "premium", "diamond"].includes(value);
+
 const TierPackages = () => {
   const { tier } = useParams<{ tier: string }>();
-  const validTier = tier as ProductTier;
-  
-  // Validate tier
-  if (!tier || !["basic", "premium", "diamond"].includes(tier)) {
-    return <Navigate to="/packages" replace />;
-  }
+  const validTier: ProductTier = isProductTier(tier) ? tier : "basic";
 
   const { products, isLoading } = useProducts({ isPackage: true, tier: validTier });
   const { addToCart } = useCart();
-  
+
+  if (!isProductTier(tier)) {
+    return <Navigate to="/packages" replace />;
+  }
+
   const config = tierConfig[validTier];
   const tierInfo = TIERS[validTier];
-  const TierIcon = config.icon;
 
   const handleAddToCart = async (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
     await addToCart(productId);
   };
 
-  const otherTiers = Object.entries(tierConfig).filter(([key]) => key !== tier);
+  const otherTiers = Object.keys(tierConfig).filter((key) => key !== tier) as ProductTier[];
 
   return (
     <Layout>
       {/* Hero Section */}
-      <section className={cn("relative overflow-hidden py-16 md:py-24 bg-gradient-to-br", config.heroGradient)}>
-        <div className="absolute inset-0 overflow-hidden">
-          <div className={cn("absolute -top-40 -right-40 h-80 w-80 rounded-full blur-3xl", config.bgColor)} />
-          <div className={cn("absolute -bottom-40 -left-40 h-80 w-80 rounded-full blur-3xl", config.bgColor)} />
-        </div>
-
-        <div className="container relative">
-          <Link to="/packages" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
+      <section className="border-b border-border pt-10 pb-16 md:pt-14 md:pb-20">
+        <div className="container">
+          <Link to="/packages" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" />
-            All Packages
+            All packages
           </Link>
 
-          <div className="flex items-start gap-6 mb-8">
-            <div className={cn(
-              "w-20 h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-lg",
-              config.gradient
-            )}>
-              <TierIcon className="h-10 w-10 text-white" />
-            </div>
-            <div>
-              <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-2">
-                {tierInfo.name} Packages
+          <div className="mt-10 grid gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-7">
+              <p className="eyebrow mb-4">{tierInfo.priceRange}</p>
+              <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl">
+                {tierInfo.name} packages
               </h1>
-              <p className="text-xl text-muted-foreground">
-                {tierInfo.priceRange}
+              <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
+                {config.description}
               </p>
             </div>
-          </div>
 
-          <p className="text-lg text-muted-foreground max-w-3xl mb-8">
-            {config.description}
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Ideal For */}
-            <Card className={cn("border", config.borderColor)}>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <Check className={cn("h-5 w-5", config.accentColor)} />
-                  Ideal For
-                </h3>
-                <ul className="space-y-2">
-                  {config.idealFor.map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-muted-foreground">
-                      <div className={cn("h-1.5 w-1.5 rounded-full", config.gradient.includes("emerald") ? "bg-emerald-500" : config.gradient.includes("primary") ? "bg-primary" : "bg-violet-500")} />
+            <div className="space-y-8 lg:col-span-5 lg:border-l lg:border-border lg:pl-12">
+              <div>
+                <h3 className="text-sm font-medium">Ideal for</h3>
+                <ul className="mt-3 space-y-2">
+                  {config.idealFor.map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-muted-foreground">
+                      <Check className="mt-1 h-4 w-4 shrink-0 text-foreground" />
                       {item}
                     </li>
                   ))}
                 </ul>
-              </CardContent>
-            </Card>
-
-            {/* Lighting Guide */}
-            <Card className={cn("border", config.borderColor)}>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <Lightbulb className={cn("h-5 w-5", config.accentColor)} />
-                  What's Included - Lighting
-                </h3>
-                <p className="text-muted-foreground">
-                  {config.lightingGuide}
-                </p>
-              </CardContent>
-            </Card>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium">Lighting</h3>
+                <p className="mt-3 text-muted-foreground">{config.lightingGuide}</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Packages Section */}
-      <section className="py-16 md:py-24">
+      <section className="section">
         <div className="container">
-          <h2 className="text-2xl font-bold mb-8">
-            Choose Your {tierInfo.name} Package
+          <h2 className="mb-10 text-3xl font-semibold tracking-tight">
+            Choose your {tierInfo.name.toLowerCase()} package
           </h2>
 
           {isLoading ? (
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               {[1, 2].map((i) => (
                 <div key={i} className="space-y-4">
-                  <Skeleton className="aspect-video w-full" />
+                  <Skeleton className="aspect-video w-full rounded-2xl" />
                   <Skeleton className="h-6 w-3/4" />
                   <Skeleton className="h-20 w-full" />
                   <Skeleton className="h-10 w-full" />
@@ -190,24 +127,22 @@ const TierPackages = () => {
               ))}
             </div>
           ) : products.length > 0 ? (
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               {products.map((pkg, index) => {
-                const savings = pkg.original_price_naira 
-                  ? pkg.original_price_naira - pkg.price_naira 
+                const savings = pkg.original_price_naira
+                  ? pkg.original_price_naira - pkg.price_naira
                   : 0;
-                const savingsPercent = pkg.original_price_naira 
-                  ? Math.round((savings / pkg.original_price_naira) * 100) 
+                const savingsPercent = pkg.original_price_naira
+                  ? Math.round((savings / pkg.original_price_naira) * 100)
                   : 0;
                 const specs = pkg.specifications as Record<string, string>;
 
                 return (
-                  <Card 
-                    key={pkg.id} 
+                  <article
+                    key={pkg.id}
                     className={cn(
-                      "group overflow-hidden transition-all hover:shadow-xl",
-                      config.borderColor,
-                      index === 0 && "ring-2 ring-offset-2 ring-offset-background",
-                      index === 0 && (validTier === "basic" ? "ring-emerald-500/50" : validTier === "premium" ? "ring-primary/50" : "ring-violet-500/50")
+                      "group flex flex-col overflow-hidden rounded-2xl border",
+                      index === 0 ? "border-foreground" : "border-border"
                     )}
                   >
                     {/* Image */}
@@ -216,119 +151,100 @@ const TierPackages = () => {
                         <img
                           src={pkg.image_url}
                           alt={pkg.name}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
-                          <Package className="h-16 w-16 text-muted-foreground/50" />
+                          <Package className="h-12 w-12 text-muted-foreground/40" strokeWidth={1.25} />
                         </div>
                       )}
-                      
-                      {/* Badges */}
+
                       <div className="absolute top-4 left-4 flex gap-2">
-                        <Badge className={config.badgeColor}>
-                          {tierInfo.name}
-                        </Badge>
                         {index === 0 && (
-                          <Badge className="bg-accent text-accent-foreground">
+                          <span className="rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
                             Recommended
-                          </Badge>
+                          </span>
+                        )}
+                        {savingsPercent > 0 && (
+                          <span className="rounded-full bg-background/90 px-2.5 py-0.5 text-xs font-medium backdrop-blur">
+                            Save {savingsPercent}%
+                          </span>
                         )}
                       </div>
-                      
-                      {savingsPercent > 0 && (
-                        <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
-                          Save {savingsPercent}%
-                        </Badge>
-                      )}
                     </div>
 
-                    <CardContent className="p-6">
-                      <h3 className="text-2xl font-bold mb-3">{pkg.name}</h3>
-                      
+                    <div className="flex flex-1 flex-col p-6 md:p-8">
+                      <h3 className="text-2xl font-semibold">{pkg.name}</h3>
+
                       {pkg.description && (
-                        <p className="text-muted-foreground mb-6 leading-relaxed">
+                        <p className="mt-3 leading-relaxed text-muted-foreground">
                           {pkg.description}
                         </p>
                       )}
 
                       {/* What's Included */}
                       {specs && Object.keys(specs).length > 0 && (
-                        <div className="mb-6">
-                          <h4 className="font-semibold mb-3 flex items-center gap-2">
-                            <Package className="h-4 w-4" />
-                            What's Included
-                          </h4>
-                          <div className="grid gap-2">
+                        <div className="mt-8 border-t border-border pt-6">
+                          <h4 className="text-sm font-medium">What's included</h4>
+                          <dl className="mt-4 space-y-3 text-sm">
                             {Object.entries(specs)
                               .filter(([key]) => !["Best For", "Included Items"].includes(key))
                               .map(([key, value]) => (
-                                <div key={key} className="flex items-start gap-3 text-sm">
-                                  <Check className={cn("h-4 w-4 mt-0.5 flex-shrink-0", config.accentColor)} />
-                                  <div>
-                                    <span className="font-medium">{key}:</span>{" "}
-                                    <span className="text-muted-foreground">{value}</span>
-                                  </div>
+                                <div key={key} className="grid grid-cols-3 gap-4">
+                                  <dt className="text-muted-foreground">{key}</dt>
+                                  <dd className="col-span-2">{value}</dd>
                                 </div>
                               ))}
-                          </div>
+                          </dl>
                         </div>
                       )}
 
-                      {/* Best For */}
                       {specs?.["Best For"] && (
-                        <div className={cn("p-3 rounded-lg mb-6", config.bgColor)}>
-                          <p className="text-sm">
-                            <span className="font-medium">Best For:</span>{" "}
-                            <span className="text-muted-foreground">{specs["Best For"]}</span>
-                          </p>
-                        </div>
+                        <p className="mt-6 text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground">Best for:</span> {specs["Best For"]}
+                        </p>
                       )}
 
                       {/* Pricing */}
-                      <div className="space-y-3 mb-6 p-4 rounded-lg bg-muted/50">
-                        <div className="flex items-baseline justify-between">
-                          <span className="text-3xl font-bold">{formatNaira(pkg.price_naira)}</span>
+                      <div className="mt-auto pt-8">
+                        <div className="flex items-baseline gap-3">
+                          <span className="text-3xl font-semibold tracking-tight">{formatNaira(pkg.price_naira)}</span>
                           {pkg.original_price_naira && pkg.original_price_naira > pkg.price_naira && (
-                            <span className="text-lg text-muted-foreground line-through">
+                            <span className="text-muted-foreground line-through">
                               {formatNaira(pkg.original_price_naira)}
                             </span>
                           )}
                         </div>
                         {savings > 0 && (
-                          <p className="text-green-600 font-semibold">
-                            You save {formatNaira(savings)} with this bundle!
+                          <p className="mt-1 text-sm text-success">
+                            You save {formatNaira(savings)} with this bundle
                           </p>
                         )}
-                      </div>
 
-                      {/* Actions */}
-                      <div className="flex gap-3">
-                        <Link to={`/product/${pkg.id}`} className="flex-1">
-                          <Button variant="outline" className="w-full gap-2">
-                            View Full Details
-                            <ArrowRight className="h-4 w-4" />
+                        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                          <Button
+                            className="sm:flex-1"
+                            onClick={(e) => handleAddToCart(pkg.id, e)}
+                            disabled={!pkg.in_stock}
+                          >
+                            <ShoppingCart />
+                            Add to cart
                           </Button>
-                        </Link>
-                        <Button 
-                          className="gap-2 px-6"
-                          onClick={(e) => handleAddToCart(pkg.id, e)}
-                          disabled={!pkg.in_stock}
-                        >
-                          <ShoppingCart className="h-4 w-4" />
-                          Add to Cart
-                        </Button>
+                          <Button variant="outline" className="sm:flex-1" asChild>
+                            <Link to={`/product/${pkg.id}`}>View details</Link>
+                          </Button>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </article>
                 );
               })}
             </div>
           ) : (
-            <div className="text-center py-12 bg-muted/50 rounded-lg border border-dashed border-border">
-              <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No {tierInfo.name} Packages Available</h3>
-              <p className="text-muted-foreground mb-4">
+            <div className="panel py-16 text-center">
+              <Package className="mx-auto mb-4 h-10 w-10 text-muted-foreground/50" strokeWidth={1.25} />
+              <h3 className="text-lg font-semibold">No {tierInfo.name} packages available</h3>
+              <p className="mt-1 text-muted-foreground">
                 Check back soon for curated {tierInfo.name.toLowerCase()} bundles.
               </p>
             </div>
@@ -337,36 +253,26 @@ const TierPackages = () => {
       </section>
 
       {/* Other Tiers */}
-      <section className="py-16 bg-muted/30">
+      <section className="section bg-muted/40">
         <div className="container">
-          <h2 className="text-2xl font-bold mb-8 text-center">
-            Explore Other Tiers
+          <h2 className="mb-8 text-center text-2xl font-semibold tracking-tight">
+            Explore other tiers
           </h2>
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {otherTiers.map(([key, otherConfig]) => {
-              const otherTierInfo = TIERS[key as ProductTier];
-              const OtherIcon = otherConfig.icon;
-              
+          <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2">
+            {otherTiers.map((key) => {
+              const otherTierInfo = TIERS[key];
+
               return (
-                <Link key={key} to={`/packages/${key}`}>
-                  <Card className={cn(
-                    "h-full transition-all hover:shadow-lg",
-                    otherConfig.borderColor
-                  )}>
-                    <CardContent className="p-6 flex items-center gap-4">
-                      <div className={cn(
-                        "w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br flex-shrink-0",
-                        otherConfig.gradient
-                      )}>
-                        <OtherIcon className="h-7 w-7 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg">{otherTierInfo.name} Packages</h3>
-                        <p className="text-sm text-muted-foreground">{otherTierInfo.priceRange}</p>
-                      </div>
-                      <ArrowRight className="h-5 w-5 ml-auto text-muted-foreground" />
-                    </CardContent>
-                  </Card>
+                <Link
+                  key={key}
+                  to={`/packages/${key}`}
+                  className="group flex items-center gap-4 rounded-2xl border border-border bg-background p-6 transition-colors hover:border-foreground/20"
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold">{otherTierInfo.name} packages</h3>
+                    <p className="text-sm text-muted-foreground">{otherTierInfo.priceRange}</p>
+                  </div>
+                  <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                 </Link>
               );
             })}
@@ -375,27 +281,25 @@ const TierPackages = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24">
+      <section className="section">
         <div className="container">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">
-              Need Help Choosing?
+            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+              Need help choosing?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Not sure which package is right for you? Book a free consultation with our creator experts.
+            <p className="mt-4 text-lg text-muted-foreground">
+              Book a free consultation with our creator experts.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/consultations">
-                <Button size="lg" className="gap-2">
-                  Book Free Consultation
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="/shop">
-                <Button size="lg" variant="outline">
-                  Browse Individual Products
-                </Button>
-              </Link>
+            <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+              <Button size="lg" asChild>
+                <Link to="/consultations">
+                  Book a free consultation
+                  <ArrowRight />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/shop">Browse individual products</Link>
+              </Button>
             </div>
           </div>
         </div>

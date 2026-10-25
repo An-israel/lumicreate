@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
-import { Check, Sparkles, Crown, Gem } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import SectionHeader from "@/components/layout/SectionHeader";
+import { cn } from "@/lib/utils";
 import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
 const defaultTiers = [
   {
     name: "Basic",
-    icon: Sparkles,
     description: "Perfect for beginners starting their content journey",
     priceRange: "₦15,000 - ₦50,000",
     features: [
@@ -18,13 +17,10 @@ const defaultTiers = [
       "Basic backdrops",
       "Entry-level accessories",
     ],
-    color: "from-emerald-500 to-teal-500",
-    borderColor: "border-emerald-500/30",
     popular: false,
   },
   {
     name: "Premium",
-    icon: Crown,
     description: "For creators ready to level up their production quality",
     priceRange: "₦50,000 - ₦200,000",
     features: [
@@ -35,13 +31,10 @@ const defaultTiers = [
       "Professional backdrops",
       "Acoustic treatment basics",
     ],
-    color: "from-primary to-accent",
-    borderColor: "border-primary/30",
     popular: true,
   },
   {
     name: "Diamond",
-    icon: Gem,
     description: "Professional-grade equipment for serious creators",
     priceRange: "₦200,000+",
     features: [
@@ -52,8 +45,6 @@ const defaultTiers = [
       "Complete studio packages",
       "Priority support & setup help",
     ],
-    color: "from-violet-500 to-purple-500",
-    borderColor: "border-violet-500/30",
     popular: false,
   },
 ];
@@ -71,88 +62,62 @@ const PackageTiers = () => {
   const subtitle = content?.subtitle || "Curated packages designed for every stage of your creator journey. All equipment is carefully selected for Nigerian creators.";
 
   return (
-    <section className="py-16 md:py-24 bg-background">
+    <section className="section border-t border-border">
       <div className="container">
-        {/* Section Header */}
-        <div className="mx-auto max-w-2xl text-center mb-12">
-          <Badge variant="outline" className="mb-4">
-            Equipment Packages
-          </Badge>
-          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl mb-4">
-            {title}
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            {subtitle}
-          </p>
-        </div>
+        <SectionHeader eyebrow="Equipment packages" title={title} subtitle={subtitle} />
 
         {/* Tier Cards */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+        <div className="grid gap-4 md:grid-cols-3 max-w-6xl mx-auto">
           {defaultTiers.map((tier) => (
-            <Card
+            <div
               key={tier.name}
-              className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${tier.borderColor} ${
-                tier.popular ? "border-2 scale-[1.02] shadow-lg" : "border"
-              }`}
-            >
-              {tier.popular && (
-                <div className="absolute top-0 right-0">
-                  <div className={`bg-gradient-to-r ${tier.color} text-white text-xs font-semibold px-3 py-1 rounded-bl-lg`}>
-                    Most Popular
-                  </div>
-                </div>
+              className={cn(
+                "relative flex flex-col rounded-2xl border p-8 transition-colors",
+                tier.popular ? "border-foreground" : "border-border hover:border-foreground/20"
               )}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold">{tier.name}</h3>
+                {tier.popular && (
+                  <span className="rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
+                    Most popular
+                  </span>
+                )}
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">{tier.description}</p>
 
-              <CardHeader className="pb-4">
-                <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${tier.color} text-white mb-4`}>
-                  <tier.icon className="h-6 w-6" />
-                </div>
-                <CardTitle className="text-2xl font-display">{tier.name}</CardTitle>
-                <CardDescription className="text-base">{tier.description}</CardDescription>
-              </CardHeader>
+              <p className="mt-8 text-3xl font-semibold tracking-tight">{tier.priceRange}</p>
 
-              <CardContent className="pb-4">
-                <div className="mb-6">
-                  <p className="text-2xl font-bold text-foreground">{tier.priceRange}</p>
-                </div>
+              <ul className="mt-8 space-y-3 border-t border-border pt-8">
+                {tier.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-sm">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
+                    <span className="text-muted-foreground">{feature}</span>
+                  </li>
+                ))}
+              </ul>
 
-                <ul className="space-y-3">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Check className={`h-5 w-5 shrink-0 mt-0.5 bg-gradient-to-r ${tier.color} bg-clip-text text-transparent`} />
-                      <span className="text-sm text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-
-              <CardFooter>
-                <Button
-                  className={`w-full ${tier.popular ? `bg-gradient-to-r ${tier.color} hover:opacity-90` : ""}`}
-                  variant={tier.popular ? "default" : "outline"}
-                  asChild
-                >
-                  <Link to={`/packages?tier=${tier.name.toLowerCase()}`}>
-                    Browse {tier.name} Packages
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
+              <Button
+                className="mt-10 w-full"
+                variant={tier.popular ? "default" : "outline"}
+                asChild
+              >
+                <Link to={`/packages/${tier.name.toLowerCase()}`}>
+                  Browse {tier.name}
+                </Link>
+              </Button>
+            </div>
           ))}
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-12 text-center">
-          <p className="text-muted-foreground mb-4">
-            Not sure which tier is right for you?
-          </p>
-          <Button variant="link" className="gap-2" asChild>
-            <Link to="/quiz">
-              Take the 2-minute equipment quiz
-              <Sparkles className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        <p className="mt-12 text-center text-sm text-muted-foreground">
+          Not sure which tier is right for you?{" "}
+          <Link to="/quiz" className="inline-flex items-center gap-1 font-medium text-primary hover:underline underline-offset-4">
+            Take the 2-minute quiz
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </p>
       </div>
     </section>
   );

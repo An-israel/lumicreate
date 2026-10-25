@@ -62,7 +62,7 @@ export default function OrderTracking() {
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-bold mb-2">Sign In Required</h2>
+              <h2 className="text-xl font-semibold mb-2">Sign In Required</h2>
               <p className="text-muted-foreground mb-4">
                 Please sign in to view your order.
               </p>
@@ -83,7 +83,7 @@ export default function OrderTracking() {
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-bold mb-2">Order Not Found</h2>
+              <h2 className="text-xl font-semibold mb-2">Order Not Found</h2>
               <p className="text-muted-foreground mb-4">
                 We couldn't find this order. It may have been removed or the link is invalid.
               </p>
@@ -122,7 +122,7 @@ export default function OrderTracking() {
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Order Tracking</h1>
+            <h1 className="text-3xl font-semibold">Order Tracking</h1>
             <p className="text-muted-foreground mt-1">
               Order #{order.order_number}
             </p>

@@ -9,9 +9,9 @@ const defaultFooterLinks = {
   shop: [
     { name: "All Products", href: "/shop" },
     { name: "Packages", href: "/packages" },
-    { name: "Basic Tier", href: "/packages?tier=basic" },
-    { name: "Premium Tier", href: "/packages?tier=premium" },
-    { name: "Diamond Tier", href: "/packages?tier=diamond" },
+    { name: "Basic Tier", href: "/packages/basic" },
+    { name: "Premium Tier", href: "/packages/premium" },
+    { name: "Diamond Tier", href: "/packages/diamond" },
   ],
   support: [
     { name: "FAQs", href: "/#faq" },
@@ -66,27 +66,33 @@ const Footer = () => {
       }))
     : defaultSocialLinks;
 
+  const columns = [
+    { title: "Shop", links: shopLinks },
+    { title: "Support", links: supportLinks },
+    { title: "Company", links: companyLinks },
+  ];
+
   return (
-    <footer className="border-t border-border bg-muted/30 relative overflow-hidden">
-      <div className="container py-12 md:py-16 relative z-10">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
+    <footer className="border-t border-border bg-background">
+      <div className="container py-14 md:py-20">
+        <div className="grid gap-12 md:grid-cols-12">
           {/* Brand Column */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <Link to="/" className="flex items-center gap-3 mb-4">
-              <img src={currentLogo} alt="Luminate Creators" className="h-9 w-9" />
-              <span className="font-display font-bold text-lg">Luminate Creators</span>
+          <div className="md:col-span-5">
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <img src={currentLogo} alt="Luminate Creators" className="h-7 w-7" />
+              <span className="text-[15px] font-semibold tracking-tight">Luminate Creators</span>
             </Link>
-            <p className="text-sm text-muted-foreground mb-4 max-w-xs">
+            <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
               {tagline}
             </p>
-            <div className="flex gap-3">
+            <div className="mt-6 flex gap-1">
               {socialLinks.map((social: any) => (
                 <a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label={social.name}
                 >
                   <social.icon className="h-4 w-4" />
@@ -95,66 +101,31 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Shop Links */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Shop</h3>
-            <ul className="space-y-2.5">
-              {shopLinks.map((link: { name: string; href: string }) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Support Links */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Support</h3>
-            <ul className="space-y-2.5">
-              {supportLinks.map((link: { name: string; href: string }) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Company</h3>
-            <ul className="space-y-2.5">
-              {companyLinks.map((link: { name: string; href: string }) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-7">
+            {columns.map((column) => (
+              <div key={column.title}>
+                <h3 className="text-sm font-medium text-foreground mb-4">{column.title}</h3>
+                <ul className="space-y-3">
+                  {column.links.map((link: { name: string; href: string }) => (
+                    <li key={link.name}>
+                      <Link
+                        to={link.href}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {currentYear} Luminate Creators. All rights reserved.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {copyrightText}
-          </p>
+        <div className="mt-14 pt-6 border-t border-border flex flex-col md:flex-row justify-between gap-2 text-xs text-muted-foreground">
+          <p>© {currentYear} Luminate Creators. All rights reserved.</p>
+          <p>{copyrightText}</p>
         </div>
       </div>
     </footer>

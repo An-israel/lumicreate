@@ -172,10 +172,10 @@ const Auth = () => {
             {/* Logo */}
             <div className="text-center mb-8">
               <Link to="/" className="inline-flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-                  <span className="text-xl font-bold text-primary-foreground">L</span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
+                  <span className="text-lg font-semibold text-background">L</span>
                 </div>
-                <span className="text-2xl font-display font-bold">Luminate</span>
+                <span className="text-2xl font-semibold tracking-tight">Luminate</span>
               </Link>
               <p className="mt-2 text-muted-foreground">
                 Staff Portal Access
@@ -296,10 +296,10 @@ const Auth = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-                <span className="text-xl font-bold text-primary-foreground">L</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
+                <span className="text-lg font-semibold text-background">L</span>
               </div>
-              <span className="text-2xl font-display font-bold">Luminate</span>
+              <span className="text-2xl font-semibold tracking-tight">Luminate</span>
             </Link>
             <p className="mt-2 text-muted-foreground">
               Your creator journey starts here

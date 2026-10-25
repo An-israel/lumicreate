@@ -190,7 +190,7 @@ export default function Staff() {
       case "orders":
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Orders</h2>
+            <h2 className="text-2xl font-semibold">Orders</h2>
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -273,7 +273,7 @@ export default function Staff() {
       case "products":
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Products</h2>
+            <h2 className="text-2xl font-semibold">Products</h2>
             <p className="text-sm text-muted-foreground">View only. Contact admin to add or edit products.</p>
 
             <div className="relative flex-1 max-w-sm">
@@ -333,7 +333,7 @@ export default function Staff() {
       case "consultations":
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Consultations</h2>
+            <h2 className="text-2xl font-semibold">Consultations</h2>
             <Card>
               <Table>
                 <TableHeader>
@@ -394,7 +394,7 @@ export default function Staff() {
       case "subscribers":
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Newsletter Subscribers</h2>
+            <h2 className="text-2xl font-semibold">Newsletter Subscribers</h2>
             <p className="text-sm text-muted-foreground">View only. Contact admin to manage subscribers.</p>
 
             <div className="relative flex-1 max-w-sm">
@@ -437,7 +437,7 @@ export default function Staff() {
       default: // overview
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Staff Dashboard</h2>
+            <h2 className="text-2xl font-semibold">Staff Dashboard</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {stats.map((stat) => (
@@ -446,7 +446,7 @@ export default function Staff() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-muted-foreground">{stat.label}</p>
-                        <p className="text-3xl font-bold">{stat.value}</p>
+                        <p className="text-3xl font-semibold">{stat.value}</p>
                       </div>
                       <stat.icon className="h-8 w-8 text-muted-foreground" />
                     </div>
@@ -513,7 +513,7 @@ export default function Staff() {
       {/* Sidebar */}
       <aside className="w-64 bg-background border-r flex flex-col">
         <div className="p-6 border-b">
-          <h1 className="text-xl font-bold">Luminate Staff</h1>
+          <h1 className="text-xl font-semibold">Luminate Staff</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {profile?.full_name || "Staff Member"}
           </p>

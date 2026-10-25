@@ -236,7 +236,7 @@ export default function Admin() {
       case "orders":
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Orders</h2>
+            <h2 className="text-2xl font-semibold">Orders</h2>
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -307,7 +307,7 @@ export default function Admin() {
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-2xl font-bold">Products</h2>
+              <h2 className="text-2xl font-semibold">Products</h2>
               <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => { setEditingProduct(null); setProductImageUrl(""); }}>
@@ -504,7 +504,7 @@ export default function Admin() {
       case "consultations":
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Consultations</h2>
+            <h2 className="text-2xl font-semibold">Consultations</h2>
             <Card>
               <Table>
                 <TableHeader>
@@ -550,7 +550,7 @@ export default function Admin() {
       case "subscribers":
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Newsletter Subscribers</h2>
+            <h2 className="text-2xl font-semibold">Newsletter Subscribers</h2>
             <div className="flex items-center justify-between gap-4">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -629,7 +629,7 @@ export default function Admin() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold">Dashboard Overview</h2>
+              <h2 className="text-2xl font-semibold">Dashboard Overview</h2>
               <p className="text-muted-foreground">Welcome to the admin dashboard</p>
             </div>
 
@@ -643,7 +643,7 @@ export default function Admin() {
                         <stat.icon className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-2xl font-semibold">{stat.value}</p>
                         <p className="text-sm text-muted-foreground">{stat.label}</p>
                       </div>
                     </div>

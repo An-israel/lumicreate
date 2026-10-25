@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Clock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import SectionHeader from "@/components/layout/SectionHeader";
 import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
 const defaultBlogPosts = [
@@ -47,61 +46,43 @@ const ResourcesSection = () => {
   const ctaLink = content?.cta_link || "/resources";
 
   return (
-    <section className="py-16 md:py-24 bg-muted/30">
+    <section className="section">
       <div className="container">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-sm mb-4">
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="text-muted-foreground">Creator Resources</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              {title}
-            </h2>
-            <p className="text-muted-foreground mt-2 max-w-lg">
-              {subtitle}
-            </p>
-          </div>
-          <Button variant="outline" asChild>
-            <Link to={ctaLink}>
-              {ctaText}
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Link>
-          </Button>
-        </div>
+        <SectionHeader
+          align="left"
+          eyebrow="Creator resources"
+          title={title}
+          subtitle={subtitle}
+          action={
+            <Button variant="outline" asChild>
+              <Link to={ctaLink}>
+                {ctaText}
+                <ArrowRight />
+              </Link>
+            </Button>
+          }
+        />
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid gap-x-6 gap-y-10 md:grid-cols-3">
           {defaultBlogPosts.map((post) => (
-            <Card key={post.id} className="overflow-hidden card-hover group">
-              <div className="aspect-video relative overflow-hidden">
+            <Link key={post.id} to={`/resources/${post.id}`} className="group block">
+              <div className="aspect-[16/10] overflow-hidden rounded-2xl bg-muted">
                 <img
                   src={post.image}
                   alt={post.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
-                <Badge className="absolute top-3 left-3 bg-primary/90 text-primary-foreground">
-                  {post.category}
-                </Badge>
               </div>
-              <CardContent className="p-5">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                  <Clock className="h-4 w-4" />
-                  {post.readTime}
-                </div>
-                <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                  {post.title}
-                </h3>
-                <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
-                  {post.excerpt}
-                </p>
-                <Link 
-                  to={`/resources/${post.id}`}
-                  className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80"
-                >
-                  Read More <ArrowRight className="h-4 w-4 ml-1" />
-                </Link>
-              </CardContent>
-            </Card>
+              <p className="mt-5 text-xs text-muted-foreground">
+                {post.category} · {post.readTime} read
+              </p>
+              <h3 className="mt-2 text-lg font-semibold leading-snug text-foreground group-hover:underline underline-offset-4 decoration-1">
+                {post.title}
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                {post.excerpt}
+              </p>
+            </Link>
           ))}
         </div>
       </div>

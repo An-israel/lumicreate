@@ -199,7 +199,7 @@ export default function BlogManagement() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold">Blog Posts</h2>
+        <h2 className="text-2xl font-semibold">Blog Posts</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => { setEditingPost(null); setImageUrl(""); }}>

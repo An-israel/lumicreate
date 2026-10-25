@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { UserPlus, Lock, Sparkles, ShoppingCart, Gift, Star } from "lucide-react";
+import { UserPlus, Lock, Sparkles, ShoppingCart, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/layout/Layout";
@@ -77,29 +77,25 @@ const AuthRequired = ({
       <div className="min-h-[80vh] flex items-center justify-center py-12">
         <div className="container max-w-lg">
           <Card className="overflow-hidden">
-            {/* Header Gradient */}
-            <div className="h-2 bg-gradient-to-r from-primary via-accent to-primary" />
-            
             <CardContent className="pt-8 pb-8 text-center">
               {/* Icon */}
-              <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-primary/10 mb-6">
-                <Icon className="h-8 w-8 text-primary" />
+              <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-muted mb-6">
+                <Icon className="h-6 w-6" strokeWidth={1.5} />
               </div>
 
               {/* Title & Description */}
-              <h1 className="text-2xl font-bold text-foreground mb-3">{displayTitle}</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-3">{displayTitle}</h1>
               <p className="text-muted-foreground mb-6">{displayDescription}</p>
 
               {/* Benefits */}
               <div className="bg-muted/50 rounded-xl p-4 mb-6 text-left">
                 <p className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                  <Star className="h-4 w-4 text-primary" />
-                  Member Benefits:
+                  Member benefits
                 </p>
                 <ul className="space-y-2">
                   {config.benefits.map((benefit, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="text-primary mt-0.5">✓</span>
+                      <span className="text-foreground mt-0.5">✓</span>
                       {benefit}
                     </li>
                   ))}
@@ -122,7 +118,7 @@ const AuthRequired = ({
               </div>
 
               {/* Promo */}
-              <div className="mt-6 p-3 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+              <div className="mt-6 p-3 rounded-xl border border-border">
                 <p className="text-sm text-foreground">
                   <span className="font-medium">🎉 New users get exclusive deals!</span>
                   <br />

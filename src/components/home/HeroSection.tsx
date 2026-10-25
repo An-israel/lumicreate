@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Play } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
@@ -25,83 +25,94 @@ const HeroSection = () => {
   const trustRating = content?.trust_rating || "4.9/5 rating";
   const trustDelivery = content?.trust_delivery || "24hr Lagos delivery";
 
-  return (
-    <section className="relative overflow-hidden py-16 md:py-24 lg:py-32">
-      {/* Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/15" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-secondary/5 to-primary/10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-      
-      {/* Animated gradient orbs for depth */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 animate-gradient-shift" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 animate-gradient-shift-reverse" />
-      <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" />
+  const showcase = [
+    {
+      label: "Video",
+      caption: "Cameras & capture",
+      image: content?.showcase_image_1 || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=900&q=80",
+      href: "/shop",
+    },
+    {
+      label: "Lighting",
+      caption: "Ring lights & panels",
+      image: content?.showcase_image_2 || "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=900&q=80",
+      href: "/shop",
+    },
+    {
+      label: "Audio",
+      caption: "Mics & interfaces",
+      image: content?.showcase_image_3 || "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=900&q=80",
+      href: "/shop",
+    },
+  ];
 
-      <div className="container relative">
+  return (
+    <section className="pt-16 pb-20 md:pt-28 md:pb-28">
+      <div className="container">
         <div className="mx-auto max-w-4xl text-center">
           {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm backdrop-blur-sm animate-fade-in">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-muted-foreground">{badgeText}</span>
-          </div>
+          <Link
+            to={ctaSecondaryLink}
+            className="mb-8 inline-flex items-center gap-1 rounded-full border border-border px-3.5 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground animate-fade-in"
+          >
+            {badgeText}
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
 
           {/* Headline */}
-          <h1 className="mb-6 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <h1 className="text-5xl font-semibold tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-[5.5rem] lg:leading-[1.02] animate-fade-in" style={{ animationDelay: "0.05s" }}>
             {titleLine1}{" "}
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              {titleHighlight}
-            </span>
+            <span className="text-muted-foreground">{titleHighlight}</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground md:text-xl animate-fade-in" style={{ animationDelay: "0.1s" }}>
             {subtitle}
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <Button size="lg" className="w-full sm:w-auto gap-2 text-base" asChild>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: "0.15s" }}>
+            <Button size="lg" className="w-full sm:w-auto" asChild>
               <Link to={ctaPrimaryLink}>
                 {ctaPrimaryText}
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 text-base" asChild>
-              <Link to={ctaSecondaryLink}>
-                <Play className="h-4 w-4" />
-                {ctaSecondaryText}
-              </Link>
+            <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
+              <Link to={ctaSecondaryLink}>{ctaSecondaryText}</Link>
             </Button>
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-muted-foreground animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-primary/60 to-accent/60"
-                  />
-                ))}
+          <ul className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <li>{trustCreators}</li>
+            <li className="flex items-center gap-1.5">
+              <span className="text-foreground">★</span>
+              {trustRating}
+            </li>
+            <li>{trustDelivery}</li>
+          </ul>
+        </div>
+
+        {/* Category showcase */}
+        <div className="mt-16 grid gap-4 sm:grid-cols-3 md:mt-24 animate-fade-in" style={{ animationDelay: "0.25s" }}>
+          {showcase.map((item) => (
+            <Link
+              key={item.label}
+              to={item.href}
+              className="group relative block aspect-[16/10] overflow-hidden rounded-2xl bg-muted sm:aspect-[3/4]"
+            >
+              <img
+                src={item.image}
+                alt={item.label}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-5 pt-16 text-white">
+                <p className="text-lg font-semibold">{item.label}</p>
+                <p className="text-sm text-white/75">{item.caption}</p>
               </div>
-              <span className="text-sm">{trustCreators}</span>
-            </div>
-            <div className="h-4 w-px bg-border hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <span key={i} className="text-warning">★</span>
-                ))}
-              </div>
-              <span className="text-sm">{trustRating}</span>
-            </div>
-            <div className="h-4 w-px bg-border hidden sm:block" />
-            <div className="text-sm">
-              <span className="font-semibold text-foreground">{trustDelivery.split(" ")[0]}</span>{" "}
-              {trustDelivery.split(" ").slice(1).join(" ")}
-            </div>
-          </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

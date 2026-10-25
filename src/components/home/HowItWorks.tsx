@@ -1,5 +1,5 @@
 import { Search, ShoppingBag, Truck } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import SectionHeader from "@/components/layout/SectionHeader";
 import { usePageContent, useSectionVisibility } from "@/hooks/usePageContent";
 
 const defaultSteps = [
@@ -46,55 +46,27 @@ const HowItWorks = () => {
     : defaultSteps;
 
   return (
-    <section className="py-16 md:py-24 bg-muted/30">
+    <section className="section bg-muted/40">
       <div className="container">
-        {/* Section Header */}
-        <div className="mx-auto max-w-2xl text-center mb-12">
-          <Badge variant="outline" className="mb-4">
-            Simple Process
-          </Badge>
-          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
-            {title}
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            {subtitle}
-          </p>
-        </div>
+        <SectionHeader eyebrow="How it works" title={title} subtitle={subtitle} />
 
         {/* Steps */}
-        <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
-          {steps.map((step: any, index: number) => (
-            <div
-              key={step.number}
-              className="relative group"
-            >
-              {/* Connector Line */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 left-1/2 w-full h-px bg-border" />
-              )}
-
-              <div className="relative bg-background rounded-2xl p-6 border border-border transition-all duration-300 hover:shadow-lg hover:border-primary/30">
-                {/* Step Number */}
-                <div className="absolute -top-3 -right-3 h-8 w-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground">
-                  {step.number}
-                </div>
-
-                {/* Icon */}
-                <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-muted text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <step.icon className="h-7 w-7" />
-                </div>
-
-                {/* Content */}
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground">
-                  {step.description}
-                </p>
+        <ol className="grid gap-10 md:grid-cols-3 md:gap-8 max-w-5xl mx-auto">
+          {steps.map((step: any) => (
+            <li key={step.number} className="border-t border-foreground/15 pt-6">
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span className="text-sm font-medium tabular-nums">{step.number}</span>
+                <step.icon className="h-5 w-5" strokeWidth={1.5} />
               </div>
-            </div>
+              <h3 className="mt-6 text-xl font-semibold text-foreground">
+                {step.title}
+              </h3>
+              <p className="mt-2 leading-relaxed text-muted-foreground">
+                {step.description}
+              </p>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

@@ -229,14 +229,14 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold">Customer Reviews</h2>
+      <h2 className="text-2xl font-semibold">Customer Reviews</h2>
       
       {/* Rating Overview */}
       <div className="grid md:grid-cols-2 gap-8">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center mb-6">
-              <div className="text-5xl font-bold">{stats.averageRating.toFixed(1)}</div>
+              <div className="text-5xl font-semibold">{stats.averageRating.toFixed(1)}</div>
               <StarRating rating={Math.round(stats.averageRating)} size="lg" />
               <p className="text-muted-foreground mt-2">
                 Based on {stats.totalReviews} {stats.totalReviews === 1 ? "review" : "reviews"}

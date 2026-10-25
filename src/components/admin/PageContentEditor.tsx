@@ -167,7 +167,7 @@ export default function PageContentEditor() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Content Management</h2>
+          <h2 className="text-2xl font-semibold">Content Management</h2>
           <p className="text-muted-foreground">
             Edit all text, images, and content across your website
           </p>

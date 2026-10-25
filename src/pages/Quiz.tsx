@@ -116,7 +116,7 @@ const Quiz = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 py-12 md:py-20">
+      <div className="min-h-screen py-12 md:py-20">
         <div className="container max-w-3xl">
           {/* Header */}
           <div className="text-center mb-8">
@@ -124,7 +124,7 @@ const Quiz = () => {
               <Sparkles className="h-3 w-3 mr-1 text-primary" />
               Equipment Quiz
             </Badge>
-            <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl mb-2">
+            <h1 className="font-display text-3xl font-semibold text-foreground md:text-4xl mb-2">
               Find Your Perfect Setup
             </h1>
             <p className="text-muted-foreground">

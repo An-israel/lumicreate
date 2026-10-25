@@ -60,11 +60,11 @@ const EmailCapture = ({ quizAnswers }: EmailCaptureProps) => {
 
   if (isSubmitted) {
     return (
-      <Card className="bg-gradient-to-r from-emerald-500/10 via-background to-primary/10 border-emerald-500/30">
+      <Card className="bg-muted/40">
         <CardContent className="py-6">
           <div className="flex items-center justify-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
-              <Check className="h-5 w-5 text-emerald-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success/15">
+              <Check className="h-5 w-5 text-success" />
             </div>
             <div className="text-left">
               <p className="font-medium text-foreground">You're all set!</p>
@@ -79,11 +79,11 @@ const EmailCapture = ({ quizAnswers }: EmailCaptureProps) => {
   }
 
   return (
-    <Card className="bg-gradient-to-r from-primary/10 via-background to-accent/10 border-primary/30">
+    <Card className="bg-muted/40">
       <CardContent className="py-6">
         <div className="flex items-start gap-4 mb-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20">
-            <Mail className="h-5 w-5 text-primary" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background">
+            <Mail className="h-5 w-5" strokeWidth={1.5} />
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-foreground mb-1">

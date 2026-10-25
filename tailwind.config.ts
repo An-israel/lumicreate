@@ -7,15 +7,15 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: { DEFAULT: "1rem", sm: "1.5rem", lg: "2rem" },
       screens: {
-        "2xl": "1400px",
+        "2xl": "1280px",
       },
     },
     extend: {
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
-        display: ["Space Grotesk", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Inter", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -69,15 +69,9 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
-        coin: {
-          DEFAULT: "hsl(var(--coin))",
-          foreground: "hsl(var(--coin-foreground))",
-        },
         luminate: {
           blue: "hsl(var(--luminate-blue))",
-          yellow: "hsl(var(--luminate-yellow))",
           dark: "hsl(var(--luminate-dark))",
-          cyan: "hsl(var(--luminate-cyan))",
         },
       },
       borderRadius: {

@@ -114,7 +114,7 @@ export default function SectionVisibilityManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Section Visibility</h2>
+          <h2 className="text-2xl font-semibold">Section Visibility</h2>
           <p className="text-muted-foreground">
             Toggle sections on or off for each page
           </p>

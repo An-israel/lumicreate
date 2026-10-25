@@ -48,7 +48,7 @@ export default function OrderConfirmation() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 py-12">
+        <div className="min-h-screen py-12">
           <div className="container max-w-3xl">
             <div className="text-center mb-8">
               <Skeleton className="h-16 w-16 rounded-full mx-auto mb-4" />
@@ -70,7 +70,7 @@ export default function OrderConfirmation() {
           <Card className="max-w-md">
             <CardContent className="pt-6 text-center">
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-bold mb-2">Order Not Found</h2>
+              <h2 className="text-xl font-semibold mb-2">Order Not Found</h2>
               <p className="text-muted-foreground mb-4">
                 We couldn't find this order. Please check your order history.
               </p>
@@ -86,14 +86,14 @@ export default function OrderConfirmation() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 py-12">
+      <div className="min-h-screen py-12">
         <div className="container max-w-3xl">
           {/* Success Header */}
           <div className="text-center mb-10">
             <div className="flex h-20 w-20 mx-auto items-center justify-center rounded-full bg-emerald-500/10 mb-6">
               <CheckCircle2 className="h-10 w-10 text-emerald-500" />
             </div>
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
+            <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-3">
               Order Placed Successfully!
             </h1>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
@@ -102,12 +102,12 @@ export default function OrderConfirmation() {
           </div>
 
           {/* Order Number Card */}
-          <Card className="mb-6 bg-gradient-to-r from-primary/5 via-background to-accent/5 border-primary/20">
+          <Card className="mb-6 bg-muted/40">
             <CardContent className="py-6">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-center sm:text-left">
                   <p className="text-sm text-muted-foreground mb-1">Order Number</p>
-                  <p className="text-2xl font-bold font-mono text-foreground">{order.order_number}</p>
+                  <p className="text-2xl font-semibold font-mono text-foreground">{order.order_number}</p>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={handleCopyOrderNumber}>
