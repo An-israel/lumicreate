@@ -6,21 +6,20 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import StaffManagement from "@/components/admin/StaffManagement";
 import BlogManagement from "@/components/admin/BlogManagement";
 import PageContentEditor from "@/components/admin/PageContentEditor";
-import ImageUpload from "@/components/admin/ImageUpload";
+import ProductFormDialog from "@/components/admin/ProductFormDialog";
+import ProductImportDialog from "@/components/admin/ProductImportDialog";
 import PaymentAlerts from "@/components/admin/PaymentAlerts";
 import RealtimePaymentAlerts from "@/components/admin/RealtimePaymentAlerts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Package, ShoppingCart, Users, Plus, Edit, Trash2, Eye, Search, Mail, UserX, CheckCircle, Shield, BookOpen } from "lucide-react";
+import { Package, ShoppingCart, Users, Plus, Edit, FileSpreadsheet, Trash2, Eye, Search, Mail, UserX, CheckCircle, Shield, BookOpen } from "lucide-react";
 import { Order, Product, Consultation } from "@/types/database";
 
 interface NewsletterSubscriber {
@@ -29,7 +28,7 @@ interface NewsletterSubscriber {
   subscribed_at: string;
   is_active: boolean;
 }
-import { ORDER_STATUSES, CONTENT_TYPES, formatNaira } from "@/lib/constants";
+import { ORDER_STATUSES, formatNaira } from "@/lib/constants";
 
 export default function Admin() {
   const { isStaff, isLoading: authLoading } = useAuth();
@@ -46,7 +45,7 @@ export default function Admin() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [productImageUrl, setProductImageUrl] = useState("");
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isStaff) {
@@ -96,49 +95,6 @@ export default function Admin() {
       }
       
       fetchData();
-    }
-  };
-
-  const handleProductSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    const productData = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      price_naira: parseInt(formData.get("price_naira") as string),
-      price_coins: Math.round(parseInt(formData.get("price_naira") as string) / 100), // Auto-calculate based on Naira
-      tier: formData.get("tier") as Product["tier"],
-      content_types: [formData.get("content_type") as string] as Product["content_types"],
-      image_url: productImageUrl || null,
-      in_stock: formData.get("in_stock") === "true",
-      is_package: formData.get("is_package") === "true",
-    };
-
-    if (editingProduct) {
-      const { error } = await supabase
-        .from("products")
-        .update(productData)
-        .eq("id", editingProduct.id);
-
-      if (error) {
-        toast.error("Failed to update product");
-      } else {
-        toast.success("Product updated");
-        setIsProductDialogOpen(false);
-        setEditingProduct(null);
-        fetchData();
-      }
-    } else {
-      const { error } = await supabase.from("products").insert(productData);
-
-      if (error) {
-        toast.error("Failed to create product");
-      } else {
-        toast.success("Product created");
-        setIsProductDialogOpen(false);
-        fetchData();
-      }
     }
   };
 
@@ -308,117 +264,31 @@ export default function Admin() {
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-2xl font-semibold">Products</h2>
-              <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={() => { setEditingProduct(null); setProductImageUrl(""); }}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
-                    <DialogDescription>
-                      {editingProduct ? "Update product details" : "Create a new product listing"}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleProductSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Product Name</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        defaultValue={editingProduct?.name}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        name="description"
-                        defaultValue={editingProduct?.description || ""}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="price_naira">Price (₦)</Label>
-                        <Input
-                          id="price_naira"
-                          name="price_naira"
-                          type="number"
-                          defaultValue={editingProduct?.price_naira}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="tier">Tier</Label>
-                        <Select name="tier" defaultValue={editingProduct?.tier || "basic"}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="basic">Basic</SelectItem>
-                            <SelectItem value="premium">Premium</SelectItem>
-                            <SelectItem value="diamond">Diamond</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="content_type">Content Type</Label>
-                      <Select name="content_type" defaultValue={editingProduct?.content_types?.[0] || "general"}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CONTENT_TYPES.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <ImageUpload
-                      value={productImageUrl}
-                      onChange={setProductImageUrl}
-                      label="Product Image"
-                    />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="in_stock">In Stock</Label>
-                        <Select name="in_stock" defaultValue={editingProduct?.in_stock !== false ? "true" : "false"}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="true">Yes</SelectItem>
-                            <SelectItem value="false">No</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="is_package">Is Package</Label>
-                        <Select name="is_package" defaultValue={editingProduct?.is_package ? "true" : "false"}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="false">No</SelectItem>
-                            <SelectItem value="true">Yes</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit">
-                        {editingProduct ? "Update Product" : "Create Product"}
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Import spreadsheet
+                </Button>
+                <Button onClick={() => { setEditingProduct(null); setIsProductDialogOpen(true); }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </div>
+              <ProductFormDialog
+                open={isProductDialogOpen}
+                onOpenChange={(open) => {
+                  setIsProductDialogOpen(open);
+                  if (!open) setEditingProduct(null);
+                }}
+                product={editingProduct}
+                onSaved={fetchData}
+              />
+              <ProductImportDialog
+                open={isImportDialogOpen}
+                onOpenChange={setIsImportDialogOpen}
+                existingProducts={products}
+                onImported={fetchData}
+              />
             </div>
 
             <div className="relative flex-1 max-w-sm">
@@ -478,7 +348,6 @@ export default function Admin() {
                             size="icon"
                             onClick={() => {
                               setEditingProduct(product);
-                              setProductImageUrl(product.image_url || "");
                               setIsProductDialogOpen(true);
                             }}
                           >

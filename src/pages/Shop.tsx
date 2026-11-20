@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Search, Package, Mic, Lightbulb, Camera, Headphones, ArrowRight } from "lucide-react";
+import { Search, Package, ArrowRight } from "lucide-react";
+import { ALL_CATEGORY, PRODUCT_CATEGORIES, getProductCategories } from "@/lib/productCategories";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,64 +14,7 @@ import { cn } from "@/lib/utils";
 import { Product } from "@/types/database";
 import { toast } from "sonner";
 
-// Categories for individual products
-const productCategories = [
-  { 
-    id: "all", 
-    label: "All Products", 
-    icon: Package,
-    description: "Browse all individual equipment"
-  },
-  { 
-    id: "microphones", 
-    label: "Microphones", 
-    icon: Mic,
-    description: "From lavaliers to broadcast mics",
-    keywords: ["microphone", "mic", "lavalier", "shotgun", "condenser", "dynamic", "wireless"]
-  },
-  { 
-    id: "key-lights", 
-    label: "Key Lights", 
-    icon: Lightbulb,
-    description: "Main light sources for your setup",
-    keywords: ["key light", "ring light", "sl-60", "120d", "main light"]
-  },
-  { 
-    id: "fill-lights", 
-    label: "Fill Lights", 
-    icon: Lightbulb,
-    description: "Secondary lighting for balance",
-    keywords: ["fill", "secondary", "panel", "660"]
-  },
-  { 
-    id: "background-lights", 
-    label: "Background Lights", 
-    icon: Lightbulb,
-    description: "RGB and ambient lighting",
-    keywords: ["background", "rgb", "strip", "mc", "ambient", "accent"]
-  },
-  { 
-    id: "rim-lights", 
-    label: "Rim Lights", 
-    icon: Lightbulb,
-    description: "Hair and separation lighting",
-    keywords: ["rim", "hair", "separation", "sz150"]
-  },
-  { 
-    id: "stands-mounts", 
-    label: "Stands & Mounts", 
-    icon: Camera,
-    description: "Tripods, C-stands, boom arms",
-    keywords: ["tripod", "stand", "c-stand", "boom arm", "mount"]
-  },
-  { 
-    id: "audio-gear", 
-    label: "Audio Gear", 
-    icon: Headphones,
-    description: "Interfaces, headphones, accessories",
-    keywords: ["interface", "headphones", "audio", "scarlett", "rodecaster", "focusrite"]
-  },
-];
+const productCategories = [ALL_CATEGORY, ...PRODUCT_CATEGORIES];
 
 const Shop = () => {
   const [searchParams] = useSearchParams();
@@ -101,34 +45,6 @@ const Shop = () => {
 
   const isComparing = (productId: string) => compareProducts.some(p => p.id === productId);
 
-  // Categorize products
-  const categorizeProduct = (product: Product): string[] => {
-    const categories: string[] = [];
-    const name = product.name.toLowerCase();
-    const description = (product.description || "").toLowerCase();
-    const specs = product.specifications as Record<string, string> | null;
-    const lightType = specs?.["Light Type"]?.toLowerCase() || "";
-    const type = specs?.["Type"]?.toLowerCase() || "";
-
-    for (const category of productCategories) {
-      if (category.id === "all") continue;
-      
-      const keywords = category.keywords || [];
-      const matchesKeyword = keywords.some(keyword => 
-        name.includes(keyword) || 
-        description.includes(keyword) ||
-        lightType.includes(keyword) ||
-        type.includes(keyword)
-      );
-      
-      if (matchesKeyword) {
-        categories.push(category.id);
-      }
-    }
-    
-    return categories.length > 0 ? categories : ["other"];
-  };
-
   // Filter products by category and search
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -148,7 +64,7 @@ const Shop = () => {
 
       // Category filter
       if (selectedCategory !== "all") {
-        const productCategories = categorizeProduct(product);
+        const productCategories = getProductCategories(product);
         if (!productCategories.includes(selectedCategory)) {
           return false;
         }
@@ -163,7 +79,7 @@ const Shop = () => {
     const counts: Record<string, number> = { all: products.length };
     
     for (const product of products) {
-      const categories = categorizeProduct(product);
+      const categories = getProductCategories(product);
       for (const cat of categories) {
         counts[cat] = (counts[cat] || 0) + 1;
       }

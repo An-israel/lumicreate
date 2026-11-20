@@ -507,8 +507,53 @@ export type Database = {
           },
         ]
       }
+      product_sourcing: {
+        Row: {
+          cost_price_naira: number | null
+          created_at: string
+          notes: string | null
+          product_id: string
+          supplier_name: string | null
+          supplier_product_id: string | null
+          supplier_sku_id: string | null
+          supplier_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          cost_price_naira?: number | null
+          created_at?: string
+          notes?: string | null
+          product_id: string
+          supplier_name?: string | null
+          supplier_product_id?: string | null
+          supplier_sku_id?: string | null
+          supplier_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cost_price_naira?: number | null
+          created_at?: string
+          notes?: string | null
+          product_id?: string
+          supplier_name?: string | null
+          supplier_product_id?: string | null
+          supplier_sku_id?: string | null
+          supplier_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_sourcing_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
+          category: string | null
           content_types: Database["public"]["Enums"]["content_type"][] | null
           created_at: string
           description: string | null
@@ -527,6 +572,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: string | null
           content_types?: Database["public"]["Enums"]["content_type"][] | null
           created_at?: string
           description?: string | null
@@ -545,6 +591,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: string | null
           content_types?: Database["public"]["Enums"]["content_type"][] | null
           created_at?: string
           description?: string | null
