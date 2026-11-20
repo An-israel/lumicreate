@@ -71,6 +71,19 @@ export interface Product {
   is_package: boolean;
   package_items: string[];
   original_price_naira: number | null;
+  category: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProductSourcing {
+  product_id: string;
+  supplier_name: string | null;
+  supplier_url: string | null;
+  supplier_product_id: string | null;
+  supplier_sku_id: string | null;
+  cost_price_naira: number | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
 }
