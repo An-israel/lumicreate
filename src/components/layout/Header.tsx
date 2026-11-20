@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart, User, LogOut, Heart } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut, Heart, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
@@ -56,13 +56,23 @@ const Header = () => {
     navigate("/");
   };
 
+  const announcement = content?.announcement || "Free 24-hour delivery across Lagos · Nationwide in 2–3 days";
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-      <div className="container flex h-14 items-center justify-between gap-6">
+    <>
+    {/* Announcement bar */}
+    <div className="bg-brand text-brand-foreground">
+      <div className="container flex h-9 items-center justify-center gap-2 text-center text-xs font-medium sm:text-[13px]">
+        <Truck className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate">{announcement}</span>
+      </div>
+    </div>
+    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/75">
+      <div className="container flex h-16 items-center justify-between gap-6">
         {/* Logo */}
         <Link to="/" className="flex shrink-0 items-center gap-2">
-          <img src={currentLogo} alt={brandName} className="h-7 w-7" />
-          <span className="hidden text-[15px] font-semibold tracking-tight sm:block">{brandName}</span>
+          <img src={currentLogo} alt={brandName} className="h-8 w-8" />
+          <span className="hidden font-serif-display text-xl sm:block">{brandName}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -74,7 +84,7 @@ const Header = () => {
               className={cn(
                 "rounded-full px-3 py-1.5 text-sm transition-colors",
                 isActive(link.href)
-                  ? "text-foreground font-medium"
+                  ? "bg-brand-soft text-foreground font-medium"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -106,7 +116,7 @@ const Header = () => {
                 <Button variant="ghost" size="icon">
                   <ShoppingCart className="h-[18px] w-[18px]" />
                   {totalItems > 0 && (
-                    <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                    <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-brand-foreground">
                       {totalItems}
                     </span>
                   )}
@@ -167,7 +177,7 @@ const Header = () => {
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/login">Sign in</Link>
               </Button>
-              <Button size="sm" className="ml-1" asChild>
+              <Button size="sm" variant="brand" className="ml-1" asChild>
                 <Link to="/signup">Get started</Link>
               </Button>
             </>
@@ -253,7 +263,7 @@ const Header = () => {
                       Sign in
                     </Link>
                   </Button>
-                  <Button className="w-full" asChild>
+                  <Button variant="brand" className="w-full" asChild>
                     <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
                       Get started
                     </Link>
@@ -265,6 +275,7 @@ const Header = () => {
         </div>
       )}
     </header>
+    </>
   );
 };
 

@@ -46,22 +46,24 @@ const HowItWorks = () => {
     : defaultSteps;
 
   return (
-    <section className="section bg-muted/40">
+    <section className="section bg-muted/50">
       <div className="container">
         <SectionHeader eyebrow="How it works" title={title} subtitle={subtitle} />
 
         {/* Steps */}
-        <ol className="grid gap-10 md:grid-cols-3 md:gap-8 max-w-5xl mx-auto">
+        <ol className="grid gap-5 md:grid-cols-3 max-w-6xl mx-auto">
           {steps.map((step: any) => (
-            <li key={step.number} className="border-t border-foreground/15 pt-6">
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span className="text-sm font-medium tabular-nums">{step.number}</span>
-                <step.icon className="h-5 w-5" strokeWidth={1.5} />
-              </div>
-              <h3 className="mt-6 text-xl font-semibold text-foreground">
+            <li key={step.number} className="group relative overflow-hidden rounded-[1.75rem] border border-border bg-card p-8 transition-colors hover:border-brand">
+              <span aria-hidden className="pointer-events-none absolute right-7 top-6 font-serif-display text-6xl leading-none text-brand/40 transition-colors group-hover:text-brand/50">
+                {step.number}
+              </span>
+              <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-brand-foreground">
+                <step.icon className="h-5 w-5" />
+              </span>
+              <h3 className="relative mt-10 font-serif-display text-2xl text-foreground">
                 {step.title}
               </h3>
-              <p className="mt-2 leading-relaxed text-muted-foreground">
+              <p className="relative mt-3 leading-relaxed text-muted-foreground">
                 {step.description}
               </p>
             </li>

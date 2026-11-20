@@ -1,103 +1,117 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Luminate Creators Design System — clean & minimal
-   Neutral greys carry the layout; brand blue is reserved for primary actions and links. */
+/* Luminate Creators Design System — warm premium
+   Cream surfaces and warm ink carry the layout; golden yellow is the welcoming accent. */
 
 @layer base {
   :root {
     /* Brand */
-    --luminate-blue: 217 91% 50%;
-    --luminate-dark: 240 10% 4%;
+    --brand: 43 96% 56%;              /* golden yellow */
+    --brand-foreground: 30 15% 8%;
+    --brand-soft: 45 100% 92%;
 
-    --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
+    --background: 40 33% 98%;
+    --foreground: 30 12% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
+    --card-foreground: 30 12% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
+    --popover-foreground: 30 12% 9%;
 
-    --primary: 217 91% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 30 12% 9%;
+    --primary-foreground: 40 33% 98%;
 
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
+    --secondary: 38 28% 94%;
+    --secondary-foreground: 30 12% 12%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 44%;
+    --muted: 38 28% 94%;
+    --muted-foreground: 30 6% 40%;
 
-    --accent: 240 5% 95%;
-    --accent-foreground: 240 6% 10%;
+    --accent: 40 30% 93%;
+    --accent-foreground: 30 12% 12%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 91%;
-    --input: 240 6% 88%;
-    --ring: 217 91% 50%;
+    --border: 36 18% 88%;
+    --input: 36 16% 84%;
+    --ring: 43 96% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
-    --success: 142 71% 36%;
+    --success: 142 60% 32%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --sidebar-background: 240 5% 97%;
-    --sidebar-foreground: 240 10% 4%;
-    --sidebar-primary: 217 91% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 93%;
-    --sidebar-accent-foreground: 240 10% 4%;
-    --sidebar-border: 240 6% 91%;
-    --sidebar-ring: 217 91% 50%;
+    /* Fixed dark surface used for "studio" sections in both themes */
+    --ink: 30 12% 7%;
+    --ink-foreground: 40 33% 96%;
+    --ink-muted: 35 8% 62%;
+    --ink-border: 30 8% 18%;
+
+    --sidebar-background: 40 30% 96%;
+    --sidebar-foreground: 30 12% 9%;
+    --sidebar-primary: 30 12% 9%;
+    --sidebar-primary-foreground: 40 33% 98%;
+    --sidebar-accent: 38 28% 92%;
+    --sidebar-accent-foreground: 30 12% 9%;
+    --sidebar-border: 36 18% 88%;
+    --sidebar-ring: 43 96% 50%;
   }
 
   .dark {
-    --background: 240 10% 4%;
-    --foreground: 0 0% 98%;
+    --brand: 43 96% 58%;
+    --brand-foreground: 30 15% 8%;
+    --brand-soft: 43 40% 14%;
 
-    --card: 240 6% 7%;
-    --card-foreground: 0 0% 98%;
+    --background: 30 10% 5%;
+    --foreground: 40 25% 95%;
 
-    --popover: 240 6% 7%;
-    --popover-foreground: 0 0% 98%;
+    --card: 30 8% 8%;
+    --card-foreground: 40 25% 95%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --popover: 30 8% 8%;
+    --popover-foreground: 40 25% 95%;
 
-    --secondary: 240 4% 14%;
-    --secondary-foreground: 0 0% 98%;
+    --primary: 40 25% 95%;
+    --primary-foreground: 30 12% 8%;
 
-    --muted: 240 4% 12%;
-    --muted-foreground: 240 5% 65%;
+    --secondary: 30 6% 13%;
+    --secondary-foreground: 40 25% 95%;
 
-    --accent: 240 4% 14%;
-    --accent-foreground: 0 0% 98%;
+    --muted: 30 6% 11%;
+    --muted-foreground: 35 8% 64%;
+
+    --accent: 30 6% 14%;
+    --accent-foreground: 40 25% 95%;
 
     --destructive: 0 63% 45%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 4% 16%;
-    --input: 240 4% 20%;
-    --ring: 217 91% 60%;
+    --border: 30 6% 16%;
+    --input: 30 6% 20%;
+    --ring: 43 96% 58%;
 
-    --success: 142 60% 45%;
+    --success: 142 55% 45%;
     --warning: 38 92% 55%;
 
-    --sidebar-background: 240 6% 6%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 4% 14%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 4% 16%;
-    --sidebar-ring: 217 91% 60%;
+    --ink: 30 10% 9%;
+    --ink-border: 30 8% 20%;
+
+    --sidebar-background: 30 8% 7%;
+    --sidebar-foreground: 40 25% 95%;
+    --sidebar-primary: 43 96% 58%;
+    --sidebar-primary-foreground: 30 15% 8%;
+    --sidebar-accent: 30 6% 14%;
+    --sidebar-accent-foreground: 40 25% 95%;
+    --sidebar-border: 30 6% 16%;
+    --sidebar-ring: 43 96% 58%;
   }
 }
 
@@ -116,7 +130,11 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold tracking-tight;
+    @apply font-semibold tracking-tight;
+  }
+
+  ::selection {
+    background: hsl(var(--brand) / 0.45);
   }
 }
 
@@ -125,9 +143,32 @@
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Small uppercase label above section titles */
+  /* Small uppercase label above section titles, with a golden dot */
   .eyebrow {
-    @apply text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground;
+    @apply inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-1.5 w-1.5 rounded-full bg-brand;
+  }
+
+  /* Editorial serif used for display headlines */
+  .font-serif-display {
+    font-family: "Fraunces", Georgia, serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 50;
+    letter-spacing: -0.02em;
+    @apply font-normal;
+  }
+
+  /* Golden marker highlight behind a word */
+  .highlight {
+    background-image: linear-gradient(transparent 62%, hsl(var(--brand) / 0.85) 62%, hsl(var(--brand) / 0.85) 92%, transparent 92%);
+    @apply px-1 -mx-1;
+  }
+  .dark .highlight {
+    background-image: none;
+    color: hsl(var(--brand));
   }
 
   .section {
@@ -142,5 +183,25 @@
   /* Soft neutral panel used for callouts and CTAs */
   .panel {
     @apply rounded-2xl border border-border bg-muted/50;
+  }
+
+  /* Dark "studio" surface, the same in both themes */
+  .surface-ink {
+    @apply bg-ink text-ink-foreground;
+  }
+}
+
+@layer utilities {
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee { animation: none; }
   }
 }

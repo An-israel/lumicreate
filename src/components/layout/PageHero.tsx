@@ -11,11 +11,12 @@ interface PageHeroProps {
 
 /** Plain, centered page intro used at the top of inner pages. */
 const PageHero = ({ eyebrow, title, subtitle, children, className }: PageHeroProps) => (
-  <section className={cn("border-b border-border pt-16 pb-14 md:pt-24 md:pb-20", className)}>
-    <div className="container">
+  <section className={cn("relative overflow-hidden border-b border-border pt-16 pb-14 md:pt-24 md:pb-20", className)}>
+    <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 h-64 w-[48rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/20 blur-3xl" />
+    <div className="container relative">
       <div className="mx-auto max-w-3xl text-center">
-        {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
-        <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl md:leading-[1.05]">
+        {eyebrow && <p className="eyebrow mb-5">{eyebrow}</p>}
+        <h1 className="font-serif-display text-5xl text-foreground sm:text-6xl md:text-7xl md:leading-[1.02]">
           {title}
         </h1>
         {subtitle && (

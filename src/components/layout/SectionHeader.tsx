@@ -22,12 +22,12 @@ const SectionHeader = ({ eyebrow, title, subtitle, align = "center", action, cla
       )}
     >
       <div className={cn(!centered && "max-w-xl")}>
-        {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-        <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-[2.75rem] md:leading-[1.1]">
+        {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
+        <h2 className="font-serif-display text-4xl text-foreground sm:text-5xl md:text-[3.5rem] md:leading-[1.05]">
           {title}
         </h2>
         {subtitle && (
-          <p className="mt-4 text-base text-muted-foreground md:text-lg">
+          <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
             {subtitle}
           </p>
         )}

@@ -46,7 +46,7 @@ const ProductCard = ({ product, compare }: ProductCardProps) => {
   return (
     <Link to={`/product/${product.id}`} className="group flex h-full flex-col">
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted">
+      <div className="relative aspect-square overflow-hidden rounded-[1.5rem] bg-muted">
         {product.image_url ? (
           <img
             src={product.image_url}
@@ -65,7 +65,7 @@ const ProductCard = ({ product, compare }: ProductCardProps) => {
             <Badge variant="secondary" className="bg-background/90 backdrop-blur">Package</Badge>
           )}
           {onSale && (
-            <Badge variant="secondary" className="bg-background/90 backdrop-blur">Sale</Badge>
+            <Badge className="border-transparent bg-brand text-brand-foreground hover:bg-brand">Sale</Badge>
           )}
         </div>
 
@@ -88,7 +88,7 @@ const ProductCard = ({ product, compare }: ProductCardProps) => {
           <Button
             size="icon"
             aria-label="Add to cart"
-            className="absolute bottom-3 right-3 h-10 w-10 bg-foreground text-background shadow-sm hover:bg-foreground/90 md:translate-y-2 md:opacity-0 md:transition-all md:group-hover:translate-y-0 md:group-hover:opacity-100"
+            className="absolute bottom-3 right-3 h-10 w-10 bg-brand text-brand-foreground shadow-md hover:bg-brand hover:brightness-95 md:translate-y-2 md:opacity-0 md:transition-all md:group-hover:translate-y-0 md:group-hover:opacity-100"
             onClick={handleAddToCart}
           >
             <Plus className="h-4 w-4" />
