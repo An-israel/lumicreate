@@ -55,7 +55,7 @@ export default function PaymentCallback() {
             {status === "loading" && (
               <>
                 <Loader2 className="h-16 w-16 mx-auto text-primary animate-spin mb-4" />
-                <h2 className="text-xl font-bold mb-2">Verifying Payment</h2>
+                <h2 className="text-xl font-semibold mb-2">Verifying Payment</h2>
                 <p className="text-muted-foreground">Please wait while we confirm your payment...</p>
               </>
             )}
@@ -63,7 +63,7 @@ export default function PaymentCallback() {
             {status === "error" && (
               <>
                 <XCircle className="h-16 w-16 mx-auto text-destructive mb-4" />
-                <h2 className="text-xl font-bold mb-2">Payment Failed</h2>
+                <h2 className="text-xl font-semibold mb-2">Payment Failed</h2>
                 <p className="text-muted-foreground mb-6">{message}</p>
                 <div className="flex gap-3 justify-center">
                   <Button onClick={() => navigate(-1)}>

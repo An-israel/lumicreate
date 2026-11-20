@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, Clock, ArrowRight, BookOpen, Video, Lightbulb, TrendingUp, Search, Loader2, CheckCircle } from "lucide-react";
+import { BookOpen, Video, Lightbulb, TrendingUp, Search, Loader2, Mic } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import PageHero from "@/components/layout/PageHero";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useBlogPosts } from "@/hooks/useBlogPosts";
 import { supabase } from "@/integrations/supabase/client";
@@ -124,156 +124,120 @@ const Resources = () => {
     return (
       <Layout>
         <div className="container py-20 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground mt-4">Loading articles...</p>
+          <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
+          <p className="text-muted-foreground mt-4">Loading articles…</p>
         </div>
       </Layout>
     );
   }
 
+  const formatDate = (post: { published_at: string | null; created_at: string }) =>
+    format(new Date(post.published_at || post.created_at), "MMM d, yyyy");
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("All");
+  };
+
+  const topics = [
+    { category: "equipment", icon: Video, title: "Camera guides", description: "Find your perfect camera" },
+    { category: "tutorials", icon: Mic, title: "Audio tutorials", description: "Sound like a pro" },
+    { category: "tips", icon: Lightbulb, title: "Lighting tips", description: "Master your lighting" },
+    { category: "news", icon: TrendingUp, title: "Growth strategy", description: "Grow your audience" },
+  ];
+
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-muted/30 py-12 md:py-20">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
+      <PageHero
+        eyebrow="Creator resources"
+        title="Level up your content"
+        subtitle="Tutorials, equipment guides, and growth strategies to help Nigerian creators succeed."
+      >
+        <div className="relative mx-auto max-w-lg">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search articles"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-12 rounded-full border-transparent bg-muted pl-11 text-base focus-visible:bg-background"
+          />
         </div>
-
-        <div className="container relative">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm backdrop-blur-sm">
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="text-muted-foreground">Creator Resources</span>
-            </div>
-
-            <h1 className="mb-4 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Level Up Your{" "}
-              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Content Game
-              </span>
-            </h1>
-
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Tutorials, equipment guides, and growth strategies to help Nigerian
-              creators succeed. Learn from the best and elevate your content.
-            </p>
-
-            {/* Search Bar */}
-            <div className="max-w-xl mx-auto relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 py-6 text-base bg-background/80 backdrop-blur-sm"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      </PageHero>
 
       {/* Categories */}
-      <section className="py-6 border-b border-border">
+      <section className="border-b border-border py-4">
         <div className="container">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((category) => (
-              <Badge
-                key={category.name}
-                variant={selectedCategory === category.name ? "default" : "outline"}
-                className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors px-4 py-1.5 capitalize"
-                onClick={() => setSelectedCategory(category.name)}
-              >
-                {category.name} ({category.count})
-              </Badge>
-            ))}
+          <div className="flex gap-2 overflow-x-auto md:flex-wrap md:justify-center">
+            {categories.map((category) => {
+              const active = selectedCategory === category.name;
+              return (
+                <button
+                  key={category.name}
+                  onClick={() => setSelectedCategory(category.name)}
+                  className={cn(
+                    "shrink-0 rounded-full border px-4 py-1.5 text-sm capitalize transition-colors",
+                    active
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {category.name}
+                  <span className={cn("ml-1.5 text-xs tabular-nums", active ? "text-background/60" : "text-muted-foreground/70")}>
+                    {category.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Results Info */}
       {(searchQuery || selectedCategory !== "All") && (
-        <section className="py-4 bg-muted/20">
-          <div className="container">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                Found {filteredPosts.length} article
-                {filteredPosts.length !== 1 ? "s" : ""}
-                {searchQuery && ` for "${searchQuery}"`}
-                {selectedCategory !== "All" && ` in ${selectedCategory}`}
-              </p>
-              {(searchQuery || selectedCategory !== "All") && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedCategory("All");
-                  }}
-                >
-                  Clear filters
-                </Button>
-              )}
-            </div>
+        <div className="container pt-6">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <p>
+              {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""}
+              {searchQuery && ` for "${searchQuery}"`}
+              {selectedCategory !== "All" && ` in ${selectedCategory}`}
+            </p>
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Featured Posts */}
       {featuredPosts.length > 0 && (
-        <section className="py-12 md:py-16">
+        <section className="pt-14 pb-6 md:pt-20">
           <div className="container">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
-              Featured Articles
-            </h2>
+            <h2 className="eyebrow mb-6">Featured</h2>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-x-6 gap-y-12 md:grid-cols-2">
               {featuredPosts.map((post) => (
-                <Card key={post.id} className="overflow-hidden card-hover">
-                  <Link to={`/resources/${post.slug}`}>
-                    <div className="aspect-video relative">
-                      {post.image_url ? (
-                        <img
-                          src={post.image_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground capitalize">
-                        {post.category}
-                      </Badge>
-                    </div>
-                    <CardContent className="p-5">
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {post.published_at
-                            ? format(new Date(post.published_at), "MMM d, yyyy")
-                            : format(new Date(post.created_at), "MMM d, yyyy")}
-                        </span>
-                        {post.read_time && (
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {post.read_time}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-2 text-lg">
-                        {post.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
-                        {post.excerpt}
-                      </p>
-                      <span className="text-primary hover:text-primary/80 inline-flex items-center">
-                        Read Article <ArrowRight className="h-4 w-4 ml-1" />
-                      </span>
-                    </CardContent>
-                  </Link>
-                </Card>
+                <Link key={post.id} to={`/resources/${post.slug}`} className="group block">
+                  <div className="aspect-[16/9] overflow-hidden rounded-2xl bg-muted">
+                    {post.image_url && (
+                      <img
+                        src={post.image_url}
+                        alt={post.title}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                    )}
+                  </div>
+                  <p className="mt-5 text-xs capitalize text-muted-foreground">
+                    {post.category} · {formatDate(post)}
+                    {post.read_time && ` · ${post.read_time}`}
+                  </p>
+                  <h3 className="mt-2 text-2xl font-semibold leading-snug text-foreground group-hover:underline underline-offset-4 decoration-1">
+                    {post.title}
+                  </h3>
+                  <p className="mt-2 text-muted-foreground line-clamp-2">
+                    {post.excerpt}
+                  </p>
+                </Link>
               ))}
             </div>
           </div>
@@ -282,52 +246,31 @@ const Resources = () => {
 
       {/* All Posts */}
       {regularPosts.length > 0 && (
-        <section className="py-12 md:py-16 bg-muted/30">
+        <section className="py-14 md:py-20">
           <div className="container">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
-              All Articles
-            </h2>
+            <h2 className="eyebrow mb-6">All articles</h2>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
               {regularPosts.map((post) => (
-                <Link key={post.id} to={`/resources/${post.slug}`}>
-                  <Card className="overflow-hidden card-hover h-full">
-                    <div className="aspect-video relative">
-                      {post.image_url ? (
-                        <img
-                          src={post.image_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
-                      )}
-                    </div>
-                    <CardContent className="p-4">
-                      <Badge variant="outline" className="mb-3 text-xs capitalize">
-                        {post.category}
-                      </Badge>
-                      <h3 className="font-semibold text-foreground mb-2 line-clamp-2">
-                        {post.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm line-clamp-2 mb-3">
-                        {post.excerpt}
-                      </p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span>
-                          {post.published_at
-                            ? format(new Date(post.published_at), "MMM d, yyyy")
-                            : format(new Date(post.created_at), "MMM d, yyyy")}
-                        </span>
-                        {post.read_time && (
-                          <>
-                            <span>•</span>
-                            <span>{post.read_time}</span>
-                          </>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                <Link key={post.id} to={`/resources/${post.slug}`} className="group block">
+                  <div className="aspect-[16/10] overflow-hidden rounded-xl bg-muted">
+                    {post.image_url && (
+                      <img
+                        src={post.image_url}
+                        alt={post.title}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                    )}
+                  </div>
+                  <p className="mt-4 text-xs capitalize text-muted-foreground">
+                    {post.category} · {formatDate(post)}
+                  </p>
+                  <h3 className="mt-1.5 font-semibold leading-snug text-foreground line-clamp-2 group-hover:underline underline-offset-4 decoration-1">
+                    {post.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2">
+                    {post.excerpt}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -338,154 +281,96 @@ const Resources = () => {
       {/* No Results */}
       {filteredPosts.length === 0 && (
         <section className="py-20">
-          <div className="container text-center">
-            <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">
-              No articles found
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Try adjusting your search or filter to find what you're looking for.
-            </p>
-            <Button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("All");
-              }}
-            >
-              Clear filters
-            </Button>
+          <div className="container">
+            <div className="panel py-16 text-center">
+              <BookOpen className="mx-auto mb-4 h-10 w-10 text-muted-foreground/50" strokeWidth={1.25} />
+              <h2 className="text-lg font-semibold text-foreground">
+                No articles found
+              </h2>
+              <p className="mt-1 text-muted-foreground mb-6">
+                Try adjusting your search or filter.
+              </p>
+              <Button variant="outline" onClick={clearFilters}>
+                Clear filters
+              </Button>
+            </div>
           </div>
         </section>
       )}
 
-      {/* Newsletter CTA */}
-      <section className="py-16 md:py-20">
+      {/* Popular topics */}
+      <section className="pb-14 md:pb-20">
         <div className="container">
-          <Card className="bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 border-primary/20">
-            <CardContent className="p-8 md:p-12 text-center">
-              <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                {isSubscribed ? (
-                  <CheckCircle className="h-8 w-8 text-primary" />
-                ) : (
-                  <Lightbulb className="h-8 w-8 text-primary" />
-                )}
-              </div>
-
-              {isSubscribed ? (
-                <>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                    You're on the List!
-                  </h2>
-                  <p className="text-muted-foreground max-w-xl mx-auto">
-                    Thanks for subscribing! You'll receive our latest creator tips
-                    and guides directly in your inbox.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                    Get Creator Tips in Your Inbox
-                  </h2>
-                  <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-                    Join 5,000+ Nigerian creators receiving weekly tips on
-                    equipment, content strategy, and growing your audience. No
-                    spam, just value.
-                  </p>
-                  <form
-                    onSubmit={handleSubscribe}
-                    className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-                  >
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="flex-1"
-                      disabled={isSubscribing}
-                    />
-                    <Button type="submit" disabled={isSubscribing}>
-                      {isSubscribing ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Subscribing...
-                        </>
-                      ) : (
-                        "Subscribe"
-                      )}
-                    </Button>
-                  </form>
-                </>
-              )}
-            </CardContent>
-          </Card>
+          <h2 className="eyebrow mb-6">Popular topics</h2>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {topics.map((topic) => (
+              <button
+                key={topic.category}
+                onClick={() => {
+                  setSelectedCategory(topic.category);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="flex items-center gap-4 rounded-2xl border border-border p-5 text-left transition-colors hover:border-foreground/20"
+              >
+                <topic.icon className="h-5 w-5 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                <div>
+                  <p className="font-medium text-foreground">{topic.title}</p>
+                  <p className="text-sm text-muted-foreground">{topic.description}</p>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Quick Links */}
-      <section className="py-12 md:py-16 bg-muted/30">
+      {/* Newsletter CTA */}
+      <section className="section bg-muted/40">
         <div className="container">
-          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
-            Popular Topics
-          </h2>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <button
-              onClick={() => setSelectedCategory("equipment")}
-              className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
-            >
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Video className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Camera Guides</p>
-                <p className="text-sm text-muted-foreground">
-                  Find your perfect camera
+          <div className="mx-auto max-w-xl text-center">
+            {isSubscribed ? (
+              <>
+                <h2 className="text-3xl font-semibold tracking-tight text-foreground">
+                  You're on the list
+                </h2>
+                <p className="mt-4 text-muted-foreground">
+                  Thanks for subscribing! You'll receive our latest creator tips
+                  and guides directly in your inbox.
                 </p>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setSelectedCategory("tutorials")}
-              className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
-            >
-              <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-accent" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Audio Tutorials</p>
-                <p className="text-sm text-muted-foreground">Sound like a pro</p>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setSelectedCategory("tips")}
-              className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
-            >
-              <div className="w-12 h-12 rounded-lg bg-secondary/30 flex items-center justify-center">
-                <Lightbulb className="h-6 w-6 text-secondary-foreground" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Lighting Tips</p>
-                <p className="text-sm text-muted-foreground">
-                  Master your lighting
+              </>
+            ) : (
+              <>
+                <h2 className="text-3xl font-semibold tracking-tight text-foreground">
+                  Creator tips in your inbox
+                </h2>
+                <p className="mt-4 text-muted-foreground">
+                  Join 5,000+ Nigerian creators receiving weekly tips on equipment,
+                  content strategy, and growing your audience. No spam.
                 </p>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setSelectedCategory("news")}
-              className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary transition-colors text-left"
-            >
-              <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-emerald-500" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Growth Strategy</p>
-                <p className="text-sm text-muted-foreground">
-                  Grow your audience
-                </p>
-              </div>
-            </button>
+                <form
+                  onSubmit={handleSubscribe}
+                  className="mt-8 flex flex-col gap-3 sm:flex-row"
+                >
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-11 flex-1 rounded-full bg-background px-5"
+                    disabled={isSubscribing}
+                  />
+                  <Button type="submit" className="h-11" disabled={isSubscribing}>
+                    {isSubscribing ? (
+                      <>
+                        <Loader2 className="animate-spin" />
+                        Subscribing…
+                      </>
+                    ) : (
+                      "Subscribe"
+                    )}
+                  </Button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       </section>

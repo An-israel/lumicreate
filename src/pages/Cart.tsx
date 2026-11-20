@@ -166,7 +166,7 @@ export default function Cart() {
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
               <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-bold mb-2">Sign in to view your cart</h2>
+              <h2 className="text-xl font-semibold mb-2">Sign in to view your cart</h2>
               <p className="text-muted-foreground mb-4">
                 Create an account to start shopping
               </p>
@@ -197,7 +197,7 @@ export default function Cart() {
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
               <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-bold mb-2">Your cart is empty</h2>
+              <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
               <p className="text-muted-foreground mb-4">
                 Browse our shop to find the perfect equipment
               </p>
@@ -246,7 +246,7 @@ export default function Cart() {
             {/* Cart Step */}
             {step === "cart" && (
               <>
-                <h1 className="text-2xl font-bold">Shopping Cart</h1>
+                <h1 className="text-2xl font-semibold">Shopping Cart</h1>
                 <div className="space-y-4">
                   {items.map((item) => (
                     <Card key={item.id}>
@@ -312,7 +312,7 @@ export default function Cart() {
             {/* Address Step */}
             {step === "address" && (
               <>
-                <h1 className="text-2xl font-bold">Delivery Address</h1>
+                <h1 className="text-2xl font-semibold">Delivery Address</h1>
                 {addresses.length > 0 && !isNewAddress ? (
                   <div className="space-y-4">
                     <RadioGroup value={selectedAddressId} onValueChange={setSelectedAddressId}>
@@ -426,7 +426,7 @@ export default function Cart() {
             {/* Confirm Step */}
             {step === "confirm" && (
               <>
-                <h1 className="text-2xl font-bold">Review Order</h1>
+                <h1 className="text-2xl font-semibold">Review Order</h1>
                 <div className="space-y-4">
                   {/* Items Summary */}
                   <Card>
@@ -534,7 +534,7 @@ export default function Cart() {
                   {step === "confirm" && (
                     <>
                       <Button
-                        className="w-full gradient-primary"
+                        className="w-full"
                         onClick={handlePlaceOrder}
                         disabled={isProcessing}
                       >

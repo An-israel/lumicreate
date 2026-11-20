@@ -4,7 +4,7 @@ import { ThemeProvider } from "./components/theme/ThemeProvider.tsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
-  <ThemeProvider defaultTheme="dark" storageKey="luminate-ui-theme">
+  <ThemeProvider defaultTheme="light" storageKey="luminate-ui-theme">
     <App />
   </ThemeProvider>
 );

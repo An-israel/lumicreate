@@ -68,7 +68,7 @@ const TrackOrder = () => {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <Package className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Track Your Order</h1>
+            <h1 className="text-3xl font-semibold text-foreground mb-2">Track Your Order</h1>
             <p className="text-muted-foreground">
               Enter your order number to see the current status of your delivery.
             </p>

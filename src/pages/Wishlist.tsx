@@ -46,7 +46,7 @@ export default function Wishlist() {
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
               <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-bold mb-2">Sign In Required</h2>
+              <h2 className="text-xl font-semibold mb-2">Sign In Required</h2>
               <p className="text-muted-foreground mb-4">
                 Please sign in to view your wishlist.
               </p>
@@ -74,7 +74,7 @@ export default function Wishlist() {
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">My Wishlist</h1>
+            <h1 className="text-3xl font-semibold">My Wishlist</h1>
             <p className="text-muted-foreground mt-1">
               {wishlistProducts.length} {wishlistProducts.length === 1 ? "item" : "items"} saved
             </p>
@@ -103,11 +103,11 @@ export default function Wishlist() {
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-8 pb-8 text-center">
               <Heart className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-              <h2 className="text-xl font-bold mb-2">Your wishlist is empty</h2>
+              <h2 className="text-xl font-semibold mb-2">Your wishlist is empty</h2>
               <p className="text-muted-foreground mb-6">
                 Start saving products you love by clicking the heart icon on any product.
               </p>
-              <Button asChild className="gradient-primary">
+              <Button asChild>
                 <Link to="/shop">
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Browse Products
@@ -149,7 +149,7 @@ export default function Wishlist() {
 
                   <div className="mt-2 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold">
+                      <span className="text-lg font-semibold">
                         {formatNaira(product!.price_naira)}
                       </span>
                       {product!.original_price_naira &&

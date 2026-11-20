@@ -89,7 +89,7 @@ export default function PaymentAlerts() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold">Payment Alerts</h2>
+          <h2 className="text-2xl font-semibold">Payment Alerts</h2>
           {unresolvedCount > 0 && (
             <Badge variant="destructive" className="text-sm">
               {unresolvedCount} unresolved

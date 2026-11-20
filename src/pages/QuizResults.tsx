@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Sparkles, ShoppingCart, ArrowRight, RotateCcw, Package, Check, GitCompare } from "lucide-react";
+import { ShoppingCart, ArrowRight, RotateCcw, Package, Check, GitCompare } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -227,19 +227,15 @@ const QuizResults = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 py-12 md:py-20">
+      <div className="min-h-screen py-12 md:py-20">
         <div className="container">
           {/* Header */}
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4">
-              <Sparkles className="h-3 w-3 mr-1 text-primary" />
               Your Personalized Recommendations
             </Badge>
-            <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl lg:text-5xl mb-4">
-              We Found Your{" "}
-              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Perfect Setup
-              </span>
+            <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl mb-4">
+              We found your perfect setup
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               Based on your answers, here are our top equipment recommendations tailored just for you.
@@ -308,7 +304,7 @@ const QuizResults = () => {
               {recommendations.map((category, index) => (
                 <section key={index}>
                   <div className="mb-6">
-                    <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+                    <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
                       {category.title}
                     </h2>
                     <p className="text-muted-foreground">{category.description}</p>
@@ -371,7 +367,7 @@ const QuizResults = () => {
                             </p>
                           )}
                           <div className="space-y-1">
-                            <p className="text-xl font-bold text-foreground">
+                            <p className="text-xl font-semibold text-foreground">
                               {formatNaira(product.price_naira)}
                             </p>
                           </div>
@@ -421,10 +417,10 @@ const QuizResults = () => {
           {/* Bottom CTA */}
           {!isLoading && recommendations.length > 0 && (
             <div className="mt-16 text-center">
-              <Card className="max-w-2xl mx-auto bg-gradient-to-br from-primary/10 via-background to-accent/10 border-primary/20">
+              <Card className="max-w-2xl mx-auto bg-muted/40">
                 <CardContent className="py-8">
-                  <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                    Need Help Deciding?
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Need help deciding?
                   </h3>
                   <p className="text-muted-foreground mb-6">
                     Book a free consultation with our equipment experts to get personalized advice.

@@ -44,7 +44,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside className="w-64 bg-background border-r flex flex-col">
         <div className="p-6 border-b">
-          <h1 className="text-xl font-bold">Luminate Admin</h1>
+          <h1 className="text-xl font-semibold">Luminate Admin</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {profile?.full_name || "Staff"}
           </p>

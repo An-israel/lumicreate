@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { initializePayment } from "@/lib/paystack";
 import Layout from "@/components/layout/Layout";
+import PageHero from "@/components/layout/PageHero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -116,20 +117,12 @@ export default function Consultations() {
 
   return (
     <Layout>
-      <div className="container-main py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <Badge className="mb-4 bg-accent text-accent-foreground">
-            Expert Guidance
-          </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Book a <span className="text-gradient">Consultation</span>
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get personalized advice from our content creation experts.
-            From equipment selection to full content strategy.
-          </p>
-        </div>
+      <PageHero
+        eyebrow="Expert guidance"
+        title="Book a consultation"
+        subtitle="Personalised advice from our content creation experts — from equipment selection to full content strategy."
+      />
+      <div className="container py-16 md:py-24">
 
         {/* Consultation Types */}
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
@@ -141,38 +134,22 @@ export default function Consultations() {
               <Card
                 key={type.id}
                 className={cn(
-                  "relative overflow-hidden transition-all duration-300 card-hover",
-                  isRecommended && "border-primary shadow-lg"
+                  "relative flex flex-col overflow-hidden transition-colors",
+                  isRecommended ? "border-foreground" : "hover:border-foreground/20"
                 )}
               >
                 {isRecommended && (
-                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold rounded-bl-lg">
-                    RECOMMENDED
-                  </div>
+                  <span className="absolute top-6 right-6 rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
+                    Recommended
+                  </span>
                 )}
 
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={cn(
-                        "p-3 rounded-full",
-                        isRecommended ? "bg-primary/10" : "bg-muted"
-                      )}
-                    >
-                      <Icon
-                        className={cn(
-                          "h-6 w-6",
-                          isRecommended ? "text-primary" : "text-muted-foreground"
-                        )}
-                      />
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-primary font-bold text-lg">
-                        {formatNaira(type.nairaValue)}
-                      </div>
-                    </div>
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-muted">
+                    <Icon className="h-5 w-5" strokeWidth={1.5} />
                   </div>
                   <CardTitle className="text-xl">{type.name}</CardTitle>
+                  <p className="text-2xl font-semibold tracking-tight">{formatNaira(type.nairaValue)}</p>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
                     {type.duration}
@@ -180,13 +157,13 @@ export default function Consultations() {
                   <CardDescription>{type.description}</CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
+                <CardContent className="flex flex-1 flex-col space-y-5">
                   <div>
-                    <p className="text-sm font-semibold mb-2">What's included:</p>
-                    <ul className="space-y-1">
+                    <p className="text-sm font-medium mb-3">What's included</p>
+                    <ul className="space-y-2">
                       {type.features.slice(0, 4).map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                          <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                           {feature}
                         </li>
                       ))}
@@ -199,7 +176,7 @@ export default function Consultations() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold mb-2">Best for:</p>
+                    <p className="text-sm font-medium mb-3">Best for</p>
                     <div className="flex flex-wrap gap-2">
                       {type.bestFor.slice(0, 2).map((item, idx) => (
                         <Badge key={idx} variant="secondary" className="text-xs">
@@ -209,13 +186,16 @@ export default function Consultations() {
                     </div>
                   </div>
 
-                  <Button
-                    className={cn("w-full", isRecommended && "gradient-primary")}
-                    onClick={() => handleSelectType(type.id)}
-                  >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Book Now
-                  </Button>
+                  <div className="mt-auto pt-4">
+                    <Button
+                      className="w-full"
+                      variant={isRecommended ? "default" : "outline"}
+                      onClick={() => handleSelectType(type.id)}
+                    >
+                      <CreditCard />
+                      Book now
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -293,7 +273,7 @@ export default function Consultations() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <div className="flex items-center gap-1 text-primary font-bold">
+                        <div className="flex items-center gap-1 text-primary font-semibold">
                           {formatNaira(selectedConsultation.nairaValue)}
                         </div>
                       </div>

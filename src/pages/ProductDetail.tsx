@@ -4,6 +4,7 @@ import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import Layout from "@/components/layout/Layout";
+import ProductCard from "@/components/shop/ProductCard";
 import ImageGallery from "@/components/product/ImageGallery";
 import ProductReviews from "@/components/product/ProductReviews";
 import RatingStars from "@/components/product/RatingStars";
@@ -24,7 +25,7 @@ import {
   ChevronRight,
   Heart
 } from "lucide-react";
-import { formatNaira, TIERS } from "@/lib/constants";
+import { formatNaira } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useReviews } from "@/hooks/useReviews";
 
@@ -70,8 +71,8 @@ export default function ProductDetail() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="container-main py-8">
-          <div className="grid lg:grid-cols-2 gap-12">
+        <div className="container pt-6 pb-20">
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
             <Skeleton className="aspect-square rounded-xl" />
             <div className="space-y-6">
               <Skeleton className="h-8 w-24" />
@@ -93,7 +94,7 @@ export default function ProductDetail() {
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 text-center">
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-bold mb-2">Product Not Found</h2>
+              <h2 className="text-xl font-semibold mb-2">Product Not Found</h2>
               <p className="text-muted-foreground mb-4">
                 The product you're looking for doesn't exist or has been removed.
               </p>
@@ -108,7 +109,6 @@ export default function ProductDetail() {
     );
   }
 
-  const tierInfo = TIERS[product.tier as keyof typeof TIERS];
   
   // Combine image_url with image_urls for gallery
   const allImages = [
@@ -118,7 +118,7 @@ export default function ProductDetail() {
 
   return (
     <Layout>
-      <div className="container-main py-8">
+      <div className="container pt-6 pb-20">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
           <Link to="/" className="hover:text-foreground transition-colors">
@@ -129,17 +129,17 @@ export default function ProductDetail() {
             Shop
           </Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground">{product.name}</span>
+          <span className="truncate text-foreground">{product.name}</span>
         </nav>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Product Image Gallery */}
           <div className="space-y-4">
             <div className="relative">
               <ImageGallery images={allImages} productName={product.name} />
               
               {product.is_package && (
-                <Badge className="absolute top-4 left-4 bg-accent text-accent-foreground z-10">
+                <Badge variant="secondary" className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur">
                   <Package className="h-3 w-3 mr-1" />
                   Package Deal
                 </Badge>
@@ -154,19 +154,17 @@ export default function ProductDetail() {
             </div>
 
             {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50 text-center">
-                <Truck className="h-5 w-5 text-primary" />
-                <span className="text-xs font-medium">Free Delivery</span>
-              </div>
-              <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50 text-center">
-                <Shield className="h-5 w-5 text-primary" />
-                <span className="text-xs font-medium">Warranty</span>
-              </div>
-              <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50 text-center">
-                <HeadphonesIcon className="h-5 w-5 text-primary" />
-                <span className="text-xs font-medium">24/7 Support</span>
-              </div>
+            <div className="grid grid-cols-3 divide-x divide-border rounded-2xl border border-border">
+              {[
+                { icon: Truck, label: "Free delivery" },
+                { icon: Shield, label: "Warranty" },
+                { icon: HeadphonesIcon, label: "24/7 support" },
+              ].map((item) => (
+                <div key={item.label} className="flex flex-col items-center gap-2 p-4 text-center">
+                  <item.icon className="h-5 w-5 text-muted-foreground" strokeWidth={1.5} />
+                  <span className="text-xs text-muted-foreground">{item.label}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -174,9 +172,9 @@ export default function ProductDetail() {
           <div className="space-y-6">
             {/* Tier Badge */}
             <div className="flex items-center justify-between">
-              <Badge className={cn(tierInfo?.color, "text-white")}>
-                {product.tier.charAt(0).toUpperCase() + product.tier.slice(1)} Tier
-              </Badge>
+              <p className="eyebrow">
+                {product.tier.charAt(0).toUpperCase() + product.tier.slice(1)} tier
+              </p>
               <Button
                 variant="ghost"
                 size="icon"
@@ -189,7 +187,7 @@ export default function ProductDetail() {
 
             {/* Title & Rating */}
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold">{product.name}</h1>
+              <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">{product.name}</h1>
               {reviewStats.totalReviews > 0 && (
                 <div className="flex items-center gap-2 mt-2">
                   <RatingStars 
@@ -205,7 +203,7 @@ export default function ProductDetail() {
             </div>
 
             {/* Description */}
-            <p className="text-lg text-muted-foreground">{product.description}</p>
+            <p className="text-lg leading-relaxed text-muted-foreground">{product.description}</p>
 
             {/* Content Types */}
             {product.content_types && product.content_types.length > 0 && (
@@ -221,9 +219,9 @@ export default function ProductDetail() {
             {/* Pricing */}
             <div className="space-y-3">
               <div className="flex items-baseline gap-4">
-                <span className="text-4xl font-bold">{formatNaira(product.price_naira)}</span>
+                <span className="text-3xl font-semibold tracking-tight">{formatNaira(product.price_naira)}</span>
                 {product.original_price_naira && product.original_price_naira > product.price_naira && (
-                  <span className="text-xl text-muted-foreground line-through">
+                  <span className="text-lg text-muted-foreground line-through">
                     {formatNaira(product.original_price_naira)}
                   </span>
                 )}
@@ -235,12 +233,13 @@ export default function ProductDetail() {
             {/* Quantity & Add to Cart */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <span className="font-medium">Quantity:</span>
-                <div className="flex items-center border rounded-lg">
+                <span className="text-sm font-medium">Quantity</span>
+                <div className="flex items-center rounded-full border">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10"
+                    aria-label="Decrease quantity"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     disabled={quantity <= 1}
                   >
@@ -251,6 +250,7 @@ export default function ProductDetail() {
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10"
+                    aria-label="Increase quantity"
                     onClick={() => setQuantity(quantity + 1)}
                   >
                     +
@@ -258,26 +258,27 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
-                  className="flex-1 gradient-primary btn-glow"
+                  className="flex-1"
                   size="lg"
                   onClick={handleAddToCart}
                   disabled={!product.in_stock || isAdding}
                 >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  {isAdding ? "Adding..." : "Add to Cart"}
+                  <ShoppingCart />
+                  {isAdding ? "Adding…" : "Add to cart"}
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
+                  className="flex-1"
                   onClick={() => {
                     handleAddToCart();
                     navigate("/cart");
                   }}
                   disabled={!product.in_stock}
                 >
-                  Buy Now
+                  Buy now
                 </Button>
               </div>
             </div>
@@ -285,48 +286,34 @@ export default function ProductDetail() {
             {/* Specifications */}
             {product.specifications && Object.keys(product.specifications).length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Specifications</h3>
-                <Card>
-                  <CardContent className="pt-4">
-                    <dl className="space-y-3">
-                      {Object.entries(product.specifications as Record<string, string>).map(
-                        ([key, value]) => (
-                          <div key={key} className="flex justify-between text-sm">
-                            <dt className="text-muted-foreground capitalize">
-                              {key.replace(/_/g, " ")}
-                            </dt>
-                            <dd className="font-medium">{value}</dd>
-                          </div>
-                        )
-                      )}
-                    </dl>
-                  </CardContent>
-                </Card>
+                <h3 className="text-sm font-medium">Specifications</h3>
+                <dl className="divide-y divide-border border-y border-border">
+                  {Object.entries(product.specifications as Record<string, string>).map(
+                    ([key, value]) => (
+                      <div key={key} className="flex justify-between gap-6 py-3 text-sm">
+                        <dt className="text-muted-foreground capitalize">
+                          {key.replace(/_/g, " ")}
+                        </dt>
+                        <dd className="text-right font-medium">{value}</dd>
+                      </div>
+                    )
+                  )}
+                </dl>
               </div>
             )}
 
             {/* Package Items (if it's a package) */}
             {product.is_package && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">What's Included</h3>
-                <Card className="bg-accent/5 border-accent/20">
-                  <CardContent className="pt-4">
-                    <ul className="space-y-2">
-                      <li className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-accent" />
-                        All essential equipment
-                      </li>
-                      <li className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-accent" />
-                        Setup guide included
-                      </li>
-                      <li className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-accent" />
-                        Priority support
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
+                <h3 className="text-sm font-medium">What's included</h3>
+                <ul className="space-y-2">
+                  {["All essential equipment", "Setup guide included", "Priority support"].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm">
+                      <Check className="h-4 w-4" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
@@ -334,48 +321,26 @@ export default function ProductDetail() {
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div className="mt-16">
+          <div className="mt-24 border-t border-border pt-16">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold">Related Products</h2>
+              <h2 className="text-2xl font-semibold tracking-tight">Related products</h2>
               <Button variant="ghost" asChild>
                 <Link to="/shop">
-                  View All
+                  View all
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Link>
               </Button>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 lg:grid-cols-4">
               {relatedProducts.map((relatedProduct) => (
-                <Link key={relatedProduct.id} to={`/product/${relatedProduct.id}`}>
-                  <Card className="overflow-hidden card-hover">
-                    <div className="aspect-square bg-muted relative">
-                      {relatedProduct.image_url ? (
-                        <img
-                          src={relatedProduct.image_url}
-                          alt={relatedProduct.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="h-12 w-12 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold line-clamp-1">{relatedProduct.name}</h3>
-                      <div className="mt-2">
-                        <span className="font-bold">{formatNaira(relatedProduct.price_naira)}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
               ))}
             </div>
           </div>
         )}
 
         {/* Product Reviews */}
-        <div className="mt-16">
+        <div className="mt-24 border-t border-border pt-16">
           <ProductReviews productId={productId!} />
         </div>
       </div>

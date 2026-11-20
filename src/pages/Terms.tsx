@@ -6,7 +6,7 @@ const Terms = () => {
     <Layout>
       <div className="bg-muted/30 min-h-screen py-12 md:py-16">
         <div className="container max-w-3xl">
-          <h1 className="font-display text-4xl font-bold text-foreground mb-2">
+          <h1 className="font-display text-4xl font-semibold text-foreground mb-2">
             Terms of Service
           </h1>
           <p className="text-muted-foreground mb-8">

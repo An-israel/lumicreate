@@ -12,7 +12,7 @@ const ThemeProviderContext = createContext<ThemeProviderContextType | undefined>
 
 export function ThemeProvider({
   children,
-  defaultTheme = "dark",
+  defaultTheme = "light",
   storageKey = "luminate-ui-theme",
 }: {
   children: React.ReactNode;
