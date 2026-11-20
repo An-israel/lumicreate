@@ -79,7 +79,7 @@ const TierPackages = () => {
           <div className="mt-10 grid gap-12 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <p className="eyebrow mb-4">{tierInfo.priceRange}</p>
-              <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl">
+              <h1 className="font-serif-display text-5xl text-foreground sm:text-6xl md:text-7xl">
                 {tierInfo.name} packages
               </h1>
               <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
@@ -93,7 +93,7 @@ const TierPackages = () => {
                 <ul className="mt-3 space-y-2">
                   {config.idealFor.map((item) => (
                     <li key={item} className="flex items-start gap-3 text-muted-foreground">
-                      <Check className="mt-1 h-4 w-4 shrink-0 text-foreground" />
+                      <Check className="mt-1 h-4 w-4 shrink-0 text-brand" strokeWidth={2.5} />
                       {item}
                     </li>
                   ))}
@@ -141,8 +141,8 @@ const TierPackages = () => {
                   <article
                     key={pkg.id}
                     className={cn(
-                      "group flex flex-col overflow-hidden rounded-2xl border",
-                      index === 0 ? "border-foreground" : "border-border"
+                      "group flex flex-col overflow-hidden rounded-[1.75rem] border bg-card",
+                      index === 0 ? "border-brand ring-1 ring-brand" : "border-border"
                     )}
                   >
                     {/* Image */}
@@ -161,7 +161,7 @@ const TierPackages = () => {
 
                       <div className="absolute top-4 left-4 flex gap-2">
                         {index === 0 && (
-                          <span className="rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
+                          <span className="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-brand-foreground">
                             Recommended
                           </span>
                         )}
@@ -174,7 +174,7 @@ const TierPackages = () => {
                     </div>
 
                     <div className="flex flex-1 flex-col p-6 md:p-8">
-                      <h3 className="text-2xl font-semibold">{pkg.name}</h3>
+                      <h3 className="font-serif-display text-3xl">{pkg.name}</h3>
 
                       {pkg.description && (
                         <p className="mt-3 leading-relaxed text-muted-foreground">
@@ -223,6 +223,7 @@ const TierPackages = () => {
 
                         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                           <Button
+                            variant={index === 0 ? "brand" : "default"}
                             className="sm:flex-1"
                             onClick={(e) => handleAddToCart(pkg.id, e)}
                             disabled={!pkg.in_stock}

@@ -135,17 +135,17 @@ export default function Consultations() {
                 key={type.id}
                 className={cn(
                   "relative flex flex-col overflow-hidden transition-colors",
-                  isRecommended ? "border-foreground" : "hover:border-foreground/20"
+                  isRecommended ? "border-brand ring-1 ring-brand" : "hover:border-foreground/20"
                 )}
               >
                 {isRecommended && (
-                  <span className="absolute top-6 right-6 rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
+                  <span className="absolute top-6 right-6 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-brand-foreground">
                     Recommended
                   </span>
                 )}
 
                 <CardHeader>
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-muted">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-soft">
                     <Icon className="h-5 w-5" strokeWidth={1.5} />
                   </div>
                   <CardTitle className="text-xl">{type.name}</CardTitle>
@@ -189,7 +189,7 @@ export default function Consultations() {
                   <div className="mt-auto pt-4">
                     <Button
                       className="w-full"
-                      variant={isRecommended ? "default" : "outline"}
+                      variant={isRecommended ? "brand" : "outline"}
                       onClick={() => handleSelectType(type.id)}
                     >
                       <CreditCard />

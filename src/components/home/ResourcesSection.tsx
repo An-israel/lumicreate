@@ -54,7 +54,7 @@ const ResourcesSection = () => {
           title={title}
           subtitle={subtitle}
           action={
-            <Button variant="outline" asChild>
+            <Button variant="outline" className="bg-transparent" asChild>
               <Link to={ctaLink}>
                 {ctaText}
                 <ArrowRight />
@@ -66,17 +66,18 @@ const ResourcesSection = () => {
         <div className="grid gap-x-6 gap-y-10 md:grid-cols-3">
           {defaultBlogPosts.map((post) => (
             <Link key={post.id} to={`/resources/${post.id}`} className="group block">
-              <div className="aspect-[16/10] overflow-hidden rounded-2xl bg-muted">
+              <div className="aspect-[16/10] overflow-hidden rounded-[1.5rem] bg-muted">
                 <img
                   src={post.image}
                   alt={post.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
               </div>
-              <p className="mt-5 text-xs text-muted-foreground">
-                {post.category} · {post.readTime} read
+              <p className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="rounded-full bg-brand-soft px-2.5 py-0.5 font-medium text-foreground">{post.category}</span>
+                {post.readTime} read
               </p>
-              <h3 className="mt-2 text-lg font-semibold leading-snug text-foreground group-hover:underline underline-offset-4 decoration-1">
+              <h3 className="mt-3 font-serif-display text-2xl leading-snug text-foreground decoration-brand decoration-2 underline-offset-4 group-hover:underline">
                 {post.title}
               </h3>
               <p className="mt-2 text-sm text-muted-foreground line-clamp-2">

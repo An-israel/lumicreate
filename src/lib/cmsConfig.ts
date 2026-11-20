@@ -30,6 +30,7 @@ export const CMS_PAGES: Record<string, CMSPage> = {
         description: "Site logo, brand name, and navigation links",
         fields: [
           { key: "brand_name", label: "Brand Name", type: "text", placeholder: "Luminate Creators" },
+          { key: "announcement", label: "Announcement Bar Text", type: "text", placeholder: "Free 24-hour delivery across Lagos · Nationwide in 2–3 days" },
           { key: "logo_dark", label: "Logo (Dark Mode)", type: "image" },
           { key: "logo_light", label: "Logo (Light Mode)", type: "image" },
           {
@@ -110,6 +111,9 @@ export const CMS_PAGES: Record<string, CMSPage> = {
           { key: "trust_creators", label: "Creators Count", type: "text", placeholder: "500+ creators" },
           { key: "trust_rating", label: "Rating Text", type: "text", placeholder: "4.9/5 rating" },
           { key: "trust_delivery", label: "Delivery Text", type: "text", placeholder: "24hr Lagos delivery" },
+          { key: "showcase_image_1", label: "Hero Image (large)", type: "image" },
+          { key: "showcase_image_2", label: "Hero Image (top right)", type: "image" },
+          { key: "showcase_image_3", label: "Hero Image (bottom right)", type: "image" },
         ],
       },
       how_it_works: {
@@ -148,6 +152,38 @@ export const CMS_PAGES: Record<string, CMSPage> = {
           { key: "subtitle", label: "Section Subtitle", type: "textarea" },
           { key: "cta_text", label: "CTA Button Text", type: "text", placeholder: "View All Resources" },
           { key: "cta_link", label: "CTA Button Link", type: "link", placeholder: "/resources" },
+        ],
+      },
+      studio_band: {
+        label: "Testimonial & Stats Band",
+        description: "Dark band with a featured testimonial and key numbers",
+        removable: true,
+        fields: [
+          { key: "quote", label: "Testimonial Quote", type: "textarea" },
+          { key: "quote_author", label: "Quote Author", type: "text", placeholder: "Chioma Adeyemi" },
+          { key: "quote_role", label: "Author Role", type: "text", placeholder: "YouTube creator · 150K subscribers" },
+          {
+            key: "stats",
+            label: "Stats",
+            type: "array",
+            arrayFields: [
+              { key: "value", label: "Value", type: "text" },
+              { key: "label", label: "Label", type: "text" },
+            ],
+          },
+        ],
+      },
+      cta_band: {
+        label: "Yellow Call-to-Action Band",
+        description: "Closing call to action above the footer",
+        removable: true,
+        fields: [
+          { key: "title", label: "Title", type: "text", placeholder: "Not sure where to start?" },
+          { key: "subtitle", label: "Subtitle", type: "textarea" },
+          { key: "cta_primary_text", label: "Primary Button Text", type: "text", placeholder: "Take the 2-minute quiz" },
+          { key: "cta_primary_link", label: "Primary Button Link", type: "link", placeholder: "/quiz" },
+          { key: "cta_secondary_text", label: "Secondary Button Text", type: "text", placeholder: "Talk to an expert" },
+          { key: "cta_secondary_link", label: "Secondary Button Link", type: "link", placeholder: "/consultations" },
         ],
       },
       faq: {

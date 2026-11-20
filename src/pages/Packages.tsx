@@ -66,7 +66,7 @@ const Packages = () => {
             subtitle="Each tier is designed for a specific stage of the creator journey. Pick the one that matches where you are now."
           />
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {tierOrder.map((tier) => {
               const tierInfo = TIERS[tier];
               const details = tierDetails[tier];
@@ -77,42 +77,44 @@ const Packages = () => {
                   key={tier}
                   to={`/packages/${tier}`}
                   className={cn(
-                    "group flex flex-col rounded-2xl border p-8 transition-colors",
-                    isPremium ? "border-foreground" : "border-border hover:border-foreground/20"
+                    "group flex flex-col rounded-[1.75rem] border p-8 transition-all duration-300 md:p-9",
+                    isPremium
+                      ? "surface-ink border-ink-border shadow-[0_30px_60px_-30px_hsl(30_20%_8%/0.6)]"
+                      : "border-border bg-card hover:-translate-y-1 hover:shadow-[0_24px_50px_-30px_hsl(30_20%_10%/0.35)]"
                   )}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold capitalize">{tierInfo.name}</h3>
+                    <h3 className="font-serif-display text-3xl capitalize">{tierInfo.name}</h3>
                     {isPremium && (
-                      <span className="rounded-full bg-foreground px-2.5 py-0.5 text-xs font-medium text-background">
+                      <span className="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-brand-foreground">
                         Most popular
                       </span>
                     )}
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{tierInfo.perfectFor}</p>
+                  <p className={cn("mt-3 text-sm", isPremium ? "text-ink-muted" : "text-muted-foreground")}>{tierInfo.perfectFor}</p>
                   <p className="mt-8 text-3xl font-semibold tracking-tight">{tierInfo.priceRange}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{details.packages} curated packages</p>
+                  <p className={cn("mt-1 text-sm", isPremium ? "text-ink-muted" : "text-muted-foreground")}>{details.packages} curated packages</p>
 
-                  <dl className="mt-8 space-y-4 border-t border-border pt-8 text-sm">
+                  <dl className={cn("mt-8 space-y-4 border-t pt-8 text-sm", isPremium ? "border-ink-border" : "border-border")}>
                     <div>
                       <dt className="font-medium">Lighting</dt>
-                      <dd className="mt-1 text-muted-foreground">{details.lights}</dd>
+                      <dd className={cn("mt-1", isPremium ? "text-ink-muted" : "text-muted-foreground")}>{details.lights}</dd>
                     </div>
                     <div>
                       <dt className="font-medium">Audio</dt>
-                      <dd className="mt-1 text-muted-foreground">{details.audio}</dd>
+                      <dd className={cn("mt-1", isPremium ? "text-ink-muted" : "text-muted-foreground")}>{details.audio}</dd>
                     </div>
                   </dl>
 
                   <ul className="mt-6 space-y-3 text-sm">
                     {details.features.slice(0, 4).map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0" />
-                        <span className="text-muted-foreground">{feature}</span>
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand" strokeWidth={2.5} />
+                        <span className={isPremium ? "text-ink-foreground/85" : "text-muted-foreground"}>{feature}</span>
                       </li>
                     ))}
                     {details.features.length > 4 && (
-                      <li className="pl-7 text-muted-foreground">
+                      <li className={cn("pl-7", isPremium ? "text-ink-muted" : "text-muted-foreground")}>
                         +{details.features.length - 4} more included
                       </li>
                     )}
@@ -121,9 +123,9 @@ const Packages = () => {
                   <span className="mt-auto pt-10">
                     <span
                       className={cn(
-                        "inline-flex h-10 w-full items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors",
+                        "inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-[15px] font-medium transition-all",
                         isPremium
-                          ? "bg-primary text-primary-foreground group-hover:bg-primary/90"
+                          ? "bg-brand text-brand-foreground group-hover:brightness-95"
                           : "border border-input group-hover:bg-muted"
                       )}
                     >
@@ -152,7 +154,7 @@ const Packages = () => {
               { value: "100%", label: "Compatibility guaranteed" },
             ].map((stat) => (
               <div key={stat.label}>
-                <dt className="text-5xl font-semibold tracking-tight">{stat.value}</dt>
+                <dt className="font-serif-display text-6xl text-foreground">{stat.value}</dt>
                 <dd className="mt-2 text-sm text-muted-foreground">{stat.label}</dd>
               </div>
             ))}
@@ -164,7 +166,7 @@ const Packages = () => {
       <section className="section">
         <div className="container">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            <h2 className="font-serif-display text-4xl md:text-5xl">
               Not sure which tier?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
@@ -172,7 +174,7 @@ const Packages = () => {
               consultation with our creator experts.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
-              <Button size="lg" asChild>
+              <Button size="lg" variant="brand" asChild>
                 <Link to="/quiz">
                   Take the quiz
                   <ArrowRight />
@@ -185,7 +187,7 @@ const Packages = () => {
 
             <p className="mt-8 text-sm text-muted-foreground">
               Prefer to browse individual items?{" "}
-              <Link to="/shop" className="font-medium text-primary hover:underline underline-offset-4">
+              <Link to="/shop" className="font-medium text-foreground underline decoration-brand decoration-2 underline-offset-4">
                 Visit the shop
               </Link>
             </p>

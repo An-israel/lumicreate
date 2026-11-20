@@ -49,13 +49,13 @@ const FAQ = () => {
   const faqs = content?.questions?.length > 0 ? content.questions : defaultFaqs;
 
   return (
-    <section id="faq" className="section border-t border-border scroll-mt-16">
+    <section id="faq" className="section border-t border-border scroll-mt-24">
       <div className="container">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
           {/* Section Header */}
           <div className="lg:col-span-4">
-            <p className="eyebrow mb-3">FAQ</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            <p className="eyebrow mb-4">FAQ</p>
+            <h2 className="font-serif-display text-4xl text-foreground sm:text-5xl">
               {title}
             </h2>
             <p className="mt-4 text-muted-foreground">
@@ -67,7 +67,7 @@ const FAQ = () => {
           <Accordion type="single" collapsible className="w-full border-t border-border lg:col-span-8">
             {faqs.map((faq: { question: string; answer: string }, index: number) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="py-5 text-left text-base font-medium hover:no-underline">
+                <AccordionTrigger className="py-6 text-left text-base font-medium hover:no-underline md:text-lg [&[data-state=open]>svg]:text-brand">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="pr-8 text-[15px] leading-relaxed text-muted-foreground">
